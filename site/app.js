@@ -12,7 +12,7 @@
   var CORE = ['SRD 5.1', 'SRD 5.2', "Player's Handbook (2014)", "Player's Handbook (2024)", "Dungeon Master's Guide (2014)",
     "Dungeon Master's Guide (2024)", 'Monster Manual (2014)', 'Monster Manual (2025)', "Xanathar's Guide to Everything", "Tasha's Cauldron of Everything"];
   var params = new URLSearchParams(location.search);
-  var DEFAULTS = { kind: 'all', types: [], rars: [], attune: '', consumable: '', favOnly: false, q: '' };
+  var DEFAULTS = { kind: 'all', types: [], rars: [], attune: '', consumable: '', show: '', q: '' };
   var state = {
     ed: params.get('ed') || store.get('di.ed', '2024'),
     kind: 'all',
@@ -20,7 +20,8 @@
     rars: [],
     attune: '',
     consumable: '',
-    favOnly: false,
+    show: '',            /* '' all, 'fav', 'wish', 'att' */
+    usable: store.get('di.usable', true),
     q: params.get('q') || '',
     sort: store.get('di.sort', 'name'),
     detail: store.get('di.detail', 'basic'),
@@ -32,6 +33,7 @@
     limit: PAGE,
     limitOthers: PAGE
   };
+  if (!params.get('ed') && activeCh()) state.ed = activeCh().ed;
   if (['2014', '2024'].indexOf(state.ed) < 0) state.ed = '2024';
   if (['basic', 'stats', 'full'].indexOf(state.detail) < 0) state.detail = 'basic';
   if (!state.favs || typeof state.favs !== 'object') state.favs = {};
@@ -50,7 +52,7 @@
     if ((v = listParam('books'))) { state.srcSel = {}; state.srcAllPending = v[0] === 'all'; v.forEach(function (k) { state.srcSel[k] = true; }); }
   })();
 
-  var DATA = null, BYID = {}, GROUPS = {}, BYNAME = {};
+  var DATA = null, BYID = {}, GROUPS = {}, BYNAME = {}, CUR_CH = null, LISTS = { favs: {}, wish: {}, att: [] };
   var $ = function (s) { return document.querySelector(s); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var norm = function (s) { return String(s || '').toLowerCase().replace(/'/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); };
@@ -186,6 +188,48 @@
     return bits;
   }
 
+  /* ---------- characters (shared D&D Toolbox list, character.js) ---------- */
+  var REPO = 'dnd-items';
+  var CLASSES = ['artificer', 'barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'wizard'];
+  function activeCh() { try { return window.DndChar ? DndChar.active() : null; } catch (e) { return null; } }
+  /* this character's lists, or the no-character favorites (di.favs) */
+  function lists() {
+    var ch = activeCh();
+    if (!ch) return { favs: state.favs, wish: {}, att: [] };
+    var l = ch.links[REPO] || {};
+    return { favs: l.favs || {}, wish: l.wish || {}, att: Array.isArray(l.att) ? l.att : [] };
+  }
+  function setLists(patch) {
+    var ch = activeCh();
+    if (!ch) { if (patch.favs) { state.favs = patch.favs; save(); } return; }
+    var l = lists(); for (var k in patch) l[k] = patch[k];
+    DndChar.setLink(ch.id, REPO, l);
+  }
+  /* attunement slots: 3 in both editions; artificers get 4, 5 and 6 at levels 10, 14 and 18 */
+  function attMax(ch) { var a = ch && window.DndChar ? DndChar.levelIn(ch, 'artificer') : 0; return a >= 18 ? 6 : a >= 14 ? 5 : a >= 10 ? 4 : 3; }
+  /* classes an item's attunement is limited to: ['cleric','paladin'], ['*caster'], or null for anyone */
+  function attClasses(it) {
+    if (it._ac === undefined) {
+      var a = typeof it.attune === 'string' ? it.attune.toLowerCase() : '';
+      var c = CLASSES.filter(function (k) { return new RegExp('\\b' + k + 's?\\b').test(a); });
+      it._ac = c.length ? c : /spellcaster/.test(a) ? ['*caster'] : null;
+    }
+    return it._ac;
+  }
+  function casts(ch) {
+    return ch.classes.some(function (c) {
+      if (['bard', 'cleric', 'druid', 'sorcerer', 'warlock', 'wizard', 'artificer'].indexOf(c.cls) >= 0) return true;
+      if (c.cls === 'paladin' || c.cls === 'ranger') return ch.ed === '2024' || c.lvl >= 2;
+      return (c.cls === 'fighter' || c.cls === 'rogue') && c.lvl >= 3 && /eldritch knight|arcane trickster/i.test((c.subName || '') + ' ' + String(c.sub || '').replace(/-/g, ' '));
+    });
+  }
+  function usableBy(ch, it) {
+    var r = attClasses(it);
+    if (!r || !ch.classes.length) return true;
+    if (r[0] === '*caster') return casts(ch);
+    return ch.classes.some(function (c) { return r.indexOf(c.cls) >= 0; });
+  }
+
   /* ---------- filtering ---------- */
   function hay(it) {
     if (!it._hay) {
@@ -207,6 +251,7 @@
     if (state.consumable === 'yes' && !it.consumable) return false;
     if (state.consumable === 'no' && it.consumable) return false;
     if (!itemSrcOn(it)) return false;
+    if (state.usable && CUR_CH && !usableBy(CUR_CH, it)) return false;
     if (q && hay(it).indexOf(q) < 0) return false;
     return true;
   }
@@ -232,7 +277,15 @@
     return rows;
   }
   function groupLabel(n) { return n === '+N Weapon' ? '+1, +2 and +3 Weapons' : n; }
-  function isFav(id) { return !!state.favs[id]; }
+  function isFav(id) { return !!LISTS.favs[id]; }
+  function isWish(id) { return !!LISTS.wish[id]; }
+  function isAtt(id) { return LISTS.att.indexOf(id) >= 0; }
+  function inShow(r) {
+    if (state.show === 'fav') return isFav(r.id);
+    if (state.show === 'wish') return isWish(r.id);
+    if (state.show === 'att') return r.isGroup ? r.members.some(function (m) { return isAtt(m.id); }) : isAtt(r.id);
+    return true;
+  }
 
   function sortRows(rows) {
     var s = state.sort, q = state.q.trim().toLowerCase();
@@ -260,10 +313,11 @@
   function render() {
     if (!DATA) return;
     var q = state.q.trim().toLowerCase();
+    CUR_CH = activeCh(); LISTS = lists();
     var srd = DATA.items.filter(function (it) { return pass(it, q); });
     var oth = DATA.others.filter(function (it) { return pass(it, q); });
     var main = toRows(state.merge ? srd.concat(oth) : srd);
-    if (state.favOnly) main = main.filter(function (r) { return isFav(r.id); });
+    if (state.show) main = main.filter(inShow);
     sortRows(main);
     var nItems = main.reduce(function (n, r) { return n + (r.isGroup ? r.members.length : 1); }, 0);
     $('#count').textContent = nItems.toLocaleString() + ' item' + (nItems === 1 ? '' : 's') + (nItems !== main.length ? ' (' + main.length.toLocaleString() + ' card' + (main.length === 1 ? '' : 's') + ')' : '');
@@ -273,12 +327,13 @@
     $('#moreBtn').hidden = main.length <= state.limit;
     $('#moreBtn').textContent = 'Show more (' + (main.length - state.limit).toLocaleString() + ' left)';
     $('#empty').hidden = main.length > 0;
-    $('#empty').textContent = state.favOnly && !Object.keys(state.favs).length
-      ? 'No favorites yet. Tap the star on any card to add it, then tick Favorites only again.'
-      : 'No items match. Try clearing a filter, adding books in Sources, or switching the rules edition.';
+    var emptyList = state.show === 'fav' ? !Object.keys(LISTS.favs).length : state.show === 'wish' ? !Object.keys(LISTS.wish).length : state.show === 'att' ? !LISTS.att.length : false;
+    $('#empty').textContent = emptyList
+      ? { fav: 'No favorites yet. Tap the star on any card to add it.', wish: 'Nothing on the wishlist yet. Open an item and choose Add to wishlist.', att: 'Nothing attuned yet. Open an item that needs attunement and choose Attune.' }[state.show]
+      : 'No items match. Try clearing a filter, adding books in Sources, or switching the rules edition.' + (state.usable && CUR_CH ? ' (Usable by ' + CUR_CH.name + ' is on.)' : '');
     if (state.merge) $('#othersSec').hidden = true;
     else {
-      if (state.favOnly) oth = oth.filter(function (r) { return isFav(r.id); });
+      if (state.show) oth = oth.filter(inShow);
       sortRows(oth);
       $('#othersSec').hidden = !oth.length;
       $('#others').innerHTML = oth.slice(0, state.limitOthers).map(otherRow).join('');
@@ -319,12 +374,16 @@
     if (r.consumable) bits.push('Consumable');
     return '<div class="meta">' + bits.map(esc).join(' &middot; ') + '</div>';
   }
+  function marks(r) {
+    var att = r.isGroup ? r.members.some(function (m) { return isAtt(m.id); }) : isAtt(r.id);
+    return (att ? ' <span class="mark att">Attuned</span>' : '') + (isWish(r.id) ? ' <span class="mark wish">Wishlist</span>' : '');
+  }
   function card(r) {
     if (r.isGroup) return groupCard(r);
     var h = '<article class="card' + (r.srd ? '' : ' book') + '"' + rarAttr(r.rarity) + ' data-id="' + esc(r.id) + '" tabindex="0" role="button" aria-label="' + esc(r.name) + ' details">' +
       favBtn(r.id, r.name) +
       '<div class="card-top"><div><h3>' + esc(r.name) + '</h3></div></div>' +
-      '<div class="pills">' + rarPill(r.rarity) + '</div>' + metaLine(r) +
+      '<div class="pills">' + rarPill(r.rarity) + marks(r) + '</div>' + metaLine(r) +
       '<div class="src">' + srcTag(r) + alsoTags(r) + (r.srd ? '' : ' <span class="small">facts only</span>') + '</div>';
     if (state.detail !== 'basic') {
       var f = factsLine(r);
@@ -340,7 +399,7 @@
     var h = '<article class="card group"' + rarAttr(g.rarity) + ' data-group="' + esc(g.id) + '" tabindex="0" role="button" aria-label="' + esc(g.name) + ' details">' +
       favBtn(g.id, g.name) +
       '<div class="card-top"><div><h3>' + esc(g.name) + '</h3><div class="alt">' + g.members.length + ' variants</div></div></div>' +
-      '<div class="pills">' + (g.rarLo !== g.rarity ? rarPill(g.rarLo) + '<span class="small">to</span>' + rarPill(g.rarity) : rarPill(g.rarity)) + '</div>' + metaLine(g) +
+      '<div class="pills">' + (g.rarLo !== g.rarity ? rarPill(g.rarLo) + '<span class="small">to</span>' + rarPill(g.rarity) : rarPill(g.rarity)) + marks(g) + '</div>' + metaLine(g) +
       '<div class="src">' + srcTag(g) + alsoTags(g.members[0]) + '</div>';
     if (state.detail !== 'basic') {
       h += '<p class="facts">' + esc(shown) + '</p>';
@@ -351,7 +410,7 @@
   }
   function otherRow(o) {
     return '<div class="other"' + rarAttr(o.rarity) + ' data-id="' + esc(o.id) + '" tabindex="0" role="button" aria-label="' + esc(o.name) + ' details">' + favBtn(o.id, o.name) +
-      '<b>' + esc(o.name) + '</b><div class="pills">' + rarPill(o.rarity) + '</div>' + metaLine(o) +
+      '<b>' + esc(o.name) + '</b><div class="pills">' + rarPill(o.rarity) + marks(o) + '</div>' + metaLine(o) +
       '<div class="src">' + srcTag(o) + '</div></div>';
   }
 
@@ -443,13 +502,14 @@
     var it = BYID[id], g = GROUPS[id];
     if (!it && !g) return;
     dlgId = id;
-    if (favsAtOpen == null) favsAtOpen = JSON.stringify(state.favs);
+    LISTS = lists();
+    if (favsAtOpen == null) favsAtOpen = JSON.stringify(LISTS);
     var h;
     if (g) {
       var m = g.filter(function (x) { return x.ed === g[0].ed; }), first = m[0];
       h = '<div class="sb-head"><h2 id="dTitle">' + esc(groupLabel(first.groupName)) + '</h2>' +
         '<p class="sb-sub">' + esc(first.type + ', ' + m.length + ' variants') + ' ' + bookLink(first) + alsoLinks(first) + '</p></div>' +
-        '<div class="mn-actions">' + favDlgBtn(id) + '</div>' +
+        '<div class="mn-actions">' + favDlgBtn(id) + wishBtn(id) + '</div>' +
         '<div class="itext">' + md(first.desc) + '</div><div class="sb-sec">Variants</div><ul class="variants">' +
         m.map(function (x) { return '<li><button type="button" class="linkish" data-open="' + esc(x.id) + '">' + esc(x.name) + '</button> ' + rarPill(x.rarity) + (x.attune ? ' <span class="small">attunement</span>' : '') + '</li>'; }).join('') + '</ul>';
     } else {
@@ -460,7 +520,7 @@
         var target = e === it.ed ? it : alt && alt.ed === e ? alt : null;
         return target ? '<button type="button" data-open="' + esc(target.id) + '" aria-selected="' + (e === it.ed) + '">' + e + ' rules</button>' : '';
       }).join('') + (it.group ? '<button type="button" data-open="' + esc(it.group) + '">All variants</button>' : '') + '</div>';
-      h += '<div class="mn-actions">' + favDlgBtn(id) + '</div>';
+      h += '<div class="mn-actions">' + favDlgBtn(id) + wishBtn(id) + attBtn(it) + '</div>';
       h += factsTable(it);
       if (it.summary) h += '<p class="summary">' + esc(it.summary) + '</p>';
       if (it.srd) h += '<div class="itext">' + md(it.desc) + '</div><p class="small">Text from the ' + (it.src === 'SRD 5.1' ? 'System Reference Document 5.1' : 'System Reference Document 5.2') + ', CC-BY-4.0.</p>';
@@ -472,6 +532,21 @@
     d.querySelector('.dlg').scrollTop = 0;
     var u = new URL(location.href); u.searchParams.set('item', id); history.replaceState(null, '', u);
   }
+  function wishBtn(id) {
+    if (!activeCh()) return '';
+    var w = isWish(id);
+    return '<button type="button" class="btn" data-wish="' + esc(id) + '" aria-pressed="' + w + '">' + (w ? '&#10003; On wishlist' : 'Add to wishlist') + '</button>';
+  }
+  function attBtn(it) {
+    var ch = activeCh();
+    if (!ch || !it.attune) return '';
+    var a = isAtt(it.id), n = LISTS.att.length, max = attMax(ch), full = !a && n >= max;
+    var h = '<button type="button" class="btn" data-att="' + esc(it.id) + '" aria-pressed="' + a + '"' +
+      (full ? ' disabled title="' + esc(ch.name) + ' is attuned to ' + max + ' items already"' : '') + '>' +
+      (a ? '&#10003; Attuned' : full ? 'Attunement full' : 'Attune') + ' (' + n + '/' + max + ')</button>';
+    if (!usableBy(ch, it)) h += '<p class="small warn-txt">' + esc(ch.name) + ' doesn\'t meet this attunement requirement.</p>';
+    return h;
+  }
   function favDlgBtn(id) {
     var f = isFav(id);
     return '<button type="button" class="btn" data-fav="' + esc(id) + '" aria-pressed="' + f + '">' + (f ? '&#9733; Favorite' : '&#9734; Add to favorites') + '</button>';
@@ -482,13 +557,18 @@
     document.querySelectorAll('[data-ed]').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.ed === state.ed); });
     document.querySelectorAll('[data-kind]').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.kind === state.kind); });
     document.querySelectorAll('[data-detail]').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.detail === state.detail); });
-    $('#attune').value = state.attune; $('#consumable').value = state.consumable; $('#favOnly').checked = state.favOnly;
+    $('#attune').value = state.attune; $('#consumable').value = state.consumable; $('#show').value = state.show;
     $('#sort').value = state.sort; $('#merge').checked = state.merge; $('#groupVar').checked = state.groupVar;
     if ($('#search').value !== state.q) $('#search').value = state.q;
+    var ch = CUR_CH;
+    document.querySelectorAll('.ch-only').forEach(function (e) { e.hidden = !ch; if ('disabled' in e) e.disabled = !ch; });
+    $('#usable').checked = state.usable;
+    $('#usableTxt').textContent = ch ? 'Usable by ' + ch.name : 'Usable by character';
+    if (ch) $('#show option[value="att"]').textContent = 'Attuned (' + LISTS.att.length + '/' + attMax(ch) + ')';
   }
   function save() {
     store.set('di.ed', state.ed); store.set('di.sort', state.sort); store.set('di.detail', state.detail);
-    store.set('di.merge', state.merge); store.set('di.groupVar', state.groupVar); store.set('di.srcSel', state.srcSel); store.set('di.favs', state.favs);
+    store.set('di.merge', state.merge); store.set('di.groupVar', state.groupVar); store.set('di.srcSel', state.srcSel); store.set('di.favs', state.favs); store.set('di.usable', state.usable);
   }
   function update(patch) {
     for (var k in patch) state[k] = patch[k];
@@ -515,13 +595,18 @@
     if (t.id === 'rarClear') return update({ rars: [] });
     if (t.id === 'moreBtn') return update({ limit: state.limit + PAGE });
     if (t.id === 'moreOthersBtn') return update({ limitOthers: state.limitOthers + PAGE });
-    if (t.dataset.fav) {
+    if (t.dataset.fav || t.dataset.wish) {
       ev.stopPropagation();
-      var f = Object.assign({}, state.favs), k = t.dataset.fav;
+      var which = t.dataset.fav ? 'favs' : 'wish', k = t.dataset.fav || t.dataset.wish, f = Object.assign({}, lists()[which]), pf = {};
       if (f[k]) delete f[k]; else f[k] = true;
-      state.favs = f; save();
-      if ($('#detail').open) openDetail(dlgId); else render();
-      return;
+      pf[which] = f; setLists(pf);
+      return refresh();
+    }
+    if (t.dataset.att) {
+      var al = lists().att.slice(), i = al.indexOf(t.dataset.att);
+      if (i >= 0) al.splice(i, 1); else if (al.length < attMax(activeCh())) al.push(t.dataset.att);
+      setLists({ att: al });
+      return refresh();
     }
     if (t.dataset.open) return openDetail(t.dataset.open);
     if (t.id === 'closeDlg') return $('#detail').close();
@@ -538,7 +623,7 @@
   $('#detail').addEventListener('close', function () {
     var u = new URL(location.href); u.searchParams.delete('item'); history.replaceState(null, '', u);
     /* redraw the list only if a favorite changed while the dialog was open (a full redraw is slow with many cards) */
-    if (JSON.stringify(state.favs) !== favsAtOpen) render();
+    if (JSON.stringify(lists()) !== favsAtOpen) render();
     favsAtOpen = null;
   });
   var qTimer = null;
@@ -546,7 +631,23 @@
   $('#attune').addEventListener('change', function () { update({ attune: this.value }); });
   $('#sort').addEventListener('change', function () { update({ sort: this.value }); });
   $('#consumable').addEventListener('change', function () { update({ consumable: this.value }); });
-  $('#favOnly').addEventListener('change', function () { update({ favOnly: this.checked }); });
+  $('#show').addEventListener('change', function () { update({ show: this.value }); });
+  $('#usable').addEventListener('change', function () { update({ usable: this.checked }); });
+  /* after a list change: with the dialog open only the dialog redraws, the list follows on close */
+  function refresh() { if ($('#detail').open) openDetail(dlgId); else render(); }
+  /* the header picker or another tab changed the character: follow its edition and redraw */
+  var lastChId = activeCh() ? activeCh().id : null;
+  if (window.DndChar) DndChar.onChange(function (ch) {
+    if (!DATA) return;
+    var id = ch ? ch.id : null;
+    if (id === lastChId) return refresh();
+    lastChId = id;
+    var patch = {};
+    if (ch && ch.ed !== state.ed) { patch.ed = ch.ed; patch.types = []; patch.rars = []; }
+    if (!ch && (state.show === 'wish' || state.show === 'att')) patch.show = '';
+    if ($('#detail').open) $('#detail').close();
+    update(patch);
+  });
   $('#merge').addEventListener('change', function () { update({ merge: this.checked }); });
   $('#groupVar').addEventListener('change', function () { update({ groupVar: this.checked }); });
   $('#srcQ').addEventListener('input', function () { state.srcQ = this.value; renderSources(); });

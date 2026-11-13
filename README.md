@@ -12,9 +12,10 @@ A searchable list of D&D 5e items for both the **2014** and **2024** rules: magi
 - Click any card for the details: a facts table, the full SRD text (tables included), a 2014/2024 switch when the item exists in both, and a link to the source book.
 - Every card shows its source, colour-coded by book. **One list (all books)** mixes the other-books index into the main list; turn it off to list those separately.
 - An original one-line summary for every SRD item (separate 2014 wording where the rules differ), on Stats/Full cards and in the detail view.
+- **Characters** (shared with the other D&D Toolbox tools through `character.js`): each one has its own favorites, wishlist and Attuned list (3 slots; more for artificers at 10, 14 and 18), a "Usable by" filter for class-limited attunement, and the rules edition follows the character. Stored in the shared `dnd.characters` record under `links['dnd-items']`.
 - Favorites are saved in your browser. The link keeps your filters (`?ed=2014&kind=magic&rarity=Legendary&type=Weapon&books=all&view=stats`), and `?item=srd_bag-of-holding` opens one item directly.
 - More cards load as you scroll; the Type and Rarity menus have Clear buttons.
-- Prints cleanly: tick Favorites only, pick Stats or Full and print for a paper item list.
+- Prints cleanly: show Favorites (or Attuned), pick Stats or Full and print for a paper item list.
 - Source material links for every book. The change log is its own page (`site/changes.html`). The header, footer and theme follow the shared D&D Toolbox conventions (`WernerCD/dnd`, `STYLE.md`); the theme is stored under `dnd.theme`, shared with the other toolbox sites.
 
 ## Data and copyright

@@ -25,6 +25,7 @@
 <header class="site-header">
   <div class="wrap hub-bar">
     <a href="https://wernercd.github.io/dnd/">&larr; D&amp;D Toolbox</a>
+    <span class="char-pick" id="charPick"></span>
     <nav class="hub-nav" aria-label="Site">
       <a href="./" aria-current="page">Tool</a>
       <a href="changes.html">Changes</a>
@@ -93,7 +94,13 @@
       <option value="yes">Consumables only</option>
       <option value="no">Non-consumables only</option>
     </select>
-    <label class="tog"><input type="checkbox" id="favOnly"> Favorites only</label>
+    <select id="show" aria-label="Show">
+      <option value="">All items</option>
+      <option value="fav">Favorites</option>
+      <option value="wish" class="ch-only">Wishlist</option>
+      <option value="att" class="ch-only">Attuned</option>
+    </select>
+    <label class="tog ch-only" id="usableLbl" title="Hide items whose attunement is limited to classes this character doesn't have"><input type="checkbox" id="usable"> <span id="usableTxt">Usable by character</span></label>
     <button type="button" class="chip" id="resetBtn">Reset filters</button>
   </div>
 </section>
@@ -177,6 +184,7 @@
   </div>
 </dialog>
 
+<script src="character.js?v=dev"></script>
 <script src="app.js?v=dev"></script>
 <script src="theme.js?v=dev"></script>
 <script src="version.js?v=dev"></script>
