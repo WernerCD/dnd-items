@@ -321,3 +321,8 @@ a.srctag:hover { text-decoration: underline; }
 /* let the browser skip layout of offscreen cards: opening a dialog with ~1,700 cards went from ~2 s to ~60 ms */
 .list .card { content-visibility: auto; contain-intrinsic-size: auto 170px; }
 .others-list .other { content-visibility: auto; contain-intrinsic-size: auto 110px; }
+/* back-link to the D&D Toolbox hub */
+.hub-row { padding-top: 10px; }
+.hub-row + .header-inner { padding-top: 6px; }
+.hub-link { font-size: .82rem; font-weight: 500; color: var(--muted); text-decoration: none; }
+.hub-link:hover, .hub-link:focus-visible { color: var(--accent); text-decoration: underline; }
