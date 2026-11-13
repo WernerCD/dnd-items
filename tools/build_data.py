@@ -32,9 +32,10 @@ CAT = {
 }
 CONSUMABLE_TYPES = {"Potion", "Scroll", "Poison", "Ammunition", "Food & Drink"}
 CONSUMABLE_NAME = re.compile(
-    r"^(Oil|Dust|Elixir|Philter|Potion|Spell Scroll|Ammunition|Arrow|Bolt|Bead of Force|Feather Token|"
-    r"Keoghtom|Nolzur|Sovereign Glue|Universal Solvent|Marvelous Pigments|Necklace of Fireballs|"
-    r"Acid|Alchemist's Fire|Antitoxin|Holy Water|Oil|Ball Bearings|Caltrops|Rations|Healer's Kit|Torch)", re.I)
+    r"^((Oil|Dust|Elixir|Philter|Potion|Spell Scroll|Ammunition|Arrow|Bolt|Bead of Force|Feather Token|"
+    r"Keoghtom's Ointment|Nolzur's Marvelous Pigments|Sovereign Glue|Universal Solvent|Necklace of Fireballs)(?![\w-])"
+    r"|(Acid|Alchemist's Fire|Antitoxin|Holy Water|Oil|Ball Bearings|Caltrops|Rations|Healer's Kit|Torch)"
+    r"( \([^)]*\))?$)", re.I)
 RARITY_ORDER = ["Mundane", "Common", "Uncommon", "Rare", "Very Rare", "Legendary", "Artifact", "Varies", "Unknown"]
 
 
