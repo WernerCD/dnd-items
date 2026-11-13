@@ -529,7 +529,7 @@
   var th = store.get('di.theme', null);
   if (th === 'dark' || th === 'light') document.documentElement.dataset.theme = th;
 
-  fetch('data/items.json').then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (d) {
+  fetch('data/items.json?v=dev').then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (d) {
     DATA = d;
     DATA.items.concat(DATA.others).forEach(function (it) {
       BYID[it.id] = it;
