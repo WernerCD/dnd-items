@@ -12,14 +12,14 @@
   var CORE = ['SRD 5.1', 'SRD 5.2', "Player's Handbook (2014)", "Player's Handbook (2024)", "Dungeon Master's Guide (2014)",
     "Dungeon Master's Guide (2024)", 'Monster Manual (2014)', 'Monster Manual (2025)', "Xanathar's Guide to Everything", "Tasha's Cauldron of Everything"];
   var params = new URLSearchParams(location.search);
-  var DEFAULTS = { kind: 'all', types: [], rars: [], attune: '', consumable: false, favOnly: false, q: '' };
+  var DEFAULTS = { kind: 'all', types: [], rars: [], attune: '', consumable: '', favOnly: false, q: '' };
   var state = {
     ed: params.get('ed') || store.get('di.ed', '2024'),
     kind: 'all',
     types: [],
     rars: [],
     attune: '',
-    consumable: false,
+    consumable: '',
     favOnly: false,
     q: params.get('q') || '',
     sort: store.get('di.sort', 'name'),
@@ -182,15 +182,17 @@
     }
     return it._hay;
   }
-  function pass(it, q) {
+  /* skip: 'type' or 'rar' leaves that facet out, for the chip counts */
+  function pass(it, q, skip) {
     if (it.ed !== state.ed) return false;
     if (state.kind === 'magic' && !it.magic) return false;
     if (state.kind === 'mundane' && it.magic) return false;
-    if (state.types.length && state.types.indexOf(it.type) < 0) return false;
-    if (state.rars.length && state.rars.indexOf(it.rarity) < 0) return false;
+    if (skip !== 'type' && state.types.length && state.types.indexOf(it.type) < 0) return false;
+    if (skip !== 'rar' && state.rars.length && state.rars.indexOf(it.rarity) < 0) return false;
     if (state.attune === 'yes' && !it.attune) return false;
     if (state.attune === 'no' && it.attune) return false;
-    if (state.consumable && !it.consumable) return false;
+    if (state.consumable === 'yes' && !it.consumable) return false;
+    if (state.consumable === 'no' && it.consumable) return false;
     if (!itemSrcOn(it)) return false;
     if (q && hay(it).indexOf(q) < 0) return false;
     return true;
@@ -201,17 +203,18 @@
     list.forEach(function (it) {
       if (state.groupVar && it.group) {
         var g = seen[it.group];
-        if (!g) { g = seen[it.group] = { group: true, id: it.group, name: groupLabel(it.groupName), members: [], src: it.src, ed: it.ed }; rows.push(g); }
+        if (!g) { g = seen[it.group] = { isGroup: true, id: it.group, name: groupLabel(it.groupName), members: [], src: it.src, ed: it.ed }; rows.push(g); }
         g.members.push(it);
       } else rows.push(it);
     });
     rows.forEach(function (r) {
-      if (!r.group) return;
+      if (!r.isGroup) return;
       if (r.members.length === 1) { rows[rows.indexOf(r)] = r.members[0]; return; }
       var m = r.members, lo = m[0], hi = m[0];
       m.forEach(function (x) { if (rarIdx(x.rarity) < rarIdx(lo.rarity)) lo = x; if (rarIdx(x.rarity) > rarIdx(hi.rarity)) hi = x; });
       r.rarity = hi.rarity; r.rarLo = lo.rarity; r.type = m[0].type; r.attune = m[0].attune; r.magic = m[0].magic;
       r.cost = m[0].cost;
+      r.consumable = m.some(function (x) { return x.consumable; });
     });
     return rows;
   }
@@ -219,9 +222,12 @@
   function isFav(id) { return !!state.favs[id]; }
 
   function sortRows(rows) {
-    var s = state.sort;
+    var s = state.sort, q = state.q.trim().toLowerCase();
+    /* when searching, items whose name matches come before items that only mention it in their text */
+    function nameHit(r) { return q && r.name.toLowerCase().indexOf(q) >= 0 ? 0 : 1; }
     rows.sort(function (x, y) {
-      var d = 0;
+      var d = nameHit(x) - nameHit(y);
+      if (d) return d;
       if (s === 'rar-desc') d = rarIdx(y.rarity) - rarIdx(x.rarity);
       else if (s === 'rar-asc') d = rarIdx(x.rarity) - rarIdx(y.rarity);
       else if (s === 'type') d = TYPE_ORDER.indexOf(x.type) - TYPE_ORDER.indexOf(y.type);
@@ -246,7 +252,7 @@
     var main = toRows(state.merge ? srd.concat(oth) : srd);
     if (state.favOnly) main = main.filter(function (r) { return isFav(r.id); });
     sortRows(main);
-    var nItems = main.reduce(function (n, r) { return n + (r.group ? r.members.length : 1); }, 0);
+    var nItems = main.reduce(function (n, r) { return n + (r.isGroup ? r.members.length : 1); }, 0);
     $('#count').textContent = nItems.toLocaleString() + ' item' + (nItems === 1 ? '' : 's') + (nItems !== main.length ? ' (' + main.length.toLocaleString() + ' cards)' : '');
     var list = $('#list');
     list.className = 'list detail-' + state.detail;
@@ -270,7 +276,7 @@
     u.searchParams.set('ed', state.ed);
     if (state.q) u.searchParams.set('q', state.q); else u.searchParams.delete('q');
     if (!$('#detail').open) u.searchParams.delete('item');
-    history.replaceState(null, '', u);
+    if (u.href !== location.href) history.replaceState(null, '', u);
   }
 
   var STAR = '<svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>';
@@ -287,7 +293,7 @@
     return '<div class="meta">' + bits.map(esc).join(' &middot; ') + '</div>';
   }
   function card(r) {
-    if (r.group) return groupCard(r);
+    if (r.isGroup) return groupCard(r);
     var h = '<article class="card' + (r.srd ? '' : ' book') + '"' + rarAttr(r.rarity) + ' data-id="' + esc(r.id) + '" tabindex="0" role="button" aria-label="' + esc(r.name) + ' details">' +
       favBtn(r.id, r.name) +
       '<div class="card-top"><div><h3>' + esc(r.name) + '</h3></div></div>' +
@@ -321,14 +327,21 @@
 
   /* type and rarity chips, built from the data for this edition */
   function renderChips() {
-    var types = {}, rars = {};
-    DATA.items.concat(DATA.others).forEach(function (it) { if (it.ed === state.ed) { types[it.type] = (types[it.type] || 0) + 1; rars[it.rarity] = (rars[it.rarity] || 0) + 1; } });
-    $('#typeChips').innerHTML = TYPE_ORDER.filter(function (t) { return types[t]; }).map(function (t) {
-      return '<button type="button" class="chip" data-type="' + esc(t) + '" aria-pressed="' + (state.types.indexOf(t) >= 0) + '">' + esc(t) + ' <span class="n">' + types[t] + '</span></button>';
-    }).join('');
-    $('#rarChips').innerHTML = RAR_ORDER.filter(function (t) { return rars[t]; }).map(function (t) {
-      return '<button type="button" class="chip rchip" style="' + rarVars(t) + '" data-rar="' + esc(t) + '" aria-pressed="' + (state.rars.indexOf(t) >= 0) + '">' + esc(t) + ' <span class="n">' + rars[t] + '</span></button>';
-    }).join('');
+    /* counts follow every other filter (books, kind, search...), so a chip's number is what you get */
+    var types = {}, rars = {}, all = {}, q = state.q.trim().toLowerCase(), pool = state.merge ? DATA.items.concat(DATA.others) : DATA.items;
+    pool.forEach(function (it) {
+      if (it.ed !== state.ed) return;
+      all[it.type] = all[it.rarity] = 1;
+      if (pass(it, q, 'type')) types[it.type] = (types[it.type] || 0) + 1;
+      if (pass(it, q, 'rar')) rars[it.rarity] = (rars[it.rarity] || 0) + 1;
+    });
+    function chip(kind, t, n, extra) {
+      var on = (kind === 'type' ? state.types : state.rars).indexOf(t) >= 0;
+      return '<button type="button" class="chip' + extra + (n ? '' : ' zero') + '" data-' + kind + '="' + esc(t) + '" aria-pressed="' + on + '"' +
+        (kind === 'rar' ? ' style="' + rarVars(t) + '"' : '') + '>' + esc(t) + ' <span class="n">' + (n || 0) + '</span></button>';
+    }
+    $('#typeChips').innerHTML = TYPE_ORDER.filter(function (t) { return all[t]; }).map(function (t) { return chip('type', t, types[t], ''); }).join('');
+    $('#rarChips').innerHTML = RAR_ORDER.filter(function (t) { return all[t]; }).map(function (t) { return chip('rar', t, rars[t], ' rchip'); }).join('');
     $('#typeSum').textContent = state.types.length ? 'Type (' + state.types.length + ')' : 'Type';
     $('#rarSum').textContent = state.rars.length ? 'Rarity (' + state.rars.length + ')' : 'Rarity';
     $('#typePick').classList.toggle('filtered', state.types.length > 0);
@@ -353,6 +366,7 @@
       return (k === firstOther ? '<div class="srcsep">Other books</div>' : '') + '<label class="srcrow"' + hueAttr(k) + '><input type="checkbox" data-src="' + esc(k) + '"' + (srcOn(k) ? ' checked' : '') + '> <i class="dot" aria-hidden="true"></i><span>' + esc(k) + '</span><span class="n">' + c[k] + '</span></label>';
     }).join('') || '<p class="small muted">No book matches.</p>';
   }
+  function allBooks() { var o = {}; DATA.items.concat(DATA.others).forEach(function (it) { itemSrcs(it).forEach(function (k) { o[k] = 1; }); }); return Object.keys(o); }
   function setSources(keys, on) {
     var sel = Object.assign({}, state.srcSel);
     keys.forEach(function (k) { if (on) sel[k] = true; else delete sel[k]; });
@@ -436,7 +450,7 @@
     document.querySelectorAll('[data-ed]').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.ed === state.ed); });
     document.querySelectorAll('[data-kind]').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.kind === state.kind); });
     document.querySelectorAll('[data-detail]').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.detail === state.detail); });
-    $('#attune').value = state.attune; $('#consumable').checked = state.consumable; $('#favOnly').checked = state.favOnly;
+    $('#attune').value = state.attune; $('#consumable').value = state.consumable; $('#favOnly').checked = state.favOnly;
     $('#sort').value = state.sort; $('#merge').checked = state.merge; $('#groupVar').checked = state.groupVar;
     if ($('#search').value !== state.q) $('#search').value = state.q;
   }
@@ -460,8 +474,8 @@
     if (t.dataset.detail) return update({ detail: t.dataset.detail });
     if (t.dataset.type) return update({ types: toggleIn(state.types, t.dataset.type) });
     if (t.dataset.rar) return update({ rars: toggleIn(state.rars, t.dataset.rar) });
-    if (t.id === 'srcAll') return setSources(Object.keys(sourceCounts()), true);
-    if (t.id === 'srcNone') return setSources(Object.keys(sourceCounts()), false);
+    if (t.id === 'srcAll') return setSources(allBooks(), true);
+    if (t.id === 'srcNone') return setSources(allBooks(), false);
     if (t.id === 'srcShown') { var sel = {}; visibleSrcKeys().forEach(function (k) { sel[k] = true; }); return update({ srcSel: sel }); }
     if (t.id === 'srcCore') return update({ srcSel: coreSel() });
     if (t.id === 'resetBtn') { var p = Object.assign({}, DEFAULTS, { srcSel: coreSel(), types: [], rars: [] }); return update(p); }
@@ -496,7 +510,7 @@
   $('#search').addEventListener('input', function () { var v = this.value; clearTimeout(qTimer); qTimer = setTimeout(function () { update({ q: v }); }, 150); });
   $('#attune').addEventListener('change', function () { update({ attune: this.value }); });
   $('#sort').addEventListener('change', function () { update({ sort: this.value }); });
-  $('#consumable').addEventListener('change', function () { update({ consumable: this.checked }); });
+  $('#consumable').addEventListener('change', function () { update({ consumable: this.value }); });
   $('#favOnly').addEventListener('change', function () { update({ favOnly: this.checked }); });
   $('#merge').addEventListener('change', function () { update({ merge: this.checked }); });
   $('#groupVar').addEventListener('change', function () { update({ groupVar: this.checked }); });

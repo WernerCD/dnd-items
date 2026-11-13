@@ -317,3 +317,4 @@ a.srctag:hover { text-decoration: underline; }
 .rchip[aria-pressed="true"] { color: hsl(var(--rh) var(--rs) var(--src-l)); background: hsl(var(--rh) calc(var(--rs) * .7) var(--src-bg)); border-color: hsl(var(--rh) var(--rs) var(--src-l)); box-shadow: inset 0 0 0 1px hsl(var(--rh) var(--rs) var(--src-l)); }
 .rar[data-rarity="Mundane"], .rchip[data-rar="Mundane"] { color: var(--ink-2); }
 .srctag.also { opacity: .8; font-weight: 400; }
+.chip.zero { opacity: .45; }
