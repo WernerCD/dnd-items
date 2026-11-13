@@ -525,7 +525,6 @@
     }
     if (t.dataset.open) return openDetail(t.dataset.open);
     if (t.id === 'closeDlg') return $('#detail').close();
-    if (t.id === 'themeBtn') return toggleTheme();
     if (t.dataset.group) return openDetail(t.dataset.group);
     if (t.dataset.id) return openDetail(t.dataset.id);
   });
@@ -557,13 +556,6 @@
     ['#srcPick', '#typePick', '#rarPick'].forEach(function (s) { var p = $(s); if (p.open && !p.contains(ev.target)) p.open = false; });
   });
 
-  function toggleTheme() {
-    var cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    var next = cur === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = next; store.set('di.theme', next);
-  }
-  var th = store.get('di.theme', null);
-  if (th === 'dark' || th === 'light') document.documentElement.dataset.theme = th;
 
   fetch('data/items.json?v=dev').then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (d) {
     DATA = d;

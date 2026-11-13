@@ -16,7 +16,7 @@ Sister site: [Wild Shape Beast List](https://wernercd.github.io/dnd-druid-wildsh
 - An original one-line summary for every SRD item (separate 2014 wording where the rules differ), on Stats/Full cards and in the detail view.
 - Favorites are saved in your browser. The link keeps your filters (`?ed=2014&kind=magic&rarity=Legendary&type=Weapon&books=all&view=stats`), and `?item=srd_bag-of-holding` opens one item directly.
 - More cards load as you scroll; the Type and Rarity menus have Clear buttons.
-- Source material links for every book, a change log, and a link to this repo at the bottom of the page.
+- Source material links for every book. The change log is its own page (`site/changes.html`). The header, footer and theme follow the shared D&D Toolbox conventions (`WernerCD/dnd`, `STYLE.md`); the theme is stored under `dnd.theme`, shared with the other toolbox sites.
 
 ## Data and copyright
 The repo and site are public, so only freely licensed text is reproduced.

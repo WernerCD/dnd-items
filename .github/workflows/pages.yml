@@ -28,7 +28,7 @@ jobs:
       - name: Build data
         run: python tools/build_data.py
       - name: Cache-bust asset links with the commit id
-        run: sed -i "s/?v=dev/?v=${GITHUB_SHA::8}/g" site/index.html site/app.js
+        run: sed -i "s/?v=dev/?v=${GITHUB_SHA::8}/g" site/index.html site/changes.html site/app.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

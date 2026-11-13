@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Changes &middot; D&amp;D Item Finder</title>
+<meta name="description" content="What has changed on the D&amp;D Item Finder.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2l11 7v14l-11 7-11-7V9z' fill='%23c9a227'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem('dnd.theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
+<link rel="stylesheet" href="styles.css?v=dev">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap hub-bar">
+    <a href="https://wernercd.github.io/dnd/">&larr; D&amp;D Toolbox</a>
+    <nav class="hub-nav" aria-label="Site">
+      <a href="./">Tool</a>
+      <a href="changes.html" aria-current="page">Changes</a>
+    </nav>
+  </div>
+  <div class="wrap header-inner">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2l11 7v14l-11 7-11-7V9z"/><path d="M16 2v28M5 9l22 14M27 9L5 23" fill="none" stroke="var(--surface)" stroke-width="1.2" opacity=".6"/></svg>
+      <div>
+        <h1><a href="./">D&amp;D Item Finder</a></h1>
+        <p class="tagline">Magic items and gear for 2014 and 2024 D&amp;D 5e rules</p>
+      </div>
+    </div>
+    <button id="themeBtn" class="icon-btn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="wrap changes">
+  <h2>Changes</h2>
+  <p class="intro">What has changed on the Item Finder, newest first. <a href="./">Back to the Item Finder</a>.</p>
+  <section class="change-day">
+    <h3><time datetime="2026-11-13">November 13, 2026</time></h3>
+    <ul>
+      <li><b>Consistent design.</b> The change log moved to its own page, and the header, footer and theme are now shared across the D&amp;D Toolbox sites.</li>
+      <li><b>D&amp;D Toolbox.</b> A link back to the <a href="https://wernercd.github.io/dnd/">D&amp;D Toolbox</a> home page, at the top of the page and in About.</li>
+      <li><b>Faster, tidier.</b> Opening an item is now instant even with every card loaded (it took about 2 seconds with the whole list showing). Tables inside quoted rules text and bold-italic labels such as <i>Injury.</i> on poisons now display properly. Poison names are capitalised, and Acid, Oil, Torch and Net in the 2024 rules count as adventuring gear. About 80 book entries that were the same item under another name (Hooded Lantern = Lantern, Hooded; Silk Rope = Rope, silk) are merged into the SRD item instead of listed twice.</li>
+      <li><b>Summaries, shareable filters.</b> Every SRD item has a short original summary on its Stats and Full cards and in its detail view, with separate 2014 wording where the rules differ. The link now keeps your filters (kind, type, rarity, attunement, consumable, books, view and sort), so a filtered list can be bookmarked or shared. The Type and Rarity menus have Clear buttons, and more cards load as you scroll.</li>
+      <li><b>Fixes.</b> Picking a rarity or type that left a single variant of a grouped item broke the page, so the filters and the Basic / Stats / Full switch stopped responding; fixed. Type and rarity counts now match what you get with your other filters. Consumables is now a menu with a Non-consumables option. Select all / Clear all cover the books of both editions. When searching, items with the word in their name come first.</li>
+      <li><b>Rarity colours and book items.</b> Cards, rarity tags and the Rarity menu share one colour per rarity. Basic gear, armor and weapons now count for the book that prints them too (for example Chain Mail shows <em>Player's Handbook p.219</em> as well as SRD 5.2), and generic variants such as Mariner's Armor and Armor of Gleaming are in the index.</li>
+      <li><b>Core books first.</b> The Sources picker lists the core rulebooks first (SRDs, Player's Handbook, Dungeon Master's Guide, Monster Manual, Xanathar's, Tasha's) and starts with only those selected; a <b>Core books</b> button goes back to that. Filter menus no longer slip behind the cards on phones.</li>
+      <li><b>Launch.</b> Every SRD 5.1 and SRD 5.2 item with full text, for 2014 and 2024 rules: magic items, weapons, armor, adventuring gear, tools, poisons, potions and scrolls. Search, filters for type, rarity, attunement and consumables, a Sources picker, Basic / Stats / Full cards, grouped variants, favorites, an index of items from other official books, source material links and this change log.</li>
+    </ul>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <ul class="foot-links">
+      <li><a href="https://wernercd.github.io/dnd/">D&amp;D Toolbox</a></li>
+      <li><a href="https://wernercd.github.io/dnd-druid-wildshapes/">Wild Shape Beast List</a></li>
+      <li><a href="https://wernercd.github.io/dnd-items/" aria-current="page">Item Finder</a></li>
+      <li><a href="changes.html">Changes</a></li>
+      <li><a href="https://github.com/WernerCD/dnd-items" rel="noopener">Source code</a></li>
+      <li><a href="https://github.com/WernerCD/dnd-items/issues" rel="noopener">Report a problem</a></li>
+    </ul>
+    <p>Unofficial fan content, not affiliated with or endorsed by Wizards of the Coast. Rules text comes from the System Reference Documents 5.1 and 5.2 by Wizards of the Coast LLC, licensed under <a href="https://creativecommons.org/licenses/by/4.0/legalcode" rel="noopener">CC BY 4.0</a>.</p>
+  </div>
+</footer>
+<script src="theme.js?v=dev"></script>
+</body>
+</html>
