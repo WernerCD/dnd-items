@@ -266,7 +266,7 @@
     if (state.favOnly) main = main.filter(function (r) { return isFav(r.id); });
     sortRows(main);
     var nItems = main.reduce(function (n, r) { return n + (r.isGroup ? r.members.length : 1); }, 0);
-    $('#count').textContent = nItems.toLocaleString() + ' item' + (nItems === 1 ? '' : 's') + (nItems !== main.length ? ' (' + main.length.toLocaleString() + ' cards)' : '');
+    $('#count').textContent = nItems.toLocaleString() + ' item' + (nItems === 1 ? '' : 's') + (nItems !== main.length ? ' (' + main.length.toLocaleString() + ' card' + (main.length === 1 ? '' : 's') + ')' : '');
     var list = $('#list');
     list.className = 'list detail-' + state.detail;
     list.innerHTML = main.slice(0, state.limit).map(card).join('');

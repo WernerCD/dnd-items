@@ -70,6 +70,9 @@ def loose_keys(name, variant_base):
 
 # book name -> SRD name, where the SRD renamed the item
 ALIASES = {"carrion crawler mucus": "crawler mucus"}
+# card titles for the 2024 per-weapon/armor variant families (the 2014 names)
+FAMILY_LABEL = {"Vicious": "Vicious Weapon", "Demon": "Demon Armor", "Dancing": "Dancing Sword",
+                "Vorpal": "Vorpal Sword", "Berserker": "Berserker Axe", "Elven": "Elven Chain"}
 
 
 def base_name(name, typ=""):
@@ -195,8 +198,26 @@ def main():
 
     # variant groups: several SRD items sharing a base name in one edition
     groups = {}
+    # the 2024 SRD lists some variants per weapon/armor with no parentheses ("Flame Tongue Longsword",
+    # "Demon Half Plate Armor"); fold those on the prefix before the mundane base item's name
+    bases = {}
     for it in items:
-        groups.setdefault((it["ed"], base_name(it["name"], it["type"])), []).append(it)
+        if not it.get("magic") and it["type"] in ("Weapon", "Armor"):
+            bases.setdefault(it["ed"], set()).add(it["name"])
+    bases = {ed: sorted(b, key=len, reverse=True) for ed, b in bases.items()}
+
+    def family(it):
+        b = base_name(it["name"], it["type"])
+        if b != it["name"] or not it.get("magic") or it["type"] not in ("Weapon", "Armor"):
+            return b
+        for m in bases.get(it["ed"], []):
+            if it["name"].endswith(" " + m):
+                pre = it["name"][:-len(m) - 1]
+                return FAMILY_LABEL.get(pre, pre)
+        return b
+
+    for it in items:
+        groups.setdefault((it["ed"], family(it)), []).append(it)
     for (ed, base), members in groups.items():
         if len(members) > 1:
             gid = f"g-{ed}-{norm(base).replace(' ', '-')}"
