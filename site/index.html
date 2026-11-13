@@ -52,11 +52,11 @@
   <div class="wrap filters">
     <details class="srcpick fpick" id="typePick">
       <summary id="typeSum">Type</summary>
-      <div class="srcpop"><div class="chips" id="typeChips" role="group" aria-label="Item type"></div></div>
+      <div class="srcpop"><div class="srcbtns"><button type="button" id="typeClear">Clear types</button></div><div class="chips" id="typeChips" role="group" aria-label="Item type"></div></div>
     </details>
     <details class="srcpick fpick" id="rarPick">
       <summary id="rarSum">Rarity</summary>
-      <div class="srcpop"><div class="chips" id="rarChips" role="group" aria-label="Rarity"></div></div>
+      <div class="srcpop"><div class="srcbtns"><button type="button" id="rarClear">Clear rarities</button></div><div class="chips" id="rarChips" role="group" aria-label="Rarity"></div></div>
     </details>
     <select id="attune" aria-label="Attunement">
       <option value="">Any attunement</option>
@@ -136,6 +136,7 @@
   <section class="about changelog" id="changelog">
     <h2>Change log</h2>
     <ol class="clog" reversed>
+      <li><time datetime="2026-11-13">2026-11-13</time> <b>Summaries, shareable filters.</b> Every SRD item has a short original summary on its Stats and Full cards and in its detail view, with separate 2014 wording where the rules differ. The link now keeps your filters (kind, type, rarity, attunement, consumable, books, view and sort), so a filtered list can be bookmarked or shared. The Type and Rarity menus have Clear buttons, and more cards load as you scroll.</li>
       <li><time datetime="2026-11-13">2026-11-13</time> <b>Fixes.</b> Picking a rarity or type that left a single variant of a grouped item broke the page, so the filters and the Basic / Stats / Full switch stopped responding; fixed. Type and rarity counts now match what you get with your other filters. Consumables is now a menu with a Non-consumables option. Select all / Clear all cover the books of both editions. When searching, items with the word in their name come first.</li>
       <li><time datetime="2026-11-13">2026-11-13</time> <b>Rarity colours and book items.</b> Cards, rarity tags and the Rarity menu share one colour per rarity. Basic gear, armor and weapons now count for the book that prints them too (for example Chain Mail shows <em>Player's Handbook p.219</em> as well as SRD 5.2), and generic variants such as Mariner's Armor and Armor of Gleaming are in the index.</li>
       <li><time datetime="2026-11-13">2026-11-13</time> <b>Core books first.</b> The Sources picker lists the core rulebooks first (SRDs, Player's Handbook, Dungeon Master's Guide, Monster Manual, Xanathar's, Tasha's) and starts with only those selected; a <b>Core books</b> button goes back to that. Filter menus no longer slip behind the cards on phones.</li>

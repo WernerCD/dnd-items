@@ -7,7 +7,7 @@ Inputs (all in the repo, refreshed by tools/fetch_sources.py):
   source/open5e-armor.json        armor table
   data-src/other-items.json       facts-only index of items from other official books
                                   (name, type, rarity, attunement, book, page). No text.
-  data-src/summaries.json         optional original one-line summaries, keyed by item id
+  data-src/summaries.json         original one-line summaries, keyed by item id or normalized name
 
 Run:  python tools/build_data.py
 """
@@ -183,8 +183,17 @@ def main():
     if sp.exists():
         summaries = load(sp)
     for it in items:
-        if it["id"] in summaries:
-            it["summary"] = summaries[it["id"]]
+        # keyed by item id, or by the normalized item / variant-group name (one line covers all variants)
+        gname = it.get("groupName")
+        gkey = norm("+1, +2 and +3 Weapons" if gname == "+N Weapon" else gname) if gname else None
+        # "2014|name" overrides the shared line where the 2014 rules differ
+        sm = None
+        for k in [it["id"]] + [p + n for n in (norm(it["name"]), gkey) if n for p in (it["ed"] + "|", "")]:
+            if k in summaries:
+                sm = summaries[k]
+                break
+        if sm:
+            it["summary"] = sm
 
     # SRD items by name and by variant-group name, so a book entry for the same item
     # (PHB "Chain Mail", DMG "+1 Weapon") becomes an "also in" note on the SRD item

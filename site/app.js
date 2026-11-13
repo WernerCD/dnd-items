@@ -36,6 +36,19 @@
   if (['basic', 'stats', 'full'].indexOf(state.detail) < 0) state.detail = 'basic';
   if (!state.favs || typeof state.favs !== 'object') state.favs = {};
   if (!state.srcSel || typeof state.srcSel !== 'object') state.srcSel = coreSel();
+  /* filters carried in the link (?kind=magic&rarity=Rare|Legendary&books=...), so a view can be shared or bookmarked */
+  function listParam(n) { var v = params.get(n); return v ? v.split('|').filter(Boolean) : null; }
+  (function () {
+    var v;
+    if ((v = params.get('kind')) && ['all', 'magic', 'mundane'].indexOf(v) >= 0) state.kind = v;
+    if ((v = listParam('type'))) state.types = v;
+    if ((v = listParam('rarity'))) state.rars = v;
+    if ((v = params.get('attune')) && ['yes', 'no'].indexOf(v) >= 0) state.attune = v;
+    if ((v = params.get('cons')) && ['yes', 'no'].indexOf(v) >= 0) state.consumable = v;
+    if ((v = params.get('view')) && ['basic', 'stats', 'full'].indexOf(v) >= 0) state.detail = v;
+    if ((v = params.get('sort'))) state.sort = v;
+    if ((v = listParam('books'))) { state.srcSel = {}; state.srcAllPending = v[0] === 'all'; v.forEach(function (k) { state.srcSel[k] = true; }); }
+  })();
 
   var DATA = null, BYID = {}, GROUPS = {}, BYNAME = {};
   var $ = function (s) { return document.querySelector(s); };
@@ -275,6 +288,17 @@
     var u = new URL(location.href);
     u.searchParams.set('ed', state.ed);
     if (state.q) u.searchParams.set('q', state.q); else u.searchParams.delete('q');
+    function setP(n, v) { if (v) u.searchParams.set(n, v); else u.searchParams.delete(n); }
+    setP('kind', state.kind !== 'all' && state.kind);
+    setP('type', state.types.join('|'));
+    setP('rarity', state.rars.join('|'));
+    setP('attune', state.attune);
+    setP('cons', state.consumable);
+    setP('view', state.detail !== 'basic' && state.detail);
+    setP('sort', state.sort !== 'name' && state.sort);
+    var books = Object.keys(state.srcSel).sort(), core = CORE.slice().sort();
+    var every = allBooks().every(srcOn);
+    setP('books', every ? 'all' : books.join('|') !== core.join('|') && books.join('|'));
     if (!$('#detail').open) u.searchParams.delete('item');
     if (u.href !== location.href) history.replaceState(null, '', u);
   }
@@ -315,7 +339,10 @@
       '<div class="card-top"><div><h3>' + esc(g.name) + '</h3><div class="alt">' + g.members.length + ' variants</div></div></div>' +
       '<div class="pills">' + (g.rarLo !== g.rarity ? rarPill(g.rarLo) + '<span class="small">to</span>' + rarPill(g.rarity) : rarPill(g.rarity)) + '</div>' + metaLine(g) +
       '<div class="src">' + srcTag(g) + alsoTags(g.members[0]) + '</div>';
-    if (state.detail !== 'basic') h += '<p class="facts">' + esc(shown) + '</p>';
+    if (state.detail !== 'basic') {
+      h += '<p class="facts">' + esc(shown) + '</p>';
+      if (g.members[0].summary) h += '<p class="summary">' + esc(g.members[0].summary) + '</p>';
+    }
     if (state.detail === 'full') h += '<div class="itext mini">' + md(g.members[0].desc) + '</div>';
     return h + '</article>';
   }
@@ -479,6 +506,8 @@
     if (t.id === 'srcShown') { var sel = {}; visibleSrcKeys().forEach(function (k) { sel[k] = true; }); return update({ srcSel: sel }); }
     if (t.id === 'srcCore') return update({ srcSel: coreSel() });
     if (t.id === 'resetBtn') { var p = Object.assign({}, DEFAULTS, { srcSel: coreSel(), types: [], rars: [] }); return update(p); }
+    if (t.id === 'typeClear') return update({ types: [] });
+    if (t.id === 'rarClear') return update({ rars: [] });
     if (t.id === 'moreBtn') return update({ limit: state.limit + PAGE });
     if (t.id === 'moreOthersBtn') return update({ limitOthers: state.limitOthers + PAGE });
     if (t.dataset.fav) {
@@ -540,6 +569,7 @@
     });
     var n14 = d.items.filter(function (i) { return i.ed === '2014'; }).length;
     $('#generated').textContent = 'Data built ' + d.generated + ' · ' + d.items.length.toLocaleString() + ' SRD items with full text (2014: ' + n14 + ', 2024: ' + (d.items.length - n14) + '), ' + d.others.length.toLocaleString() + ' more from other books (facts only).';
+    if (state.srcAllPending) { state.srcSel = {}; allBooks().forEach(function (k) { state.srcSel[k] = true; }); delete state.srcAllPending; }
     renderSourceLinks();
     render();
     var open = params.get('item');
@@ -547,5 +577,17 @@
   }).catch(function (err) {
     $('#list').innerHTML = '<p class="empty">Could not load the item data (' + esc(err.message) + ').</p>';
   });
+  /* load the next page of cards when the Show more button scrolls into view */
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting || e.target.hidden || !DATA) return;
+        if (e.target.id === 'moreBtn') update({ limit: state.limit + PAGE });
+        else update({ limitOthers: state.limitOthers + PAGE });
+        io.unobserve(e.target); io.observe(e.target); /* re-check: still in view after a short page */
+      });
+    }, { rootMargin: '600px 0px' });
+    io.observe($('#moreBtn')); io.observe($('#moreOthersBtn'));
+  }
   syncControls();
 })();

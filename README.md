@@ -13,7 +13,9 @@ Sister site: [Wild Shape Beast List](https://wernercd.github.io/dnd-druid-wildsh
 - **Group variants**: the SRD lists every +1/+2/+3 weapon, every Holy Avenger blade and so on as its own item; grouped, they show as one card with a list of variants.
 - Click any card for the details: a facts table, the full SRD text (tables included), a 2014/2024 switch when the item exists in both, and a link to the source book.
 - Every card shows its source, colour-coded by book. **One list (all books)** mixes the other-books index into the main list; turn it off to list those separately.
-- Favorites are saved in your browser. A link like `?item=srd_bag-of-holding` opens that item directly.
+- An original one-line summary for every SRD item (separate 2014 wording where the rules differ), on Stats/Full cards and in the detail view.
+- Favorites are saved in your browser. The link keeps your filters (`?ed=2014&kind=magic&rarity=Legendary&type=Weapon&books=all&view=stats`), and `?item=srd_bag-of-holding` opens one item directly.
+- More cards load as you scroll; the Type and Rarity menus have Clear buttons.
 - Source material links for every book, a change log, and a link to this repo at the bottom of the page.
 
 ## Data and copyright
@@ -36,7 +38,7 @@ Nothing is taken from D&D Beyond; the site only links to its book pages. Partner
 | `tools/fetch_sources.py` | Refreshes `source/` from Open5e and `data-src/other-items.json` from 5etools (run by hand) |
 | `source/` | Raw Open5e exports (SRD 5.1 and 5.2, CC-BY-4.0) |
 | `data-src/other-items.json` | Facts-only index of non-SRD items |
-| `data-src/summaries.json` | Optional original one-line summaries, keyed by item id (not written yet) |
+| `data-src/summaries.json` | Original one-line summaries, keyed by normalized item name (`2014|name` where the 2014 rules differ) |
 
 Run it locally:
 ```bash
