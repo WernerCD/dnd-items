@@ -311,7 +311,7 @@ a.srctag:hover { text-decoration: underline; }
 /* let the browser skip layout of offscreen cards: opening a dialog with ~1,700 cards went from ~2 s to ~60 ms */
 .list .card { content-visibility: auto; contain-intrinsic-size: auto 170px; }
 .others-list .other { content-visibility: auto; contain-intrinsic-size: auto 110px; }
-/* === dnd-shared v1 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
+/* === dnd-shared v1.1 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
 /* Paste this block unchanged at the END of each site's styles.css. Do not edit it per site;
    change it in the hub repo and re-copy it to every site. It relies on the shared tokens
    (--bg, --surface, --surface-2, --ink, --ink-2, --muted, --line, --accent, --gold, --radius). */
@@ -335,7 +335,8 @@ a.srctag:hover { text-decoration: underline; }
 .site-footer .foot-links a[aria-current="page"] { color: var(--ink); font-weight: 600; text-decoration: none; }
 .site-footer p { margin: 6px 0; max-width: 80ch; }
 
-.changes { max-width: 780px; padding-bottom: 8px; }
+.changes { padding-bottom: 8px; }
+.changes > * { max-width: 780px; }
 .changes h2 { font-size: 1.6rem; margin: 28px 0 4px; }
 .changes .intro { color: var(--ink-2); margin: 0 0 8px; }
 .change-day { margin: 22px 0 0; }
@@ -344,4 +345,4 @@ a.srctag:hover { text-decoration: underline; }
 .change-day li { margin: 6px 0; color: var(--ink-2); line-height: 1.5; }
 .change-day li b { color: var(--ink); }
 @media (max-width: 480px) { .hub-nav { gap: 10px; } .tagline { font-size: .85rem; } }
-/* === end dnd-shared v1 === */
+/* === end dnd-shared v1.1 === */
