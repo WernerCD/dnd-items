@@ -139,7 +139,7 @@
     return 'Requires attunement ' + a.replace(/^Requires attunement\s*/i, '');
   }
   function inline(s) {
-    return esc(s).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/(^|[\s(])_([^_]+)_(?=[\s.,;:)!?]|$)/g, '$1<i>$2</i>').replace(/(^|[\s(])\*([^*\s][^*]*)\*(?=[\s.,;:)!?]|$)/g, '$1<i>$2</i>');
+    return esc(s).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/(^|[\s(>])_([^_]+)_(?=[\s.,;:)!?<]|$)/g, '$1<i>$2</i>').replace(/(^|[\s(>])\*([^*\s][^*]*)\*(?=[\s.,;:)!?<]|$)/g, '$1<i>$2</i>');
   }
   /* tiny markdown: paragraphs, | tables |, - lists, **bold**, _italic_ */
   function md(text) {
@@ -160,7 +160,7 @@
       buf = []; mode = null;
     }
     lines.forEach(function (l) {
-      var t = l.trim(), m = !t ? null : /^\|/.test(t) ? 'table' : /^[-*]\s+/.test(t) && !/^\*\*/.test(t) ? 'list' : 'p';
+      var t = l.trim().replace(/^>\s?/, ''), m =!t ? null : /^\|/.test(t) ? 'table' : /^[-*]\s+/.test(t) && !/^\*\*/.test(t) ? 'list' : 'p';
       if (!m) return flush();
       if (m !== mode) flush();
       mode = m; buf.push(t);
@@ -273,6 +273,9 @@
     $('#moreBtn').hidden = main.length <= state.limit;
     $('#moreBtn').textContent = 'Show more (' + (main.length - state.limit).toLocaleString() + ' left)';
     $('#empty').hidden = main.length > 0;
+    $('#empty').textContent = state.favOnly && !Object.keys(state.favs).length
+      ? 'No favorites yet. Tap the star on any card to add it, then tick Favorites only again.'
+      : 'No items match. Try clearing a filter, adding books in Sources, or switching the rules edition.';
     if (state.merge) $('#othersSec').hidden = true;
     else {
       if (state.favOnly) oth = oth.filter(function (r) { return isFav(r.id); });
@@ -435,10 +438,12 @@
     rows.push(['Rules', it.ed + (it.srd ? ' (' + it.src + ')' : '')]);
     return '<dl class="facts-dl">' + rows.filter(function (r) { return r[1]; }).map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join('') + '</dl>';
   }
+  var favsAtOpen = null;
   function openDetail(id) {
     var it = BYID[id], g = GROUPS[id];
     if (!it && !g) return;
     dlgId = id;
+    if (favsAtOpen == null) favsAtOpen = JSON.stringify(state.favs);
     var h;
     if (g) {
       var m = g.filter(function (x) { return x.ed === g[0].ed; }), first = m[0];
@@ -533,7 +538,9 @@
   $('#detail').addEventListener('click', function (ev) { if (ev.target === this) this.close(); });
   $('#detail').addEventListener('close', function () {
     var u = new URL(location.href); u.searchParams.delete('item'); history.replaceState(null, '', u);
-    render();
+    /* redraw the list only if a favorite changed while the dialog was open (a full redraw is slow with many cards) */
+    if (JSON.stringify(state.favs) !== favsAtOpen) render();
+    favsAtOpen = null;
   });
   var qTimer = null;
   $('#search').addEventListener('input', function () { var v = this.value; clearTimeout(qTimer); qTimer = setTimeout(function () { update({ q: v }); }, 150); });

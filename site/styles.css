@@ -318,3 +318,6 @@ a.srctag:hover { text-decoration: underline; }
 .rar[data-rarity="Mundane"], .rchip[data-rar="Mundane"] { color: var(--ink-2); }
 .srctag.also { opacity: .8; font-weight: 400; }
 .chip.zero { opacity: .45; }
+/* let the browser skip layout of offscreen cards: opening a dialog with ~1,700 cards went from ~2 s to ~60 ms */
+.list .card { content-visibility: auto; contain-intrinsic-size: auto 170px; }
+.others-list .other { content-visibility: auto; contain-intrinsic-size: auto 110px; }

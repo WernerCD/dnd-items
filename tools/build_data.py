@@ -36,6 +36,7 @@ CONSUMABLE_NAME = re.compile(
     r"Keoghtom's Ointment|Nolzur's Marvelous Pigments|Sovereign Glue|Universal Solvent|Necklace of Fireballs)(?![\w-])"
     r"|(Acid|Alchemist's Fire|Antitoxin|Holy Water|Oil|Ball Bearings|Caltrops|Rations|Healer's Kit|Torch)"
     r"( \([^)]*\))?$)", re.I)
+NAME_FIX = {"Essense of either": "Essence of ether"}
 RARITY_ORDER = ["Mundane", "Common", "Uncommon", "Rare", "Very Rare", "Legendary", "Artifact", "Varies", "Unknown"]
 
 
@@ -46,6 +47,29 @@ def load(p):
 
 def norm(s):
     return re.sub(r"[^a-z0-9]+", " ", s.lower().replace("'", "")).strip()
+
+
+# a parenthesis that only gives a cost, quantity or container, not a different item
+QTY_PAREN = re.compile(r"^(\d[\d,]*( gp| feet| sq\. yd\.)?|bag of [\d,]+|\d+ (feet|day|days)|bow|vial|flask|[csegp]p|\d+ gp)$", re.I)
+
+
+def loose_keys(name, variant_base):
+    """Name variants for loose matching. variant_base also tries "X (Variant)" -> "X"."""
+    n = name.replace("'", "").replace("’", "")
+    out = {n}
+    m = re.match(r"^(.*?)\s*\(([^)]*)\)$", n)
+    if m and (QTY_PAREN.match(m.group(2).strip()) or variant_base):
+        out.add(m.group(1))
+    for x in list(out):
+        r = re.match(r"^([^,]+),\s*(.+)$", x)
+        if r:
+            out.add(r.group(2) + " " + r.group(1))
+    keys = {norm(x) for x in out}
+    return keys | {ALIASES[k] for k in keys if k in ALIASES}
+
+
+# book name -> SRD name, where the SRD renamed the item
+ALIASES = {"carrion crawler mucus": "crawler mucus"}
 
 
 def base_name(name, typ=""):
@@ -144,6 +168,8 @@ def from_open5e(r, magic, wtable):
     }
     w = weapon_info(r.get("weapon"), wtable)
     a = armor_info(r.get("armor"))
+    if typ == "Weapon" and not w and not magic:
+        it["type"] = "Adventuring Gear"  # 2024 Open5e files Acid, Oil, Torch, Net... under "weapon" with no weapon stats
     if w:
         it["weapon"] = w
     if a:
@@ -197,7 +223,17 @@ def main():
 
     # SRD items by name and by variant-group name, so a book entry for the same item
     # (PHB "Chain Mail", DMG "+1 Weapon") becomes an "also in" note on the SRD item
-    by_name, by_group = {}, {}
+    # tidy SRD 5.1 poison names, which Open5e has in lower case (and one typo)
+    small = {"of", "the", "and", "a"}
+    for it in items:
+        if it["type"] == "Poison" and it["ed"] == "2014":
+            n = NAME_FIX.get(it["name"], it["name"])
+            it["name"] = " ".join(w if (i and w in small) or w[:1].isupper() else w[:1].upper() + w[1:]
+                                  for i, w in enumerate(n.split(" ")))
+    by_name, by_group, by_loose = {}, {}, {}
+    for it in items:
+        for k in loose_keys(it["name"], False):
+            by_loose.setdefault((it["ed"], k), []).append(it)
     for it in items:
         by_name.setdefault((it["ed"], norm(it["name"])), []).append(it)
         if it.get("groupName"):
@@ -221,6 +257,10 @@ def main():
         if not hit:
             ks = keys[:1] if gm else keys  # a generic "+2 Shield" must not land on the mundane Shield
             hit = next((idx[(ed, k)] for idx in (by_name, by_group) for k in ks if (ed, k) in idx), None)
+        if not hit and not gm:
+            # same item, worded differently: "Hooded Lantern" = "Lantern, Hooded",
+            # "Silk Rope (50 feet)" = "Rope, silk (50 feet)", "Alchemist's Supplies" = "... (50 GP)"
+            hit = next((by_loose[(ed, k)] for k in loose_keys(name, True) if (ed, k) in by_loose), None)
         if hit:
             merged += 1
             for it in hit:
@@ -236,9 +276,9 @@ def main():
             "page": o.get("page"),
             "srd": False,
             "type": o["type"],
-            "rarity": o["rarity"],
+            "rarity": "Unknown" if o["rarity"] == "Mundane" and o.get("attune") else o["rarity"],
             "attune": o.get("attune"),
-            "magic": o["rarity"] != "Mundane",
+            "magic": o["rarity"] != "Mundane" or bool(o.get("attune")),  # attunement means magic
             "consumable": o["type"] in CONSUMABLE_TYPES or bool(CONSUMABLE_NAME.match(o["name"])),
         })
     # one row per id (5etools can list an item twice, e.g. reprints within a book)
