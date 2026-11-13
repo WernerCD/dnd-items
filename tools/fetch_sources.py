@@ -9,6 +9,7 @@ Run by hand (not in CI):  python tools/fetch_sources.py
    source book, page, edition. No description text is kept, ever.
 """
 import json
+import re
 import time
 import urllib.request
 from pathlib import Path
@@ -127,6 +128,37 @@ def fetch_5etools():
                 or bool(it.get("charges") and it.get("type", "").startswith("SC")),
                 "inSrd": srd,
             })
+    # generic magic variants ("+1 Armor", "Mariner's Armor", "Armor of Gleaming"...): facts from "inherits"
+    for v in get(FIVE + "magicvariants.json").get("magicvariant", []):
+        inh = v.get("inherits") or {}
+        src = inh.get("source", "")
+        info = names.get(src)
+        if not info:
+            continue
+        req = " ".join(str(r.get("type", "")) + " " + " ".join(k for k in r if k != "type") for r in v.get("requires", []))
+        if v.get("ammo") or re.search(r"\bAF?\b", req):
+            typ = "Ammunition"
+        elif re.search(r"\b(LA|MA|HA|S)\b|armor", req):
+            typ = "Armor"
+        elif re.search(r"\b(M|R)\b|weapon|sword|axe|bow", req, re.I):
+            typ = "Weapon"
+        else:
+            typ = "Other"
+        ed = "2024" if (v.get("edition") == "one" or info["published"] >= "2024-09-17") else "2014"
+        rar = rarity5(inh)
+        rows.append({
+            "name": re.sub(r"\s*\(\*\)$", "", v["name"]),
+            "source": src,
+            "sourceName": info["name"],
+            "page": inh.get("page"),
+            "edition": ed,
+            "type": typ,
+            "rarity": rar,
+            "attune": attune5(inh),
+            "magic": rar != "Mundane",
+            "consumable": typ == "Ammunition",
+            "inSrd": bool(inh.get("srd") or inh.get("srd52")),
+        })
     rows.sort(key=lambda r: (r["sourceName"], r["name"]))
     out = ROOT / "data-src" / "other-items.json"
     out.write_text(json.dumps(rows, indent=1, ensure_ascii=False), encoding="utf-8")

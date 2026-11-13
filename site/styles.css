@@ -278,8 +278,8 @@ a.srctag:hover { text-decoration: underline; }
 .card .alt { font-size: .8rem; color: var(--muted); }
 .pills { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
 .rar { font-size: .74rem; font-weight: 600; border-radius: 999px; padding: 2px 9px; white-space: nowrap;
-  color: hsl(var(--h) var(--src-s) var(--src-l)); background: hsl(var(--h) 45% var(--src-bg)); border: 1px solid hsl(var(--h) 40% var(--src-l) / .35); }
-.rar[data-r="Mundane"] { color: var(--ink-2); background: var(--surface-2); border-color: var(--line); }
+  color: hsl(var(--rh) var(--rs) var(--src-l)); background: hsl(var(--rh) calc(var(--rs) * .7) var(--src-bg)); border: 1px solid hsl(var(--rh) var(--rs) var(--src-l) / .4); }
+
 .facts { margin: 8px 0 0; font-size: .84rem; color: var(--ink-2); border-top: 1px solid var(--line); padding-top: 7px; }
 .summary { margin: 6px 0 0; font-size: .88rem; font-style: italic; color: var(--ink-2); }
 .itext p { margin: 6px 0; }
@@ -309,3 +309,11 @@ a.srctag:hover { text-decoration: underline; }
 .srclinks .small { margin-left: 4px; }
 @media (max-width: 640px) { .fpick { position: static; } }
 @media (max-width: 640px) { .controls { position: relative; z-index: 6; } }
+.srcsep { font-size: .72rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); border-top: 1px solid var(--line); margin-top: 6px; padding-top: 8px; }
+/* rarity colours: card edge, pill and Rarity chips share --rh / --rs */
+.card[data-rarity], .other[data-rarity] { border-left: 5px solid hsl(var(--rh) var(--rs) var(--src-l)); }
+.card.book[data-rarity] { border-left-style: solid; }
+.rchip { color: hsl(var(--rh) var(--rs) var(--src-l)); border-color: hsl(var(--rh) var(--rs) var(--src-l) / .5); }
+.rchip[aria-pressed="true"] { color: hsl(var(--rh) var(--rs) var(--src-l)); background: hsl(var(--rh) calc(var(--rs) * .7) var(--src-bg)); border-color: hsl(var(--rh) var(--rs) var(--src-l)); box-shadow: inset 0 0 0 1px hsl(var(--rh) var(--rs) var(--src-l)); }
+.rar[data-rarity="Mundane"], .rchip[data-rar="Mundane"] { color: var(--ink-2); }
+.srctag.also { opacity: .8; font-weight: 400; }

@@ -4,11 +4,11 @@ A searchable list of D&D 5e items for both the **2014** and **2024** rules: magi
 
 **Live site:** https://wernercd.github.io/dnd-items/
 
-Sister site: [Wild Shape Beast List](https://wernercd.github.io/druid-wildshape/) ([repo](https://github.com/WernerCD/druid-wildshape)).
+Sister site: [Wild Shape Beast List](https://wernercd.github.io/dnd-druid-wildshapes/) ([repo](https://github.com/WernerCD/dnd-druid-wildshapes)).
 
 ## Features
 - Pick the rules edition (2014 or 2024) and search names, properties and rules text.
-- Filters: magic / mundane, type, rarity, attunement, consumables only, favorites only, and a searchable **Sources** picker (Select all / Clear all / Only matches).
+- Filters: magic / mundane, type, rarity, attunement, consumables only, favorites only, and a searchable **Sources** picker (Core books / Select all / Clear all / Only matches). The core rulebooks (SRDs, PHB, DMG, MM, Xanathar's, Tasha's) are listed first and are the only ones selected at first.
 - Card detail toggle: **Basic** (name, rarity, type, attunement, source), **Stats** (cost, weight, damage, properties, weapon mastery, AC), or **Full** (the whole SRD text on every card).
 - **Group variants**: the SRD lists every +1/+2/+3 weapon, every Holy Avenger blade and so on as its own item; grouped, they show as one card with a list of variants.
 - Click any card for the details: a facts table, the full SRD text (tables included), a 2014/2024 switch when the item exists in both, and a link to the source book.

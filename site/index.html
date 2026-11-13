@@ -67,7 +67,7 @@
       <summary id="srcSum">Sources</summary>
       <div class="srcpop">
         <input type="search" id="srcQ" placeholder="Find a book..." aria-label="Filter sources">
-        <div class="srcbtns"><button type="button" id="srcAll">Select all</button><button type="button" id="srcNone">Clear all</button><button type="button" id="srcShown">Only matches</button></div>
+        <div class="srcbtns"><button type="button" id="srcCore">Core books</button><button type="button" id="srcAll">Select all</button><button type="button" id="srcNone">Clear all</button><button type="button" id="srcShown">Only matches</button></div>
         <div id="srcList" class="srclist"></div>
       </div>
     </details>
@@ -119,7 +119,7 @@
     <p>Search every item in the free D&amp;D 5e System Reference Documents, with full rules text, for the 2014 rules (SRD 5.1) and the 2024 rules (SRD 5.2). Items from the other official books are listed as an index: name, type, rarity, attunement, book and page, so you know where to look them up.</p>
     <p>Item text marked <em>SRD 5.1</em> or <em>SRD 5.2</em> comes from the System Reference Documents 5.1 and 5.2 by Wizards of the Coast LLC, available at <a href="https://dnd.wizards.com/resources/systems-reference-document" rel="noopener">dnd.wizards.com</a> and licensed under the <a href="https://creativecommons.org/licenses/by/4.0/legalcode" rel="noopener">Creative Commons Attribution 4.0 International License</a>. It was retrieved through the <a href="https://open5e.com" rel="noopener">Open5e</a> API. The index of items from other books (facts only, no rules text) was compiled from the community <a href="https://github.com/5etools-mirror-3/5etools-src" rel="noopener">5etools</a> dataset. Unofficial fan content; not affiliated with or endorsed by Wizards of the Coast.</p>
     <p class="muted" id="generated"></p>
-    <p><a href="https://github.com/WernerCD/dnd-items" rel="noopener">Source code on GitHub</a> &middot; <a href="https://github.com/WernerCD/dnd-items/issues" rel="noopener">Report a problem</a> &middot; Sister site: <a href="https://wernercd.github.io/druid-wildshape/" rel="noopener">Wild Shape Beast List</a></p>
+    <p><a href="https://github.com/WernerCD/dnd-items" rel="noopener">Source code on GitHub</a> &middot; <a href="https://github.com/WernerCD/dnd-items/issues" rel="noopener">Report a problem</a> &middot; Sister site: <a href="https://wernercd.github.io/dnd-druid-wildshapes/" rel="noopener">Wild Shape Beast List</a></p>
   </section>
 
   <section class="about" id="sources">
@@ -132,6 +132,8 @@
   <section class="about changelog" id="changelog">
     <h2>Change log</h2>
     <ol class="clog" reversed>
+      <li><time datetime="2026-11-13">2026-11-13</time> <b>Rarity colours and book items.</b> Cards, rarity tags and the Rarity menu share one colour per rarity. Basic gear, armor and weapons now count for the book that prints them too (for example Chain Mail shows <em>Player's Handbook p.219</em> as well as SRD 5.2), and generic variants such as Mariner's Armor and Armor of Gleaming are in the index.</li>
+      <li><time datetime="2026-11-13">2026-11-13</time> <b>Core books first.</b> The Sources picker lists the core rulebooks first (SRDs, Player's Handbook, Dungeon Master's Guide, Monster Manual, Xanathar's, Tasha's) and starts with only those selected; a <b>Core books</b> button goes back to that. Filter menus no longer slip behind the cards on phones.</li>
       <li><time datetime="2026-11-13">2026-11-13</time> <b>Launch.</b> Every SRD 5.1 and SRD 5.2 item with full text, for 2014 and 2024 rules: magic items, weapons, armor, adventuring gear, tools, poisons, potions and scrolls. Search, filters for type, rarity, attunement and consumables, a Sources picker, Basic / Stats / Full cards, grouped variants, favorites, an index of items from other official books, source material links and this change log.</li>
     </ol>
   </section>

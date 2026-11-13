@@ -186,13 +186,38 @@ def main():
         if it["id"] in summaries:
             it["summary"] = summaries[it["id"]]
 
-    srd_names = {(it["ed"], norm(it["name"])) for it in items}
-    srd_names |= {(it["ed"], norm(it.get("groupName", ""))) for it in items if it.get("groupName")}
-    others, dropped = [], 0
+    # SRD items by name and by variant-group name, so a book entry for the same item
+    # (PHB "Chain Mail", DMG "+1 Weapon") becomes an "also in" note on the SRD item
+    by_name, by_group = {}, {}
+    for it in items:
+        by_name.setdefault((it["ed"], norm(it["name"])), []).append(it)
+        if it.get("groupName"):
+            by_group.setdefault((it["ed"], norm(it["groupName"])), []).append(it)
+    others, merged = [], 0
     for o in load(DSRC / "other-items.json"):
-        plain = re.sub(r"^\+\d\s+", "", o["name"])  # "+1 Rod of the Pact Keeper" -> SRD "Rod of the Pact Keeper (+1)"
-        if (o["edition"], norm(o["name"])) in srd_names or (plain != o["name"] and (o["edition"], norm(plain)) in srd_names):
-            dropped += 1
+        ed, name = o["edition"], o["name"]
+        keys = [norm(name),
+                norm(re.sub(r"^\+\d\s+", "+N ", name)),  # "+1 Weapon" -> SRD group "+N Weapon"
+                norm(re.sub(r"^\+\d\s+", "", name))]     # "+1 Rod of the Pact Keeper" -> "Rod of the Pact Keeper (+1)" group
+        # an exact name wins over a variant group: PHB "Breastplate" is not the +1/+2/+3 Breastplates
+        gm = re.match(r"^\+(\d) (Armor|Shield|Weapon|Ammunition)$", name)
+        hit = None
+        if gm:  # DMG "+1 Armor" covers every SRD "<armor> (+1)"
+            typ = "Armor" if gm.group(2) in ("Armor", "Shield") else gm.group(2)
+            hit = [it for it in items if it["ed"] == ed
+                   and (it["type"] == typ or (typ == "Ammunition" and it["name"].startswith("Ammunition")))
+                   and re.search(r"\(\+" + gm.group(1) + r"\)$|\+" + gm.group(1) + "$", it["name"])
+                   and (gm.group(2) != "Shield" or it["name"].startswith("Shield"))
+                   and (gm.group(2) != "Armor" or not it["name"].startswith("Shield"))] or None
+        if not hit:
+            ks = keys[:1] if gm else keys  # a generic "+2 Shield" must not land on the mundane Shield
+            hit = next((idx[(ed, k)] for idx in (by_name, by_group) for k in ks if (ed, k) in idx), None)
+        if hit:
+            merged += 1
+            for it in hit:
+                also = it.setdefault("also", [])
+                if o["sourceName"] not in [a["src"] for a in also]:
+                    also.append({"src": o["sourceName"], "page": o.get("page")})
             continue
         others.append({
             "id": "x-" + o["edition"] + "-" + o["source"].lower() + "-" + norm(o["name"]).replace(" ", "-"),
@@ -217,8 +242,9 @@ def main():
     others.sort(key=lambda x: (x["ed"], x["name"]))
     counts = {}
     for x in items + others:
-        k = f'{x["ed"]} | {x["src"]}'
-        counts[k] = counts.get(k, 0) + 1
+        for src in [x["src"]] + [a["src"] for a in x.get("also", [])]:
+            k = f'{x["ed"]} | {src}'
+            counts[k] = counts.get(k, 0) + 1
     data = {
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "rarities": RARITY_ORDER,
@@ -230,7 +256,7 @@ def main():
     OUT.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     n14 = sum(1 for i in items if i["ed"] == "2014")
     print(f"SRD items: {len(items)} (2014: {n14}, 2024: {len(items) - n14}); "
-          f"index of other books: {len(others)} (dropped {dropped} already in the SRD)")
+          f"index of other books: {len(others)} ({merged} book entries matched to SRD items as also-in)")
     print(f"wrote {OUT.relative_to(ROOT)} ({OUT.stat().st_size // 1024} KB)")
 
 

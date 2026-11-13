@@ -8,6 +8,9 @@
   };
 
   var PAGE = 120;
+  /* the main rulebooks: listed first in the Sources picker and selected by default */
+  var CORE = ['SRD 5.1', 'SRD 5.2', "Player's Handbook (2014)", "Player's Handbook (2024)", "Dungeon Master's Guide (2014)",
+    "Dungeon Master's Guide (2024)", 'Monster Manual (2014)', 'Monster Manual (2025)', "Xanathar's Guide to Everything", "Tasha's Cauldron of Everything"];
   var params = new URLSearchParams(location.search);
   var DEFAULTS = { kind: 'all', types: [], rars: [], attune: '', consumable: false, favOnly: false, q: '' };
   var state = {
@@ -23,7 +26,7 @@
     detail: store.get('di.detail', 'basic'),
     merge: store.get('di.merge', true),
     groupVar: store.get('di.groupVar', true),
-    srcOff: store.get('di.srcOff', {}),
+    srcSel: store.get('di.srcSel', null), /* books switched on; null = the core books */
     srcQ: '',
     favs: store.get('di.favs', {}),
     limit: PAGE,
@@ -32,7 +35,7 @@
   if (['2014', '2024'].indexOf(state.ed) < 0) state.ed = '2024';
   if (['basic', 'stats', 'full'].indexOf(state.detail) < 0) state.detail = 'basic';
   if (!state.favs || typeof state.favs !== 'object') state.favs = {};
-  if (!state.srcOff || typeof state.srcOff !== 'object') state.srcOff = {};
+  if (!state.srcSel || typeof state.srcSel !== 'object') state.srcSel = coreSel();
 
   var DATA = null, BYID = {}, GROUPS = {}, BYNAME = {};
   var $ = function (s) { return document.querySelector(s); };
@@ -42,11 +45,24 @@
   var TYPE_ORDER = ['Weapon', 'Armor', 'Ammunition', 'Wondrous Item', 'Potion', 'Ring', 'Rod', 'Scroll', 'Staff', 'Wand',
     'Adventuring Gear', 'Tool', 'Spellcasting Focus', 'Poison', 'Food & Drink', 'Trade Good', 'Treasure', 'Mount', 'Vehicle', 'Other'];
   var RAR_ORDER = ['Mundane', 'Common', 'Uncommon', 'Rare', 'Very Rare', 'Legendary', 'Artifact', 'Varies', 'Unknown'];
-  var RAR_HUE = { Mundane: 30, Common: 210, Uncommon: 130, Rare: 220, 'Very Rare': 275, Legendary: 30, Artifact: 0, Varies: 190, Unknown: 190 };
+  /* rarity colours [hue, saturation]: grey, silver, green, blue, purple, orange, red */
+  var RAR_COL = { Mundane: [30, 0], Common: [210, 12], Uncommon: [130, 55], Rare: [215, 80], 'Very Rare': [275, 60], Legendary: [30, 90], Artifact: [0, 75], Varies: [190, 35], Unknown: [190, 35] };
+  function rarVars(r) { var c = RAR_COL[r] || RAR_COL.Unknown; return '--rh:' + c[0] + ';--rs:' + c[1] + '%'; }
+  function rarAttr(r) { return ' style="' + rarVars(r) + '" data-rarity="' + esc(r) + '"'; }
   function rarIdx(r) { var i = RAR_ORDER.indexOf(r); return i < 0 ? 0 : i > 6 ? 2.5 : i; }
 
   /* ---------- sources ---------- */
-  function srcOn(k) { return !state.srcOff[k]; }
+  function srcOn(k) { return !!state.srcSel[k]; }
+  /* an SRD item also printed in a book (PHB armor, DMG +1 weapons) counts for both */
+  function itemSrcs(it) { return [it.src].concat((it.also || []).map(function (a) { return a.src; })); }
+  function itemSrcOn(it) { return itemSrcs(it).some(srcOn); }
+  function alsoTags(it) {
+    return (it.also || []).map(function (a) { return ' <span class="srctag also"' + hueAttr(a.src) + ' title="Also in ' + esc(a.src) + '">' + esc(a.src + (a.page ? ' p.' + a.page : '')) + '</span>'; }).join('');
+  }
+  function alsoLinks(it) {
+    return (it.also || []).map(function (a) { return ' ' + bookLink({ src: a.src, page: a.page }); }).join('');
+  }
+  function coreSel() { var o = {}; CORE.forEach(function (k) { o[k] = true; }); return o; }
   var BOOK_HUE = {
     'SRD 5.1': 145, 'SRD 5.2': 165,
     "Player's Handbook (2014)": 0, "Player's Handbook (2024)": 0,
@@ -94,7 +110,7 @@
     var u = bookUrl(it.src);
     return u ? '<a class="srctag" href="' + u + '" target="_blank" rel="noopener"' + hueAttr(it.src) + '>' + esc(srcLabel(it)) + '</a>' : srcTag(it);
   }
-  function rarPill(r, label) { return '<span class="rar" style="--h:' + (RAR_HUE[r] == null ? 190 : RAR_HUE[r]) + '" data-r="' + esc(r) + '">' + esc(label || r) + '</span>'; }
+  function rarPill(r, label) { return '<span class="rar"' + rarAttr(r) + '>' + esc(label || r) + '</span>'; }
 
   /* ---------- formatting ---------- */
   function money(gp) {
@@ -161,7 +177,7 @@
   function hay(it) {
     if (!it._hay) {
       var w = it.weapon || {}, a = it.armor || {};
-      it._hay = [it.name, it.type, it.rarity, it.src, it.summary, typeof it.attune === 'string' ? it.attune : '', it.desc,
+      it._hay = [it.name, it.type, it.rarity, itemSrcs(it).join(' '), it.summary, typeof it.attune === 'string' ? it.attune : '', it.desc,
         w.dtype, (w.props || []).join(' '), w.mastery, a.cat].join(' ').toLowerCase();
     }
     return it._hay;
@@ -175,7 +191,7 @@
     if (state.attune === 'yes' && !it.attune) return false;
     if (state.attune === 'no' && it.attune) return false;
     if (state.consumable && !it.consumable) return false;
-    if (!srcOn(it.src)) return false;
+    if (!itemSrcOn(it)) return false;
     if (q && hay(it).indexOf(q) < 0) return false;
     return true;
   }
@@ -272,11 +288,11 @@
   }
   function card(r) {
     if (r.group) return groupCard(r);
-    var h = '<article class="card' + (r.srd ? '' : ' book') + '"' + hueAttr(r.src) + ' data-id="' + esc(r.id) + '" tabindex="0" role="button" aria-label="' + esc(r.name) + ' details">' +
+    var h = '<article class="card' + (r.srd ? '' : ' book') + '"' + rarAttr(r.rarity) + ' data-id="' + esc(r.id) + '" tabindex="0" role="button" aria-label="' + esc(r.name) + ' details">' +
       favBtn(r.id, r.name) +
       '<div class="card-top"><div><h3>' + esc(r.name) + '</h3></div></div>' +
       '<div class="pills">' + rarPill(r.rarity) + '</div>' + metaLine(r) +
-      '<div class="src">' + srcTag(r) + (r.srd ? '' : ' <span class="small">facts only</span>') + '</div>';
+      '<div class="src">' + srcTag(r) + alsoTags(r) + (r.srd ? '' : ' <span class="small">facts only</span>') + '</div>';
     if (state.detail !== 'basic') {
       var f = factsLine(r);
       if (f.length) h += '<p class="facts">' + esc(f.join(' · ')) + '</p>';
@@ -288,17 +304,17 @@
   function groupCard(g) {
     var names = g.members.map(function (m) { var x = m.name.match(/\(([^)]*)\)$/); return x ? x[1] : m.name; });
     var shown = names.slice(0, 6).join(', ') + (names.length > 6 ? ', and ' + (names.length - 6) + ' more' : '');
-    var h = '<article class="card group"' + hueAttr(g.src) + ' data-group="' + esc(g.id) + '" tabindex="0" role="button" aria-label="' + esc(g.name) + ' details">' +
+    var h = '<article class="card group"' + rarAttr(g.rarity) + ' data-group="' + esc(g.id) + '" tabindex="0" role="button" aria-label="' + esc(g.name) + ' details">' +
       favBtn(g.id, g.name) +
       '<div class="card-top"><div><h3>' + esc(g.name) + '</h3><div class="alt">' + g.members.length + ' variants</div></div></div>' +
       '<div class="pills">' + (g.rarLo !== g.rarity ? rarPill(g.rarLo) + '<span class="small">to</span>' + rarPill(g.rarity) : rarPill(g.rarity)) + '</div>' + metaLine(g) +
-      '<div class="src">' + srcTag(g) + '</div>';
+      '<div class="src">' + srcTag(g) + alsoTags(g.members[0]) + '</div>';
     if (state.detail !== 'basic') h += '<p class="facts">' + esc(shown) + '</p>';
     if (state.detail === 'full') h += '<div class="itext mini">' + md(g.members[0].desc) + '</div>';
     return h + '</article>';
   }
   function otherRow(o) {
-    return '<div class="other"' + hueAttr(o.src) + ' data-id="' + esc(o.id) + '" tabindex="0" role="button" aria-label="' + esc(o.name) + ' details">' + favBtn(o.id, o.name) +
+    return '<div class="other"' + rarAttr(o.rarity) + ' data-id="' + esc(o.id) + '" tabindex="0" role="button" aria-label="' + esc(o.name) + ' details">' + favBtn(o.id, o.name) +
       '<b>' + esc(o.name) + '</b><div class="pills">' + rarPill(o.rarity) + '</div>' + metaLine(o) +
       '<div class="src">' + srcTag(o) + '</div></div>';
   }
@@ -311,7 +327,7 @@
       return '<button type="button" class="chip" data-type="' + esc(t) + '" aria-pressed="' + (state.types.indexOf(t) >= 0) + '">' + esc(t) + ' <span class="n">' + types[t] + '</span></button>';
     }).join('');
     $('#rarChips').innerHTML = RAR_ORDER.filter(function (t) { return rars[t]; }).map(function (t) {
-      return '<button type="button" class="chip" data-rar="' + esc(t) + '" aria-pressed="' + (state.rars.indexOf(t) >= 0) + '">' + esc(t) + ' <span class="n">' + rars[t] + '</span></button>';
+      return '<button type="button" class="chip rchip" style="' + rarVars(t) + '" data-rar="' + esc(t) + '" aria-pressed="' + (state.rars.indexOf(t) >= 0) + '">' + esc(t) + ' <span class="n">' + rars[t] + '</span></button>';
     }).join('');
     $('#typeSum').textContent = state.types.length ? 'Type (' + state.types.length + ')' : 'Type';
     $('#rarSum').textContent = state.rars.length ? 'Rarity (' + state.rars.length + ')' : 'Rarity';
@@ -322,30 +338,32 @@
   /* source picker: every source in the current edition, with counts */
   function sourceCounts() {
     var c = {};
-    DATA.items.concat(DATA.others).forEach(function (it) { if (it.ed === state.ed) c[it.src] = (c[it.src] || 0) + 1; });
+    DATA.items.concat(DATA.others).forEach(function (it) { if (it.ed === state.ed) itemSrcs(it).forEach(function (k) { c[k] = (c[k] || 0) + 1; }); });
     return c;
   }
-  function srcSort(a, b) { return (/^SRD/.test(a) ? 0 : 1) - (/^SRD/.test(b) ? 0 : 1) || a.localeCompare(b); }
+  function coreIdx(k) { var i = CORE.indexOf(k); return i < 0 ? 99 : i; }
+  function srcSort(a, b) { return coreIdx(a) - coreIdx(b) || a.localeCompare(b); }
   function renderSources() {
     var c = sourceCounts(), keys = Object.keys(c).sort(srcSort);
     var on = keys.filter(srcOn).length, q = state.srcQ.trim().toLowerCase();
+    var firstOther = keys.filter(function (k) { return coreIdx(k) === 99 && (!q || k.toLowerCase().indexOf(q) >= 0); })[0];
     $('#srcSum').textContent = 'Sources' + (on === keys.length ? '' : ' (' + on + ' of ' + keys.length + ')');
     $('#srcPick').classList.toggle('filtered', on !== keys.length);
     $('#srcList').innerHTML = keys.filter(function (k) { return !q || k.toLowerCase().indexOf(q) >= 0; }).map(function (k) {
-      return '<label class="srcrow"' + hueAttr(k) + '><input type="checkbox" data-src="' + esc(k) + '"' + (srcOn(k) ? ' checked' : '') + '> <i class="dot" aria-hidden="true"></i><span>' + esc(k) + '</span><span class="n">' + c[k] + '</span></label>';
+      return (k === firstOther ? '<div class="srcsep">Other books</div>' : '') + '<label class="srcrow"' + hueAttr(k) + '><input type="checkbox" data-src="' + esc(k) + '"' + (srcOn(k) ? ' checked' : '') + '> <i class="dot" aria-hidden="true"></i><span>' + esc(k) + '</span><span class="n">' + c[k] + '</span></label>';
     }).join('') || '<p class="small muted">No book matches.</p>';
   }
   function setSources(keys, on) {
-    var off = Object.assign({}, state.srcOff);
-    keys.forEach(function (k) { if (on) delete off[k]; else off[k] = true; });
-    update({ srcOff: off });
+    var sel = Object.assign({}, state.srcSel);
+    keys.forEach(function (k) { if (on) sel[k] = true; else delete sel[k]; });
+    update({ srcSel: sel });
   }
   function visibleSrcKeys() {
     return Array.prototype.map.call(document.querySelectorAll('#srcList [data-src]'), function (i) { return i.dataset.src; });
   }
   function renderSourceLinks() {
     var per = {};
-    DATA.items.concat(DATA.others).forEach(function (it) { per[it.src] = per[it.src] || { 2014: 0, 2024: 0 }; per[it.src][it.ed]++; });
+    DATA.items.concat(DATA.others).forEach(function (it) { itemSrcs(it).forEach(function (k) { per[k] = per[k] || { 2014: 0, 2024: 0 }; per[k][it.ed]++; }); });
     $('#srcLinks').innerHTML = Object.keys(per).sort(srcSort).map(function (k) {
       var u = bookUrl(k), n = per[k], cnt = [n[2014] ? '2014: ' + n[2014] : '', n[2024] ? '2024: ' + n[2024] : ''].filter(Boolean).join(', ');
       var note = /^SRD/.test(k) ? ' (free, CC-BY-4.0, full text)' : '';
@@ -384,14 +402,14 @@
     if (g) {
       var m = g.filter(function (x) { return x.ed === g[0].ed; }), first = m[0];
       h = '<div class="sb-head"><h2 id="dTitle">' + esc(groupLabel(first.groupName)) + '</h2>' +
-        '<p class="sb-sub">' + esc(first.type + ', ' + m.length + ' variants') + ' ' + bookLink(first) + '</p></div>' +
+        '<p class="sb-sub">' + esc(first.type + ', ' + m.length + ' variants') + ' ' + bookLink(first) + alsoLinks(first) + '</p></div>' +
         '<div class="mn-actions">' + favDlgBtn(id) + '</div>' +
         '<div class="itext">' + md(first.desc) + '</div><div class="sb-sec">Variants</div><ul class="variants">' +
         m.map(function (x) { return '<li><button type="button" class="linkish" data-open="' + esc(x.id) + '">' + esc(x.name) + '</button> ' + rarPill(x.rarity) + (x.attune ? ' <span class="small">attunement</span>' : '') + '</li>'; }).join('') + '</ul>';
     } else {
       var alt = otherEd(it);
       h = '<div class="sb-head"><h2 id="dTitle">' + esc(it.name) + '</h2>' +
-        '<p class="sb-sub">' + esc(it.type + ', ' + it.rarity.toLowerCase() + (it.attune ? ' (' + attuneText(it.attune).toLowerCase() + ')' : '')) + ' ' + bookLink(it) + '</p></div>';
+        '<p class="sb-sub">' + esc(it.type + ', ' + it.rarity.toLowerCase() + (it.attune ? ' (' + attuneText(it.attune).toLowerCase() + ')' : '')) + ' ' + bookLink(it) + alsoLinks(it) + '</p></div>';
       h += '<div class="ed-tabs">' + ['2014', '2024'].map(function (e) {
         var target = e === it.ed ? it : alt && alt.ed === e ? alt : null;
         return target ? '<button type="button" data-open="' + esc(target.id) + '" aria-selected="' + (e === it.ed) + '">' + e + ' rules</button>' : '';
@@ -424,7 +442,7 @@
   }
   function save() {
     store.set('di.ed', state.ed); store.set('di.sort', state.sort); store.set('di.detail', state.detail);
-    store.set('di.merge', state.merge); store.set('di.groupVar', state.groupVar); store.set('di.srcOff', state.srcOff); store.set('di.favs', state.favs);
+    store.set('di.merge', state.merge); store.set('di.groupVar', state.groupVar); store.set('di.srcSel', state.srcSel); store.set('di.favs', state.favs);
   }
   function update(patch) {
     for (var k in patch) state[k] = patch[k];
@@ -444,8 +462,9 @@
     if (t.dataset.rar) return update({ rars: toggleIn(state.rars, t.dataset.rar) });
     if (t.id === 'srcAll') return setSources(Object.keys(sourceCounts()), true);
     if (t.id === 'srcNone') return setSources(Object.keys(sourceCounts()), false);
-    if (t.id === 'srcShown') { var vis = visibleSrcKeys(), off = {}; Object.keys(sourceCounts()).forEach(function (k) { if (vis.indexOf(k) < 0) off[k] = true; }); return update({ srcOff: off }); }
-    if (t.id === 'resetBtn') { var p = Object.assign({}, DEFAULTS, { srcOff: {}, types: [], rars: [] }); return update(p); }
+    if (t.id === 'srcShown') { var sel = {}; visibleSrcKeys().forEach(function (k) { sel[k] = true; }); return update({ srcSel: sel }); }
+    if (t.id === 'srcCore') return update({ srcSel: coreSel() });
+    if (t.id === 'resetBtn') { var p = Object.assign({}, DEFAULTS, { srcSel: coreSel(), types: [], rars: [] }); return update(p); }
     if (t.id === 'moreBtn') return update({ limit: state.limit + PAGE });
     if (t.id === 'moreOthersBtn') return update({ limitOthers: state.limitOthers + PAGE });
     if (t.dataset.fav) {

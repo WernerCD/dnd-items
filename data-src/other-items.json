@@ -117,6 +117,19 @@
   "inSrd": false
  },
  {
+  "name": "Mithral +1 Armor",
+  "source": "AI",
+  "sourceName": "Acquisitions Incorporated",
+  "page": 156,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Obviator's Lenses",
   "source": "AI",
   "sourceName": "Acquisitions Incorporated",
@@ -260,6 +273,19 @@
   "inSrd": false
  },
  {
+  "name": "Vicious +1 Weapon",
+  "source": "AI",
+  "sourceName": "Acquisitions Incorporated",
+  "page": 149,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Unknown",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Voting Kit",
   "source": "AI",
   "sourceName": "Acquisitions Incorporated",
@@ -299,6 +325,19 @@
   "inSrd": false
  },
  {
+  "name": "Aquatic Wave-Swept Weapon",
+  "source": "AU",
+  "sourceName": "Arcana Unleashed",
+  "page": 129,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Arcane Chatelaine",
   "source": "AU",
   "sourceName": "Arcana Unleashed",
@@ -319,6 +358,32 @@
   "edition": "2024",
   "type": "Wondrous Item",
   "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Ascendant Wave-Swept Weapon",
+  "source": "AU",
+  "sourceName": "Arcana Unleashed",
+  "page": 129,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Barnacled Wave-Swept Weapon",
+  "source": "AU",
+  "sourceName": "Arcana Unleashed",
+  "page": 129,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Uncommon",
   "attune": true,
   "magic": true,
   "consumable": false,
@@ -507,6 +572,19 @@
   "inSrd": false
  },
  {
+  "name": "Dispelling Ammunition",
+  "source": "AU",
+  "sourceName": "Arcana Unleashed",
+  "page": 118,
+  "edition": "2024",
+  "type": "Ammunition",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
+  "inSrd": false
+ },
+ {
   "name": "Dissuader",
   "source": "AU",
   "sourceName": "Arcana Unleashed",
@@ -582,6 +660,19 @@
   "attune": null,
   "magic": true,
   "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Goading Ammunition",
+  "source": "AU",
+  "sourceName": "Arcana Unleashed",
+  "page": 119,
+  "edition": "2024",
+  "type": "Ammunition",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
   "inSrd": false
  },
  {
@@ -1170,6 +1261,19 @@
   "inSrd": false
  },
  {
+  "name": "Tramontane Armor",
+  "source": "AU",
+  "sourceName": "Arcana Unleashed",
+  "page": 124,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Tranquil Rod of the Honed Mind",
   "source": "AU",
   "sourceName": "Arcana Unleashed",
@@ -1300,6 +1404,19 @@
   "inSrd": false
  },
  {
+  "name": "Life-Sapping Blade",
+  "source": "AUD",
+  "sourceName": "Arcana Unleashed: Deadfall",
+  "page": 118,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Masquerader's Brooch",
   "source": "AUD",
   "sourceName": "Arcana Unleashed: Deadfall",
@@ -1352,6 +1469,32 @@
   "inSrd": false
  },
  {
+  "name": "Sniper's Bracelet",
+  "source": "AUD",
+  "sourceName": "Arcana Unleashed: Deadfall",
+  "page": 119,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Spell-Fueling Armor",
+  "source": "AUD",
+  "sourceName": "Arcana Unleashed: Deadfall",
+  "page": 119,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Very Rare",
+  "attune": "by a Spellcaster",
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Spirit-Binding Censer",
   "source": "AUD",
   "sourceName": "Arcana Unleashed: Deadfall",
@@ -1373,6 +1516,32 @@
   "type": "Staff",
   "rarity": "Legendary",
   "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Thayan Sword",
+  "source": "AUD",
+  "sourceName": "Arcana Unleashed: Deadfall",
+  "page": 121,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Trick Weapon",
+  "source": "AUD",
+  "sourceName": "Arcana Unleashed: Deadfall",
+  "page": 121,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Common",
+  "attune": null,
   "magic": true,
   "consumable": false,
   "inSrd": false
@@ -1716,6 +1885,19 @@
   "inSrd": false
  },
  {
+  "name": "Hellfire Weapon",
+  "source": "BGDIA",
+  "sourceName": "Baldur's Gate: Descent Into Avernus",
+  "page": 223,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Helm of Devil Command",
   "source": "BGDIA",
   "sourceName": "Baldur's Gate: Descent Into Avernus",
@@ -1833,6 +2015,19 @@
   "inSrd": false
  },
  {
+  "name": "Armor of Safeguarding",
+  "source": "BGG",
+  "sourceName": "Bigby Presents: Glory of the Giants",
+  "page": 111,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Bigby's Beneficent Bracelet",
   "source": "BGG",
   "sourceName": "Bigby Presents: Glory of the Giants",
@@ -1840,6 +2035,19 @@
   "edition": "2014",
   "type": "Wondrous Item",
   "rarity": "Artifact",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Bloodshed Blade",
+  "source": "BGG",
+  "sourceName": "Bigby Presents: Glory of the Giants",
+  "page": 111,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Very Rare",
   "attune": true,
   "magic": true,
   "consumable": false,
@@ -2223,6 +2431,19 @@
   "inSrd": false
  },
  {
+  "name": "Zephyr Armor",
+  "source": "BGG",
+  "sourceName": "Bigby Presents: Glory of the Giants",
+  "page": 117,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Talarith",
   "source": "BAM",
   "sourceName": "Boo's Astral Menagerie",
@@ -2574,6 +2795,19 @@
   "inSrd": false
  },
  {
+  "name": "Demon Skin",
+  "source": "DitLCoT",
+  "sourceName": "Descent into the Lost Caverns of Tsojcanth",
+  "page": 14,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Iggwilv's Horn",
   "source": "DitLCoT",
   "sourceName": "Descent into the Lost Caverns of Tsojcanth",
@@ -2691,6 +2925,32 @@
   "inSrd": false
  },
  {
+  "name": "+1 Ammunition",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 150,
+  "edition": "2014",
+  "type": "Ammunition",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
+  "inSrd": true
+ },
+ {
+  "name": "+1 Armor",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 152,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "+1 Rod of the Pact Keeper",
   "source": "DMG",
   "sourceName": "Dungeon Master's Guide (2014)",
@@ -2704,6 +2964,19 @@
   "inSrd": false
  },
  {
+  "name": "+1 Shield",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 200,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "+1 Wand of the War Mage",
   "source": "DMG",
   "sourceName": "Dungeon Master's Guide (2014)",
@@ -2712,6 +2985,58 @@
   "type": "Wand",
   "rarity": "Uncommon",
   "attune": "by a spellcaster",
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "+1 Weapon",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 213,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "+1 Weapon (no damage)",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 213,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "+2 Ammunition",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 150,
+  "edition": "2014",
+  "type": "Ammunition",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
+  "inSrd": true
+ },
+ {
+  "name": "+2 Armor",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 152,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Very Rare",
+  "attune": null,
   "magic": true,
   "consumable": false,
   "inSrd": true
@@ -2730,6 +3055,19 @@
   "inSrd": false
  },
  {
+  "name": "+2 Shield",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 200,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "+2 Wand of the War Mage",
   "source": "DMG",
   "sourceName": "Dungeon Master's Guide (2014)",
@@ -2738,6 +3076,58 @@
   "type": "Wand",
   "rarity": "Rare",
   "attune": "by a spellcaster",
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "+2 Weapon",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 213,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "+2 Weapon (no damage)",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 213,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "+3 Ammunition",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 150,
+  "edition": "2014",
+  "type": "Ammunition",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
+  "inSrd": true
+ },
+ {
+  "name": "+3 Armor",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 152,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Legendary",
+  "attune": null,
   "magic": true,
   "consumable": false,
   "inSrd": true
@@ -2756,6 +3146,19 @@
   "inSrd": false
  },
  {
+  "name": "+3 Shield",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 200,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "+3 Wand of the War Mage",
   "source": "DMG",
   "sourceName": "Dungeon Master's Guide (2014)",
@@ -2764,6 +3167,45 @@
   "type": "Wand",
   "rarity": "Very Rare",
   "attune": "by a spellcaster",
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "+3 Weapon",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 213,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "+3 Weapon (no damage)",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 213,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Adamantine Armor",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 150,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Uncommon",
+  "attune": null,
   "magic": true,
   "consumable": false,
   "inSrd": true
@@ -2925,6 +3367,58 @@
   "inSrd": false
  },
  {
+  "name": "Armor of Acid Resistance",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 152,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Cold Resistance",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 152,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Fire Resistance",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 152,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Force Resistance",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 152,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Armor of Invulnerability",
   "source": "DMG",
   "sourceName": "Dungeon Master's Guide (2014)",
@@ -2932,6 +3426,84 @@
   "edition": "2014",
   "type": "Armor",
   "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Lightning Resistance",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 152,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Necrotic Resistance",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 152,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Poison Resistance",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 152,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Psychic Resistance",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 152,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Radiant Resistance",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 152,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Thunder Resistance",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 152,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
   "attune": true,
   "magic": true,
   "consumable": false,
@@ -2974,6 +3546,19 @@
   "attune": true,
   "magic": true,
   "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Arrow of Slaying",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 152,
+  "edition": "2014",
+  "type": "Ammunition",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
   "inSrd": true
  },
  {
@@ -3257,6 +3842,19 @@
   "edition": "2014",
   "type": "Wondrous Item",
   "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Berserker Axe",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 155,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
   "attune": true,
   "magic": true,
   "consumable": false,
@@ -4186,6 +4784,19 @@
   "inSrd": true
  },
  {
+  "name": "Dancing Sword",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 161,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Decanter of Endless Water",
   "source": "DMG",
   "sourceName": "Dungeon Master's Guide (2014)",
@@ -4225,6 +4836,19 @@
   "inSrd": true
  },
  {
+  "name": "Defender",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 164,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Demon Armor",
   "source": "DMG",
   "sourceName": "Dungeon Master's Guide (2014)",
@@ -4257,6 +4881,19 @@
   "page": 165,
   "edition": "2014",
   "type": "Wondrous Item",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Dragon Slayer",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 166,
+  "edition": "2014",
+  "type": "Weapon",
   "rarity": "Rare",
   "attune": null,
   "magic": true,
@@ -4784,6 +5421,19 @@
   "inSrd": false
  },
  {
+  "name": "Flame Tongue",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 170,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Folding Boat",
   "source": "DMG",
   "sourceName": "Dungeon Master's Guide (2014)",
@@ -4808,6 +5458,19 @@
   "magic": false,
   "consumable": false,
   "inSrd": false
+ },
+ {
+  "name": "Frost Brand",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 171,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
  },
  {
   "name": "Galley",
@@ -4870,6 +5533,19 @@
   "type": "Wondrous Item",
   "rarity": "Rare",
   "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Giant Slayer",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 172,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": null,
   "magic": true,
   "consumable": false,
   "inSrd": true
@@ -5234,6 +5910,19 @@
   "type": "Wondrous Item",
   "rarity": "Rare",
   "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Holy Avenger",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 174,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Legendary",
+  "attune": "by a paladin",
   "magic": true,
   "consumable": false,
   "inSrd": true
@@ -5889,6 +6578,19 @@
   "inSrd": true
  },
  {
+  "name": "Luck Blade",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 179,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Mace of Disruption",
   "source": "DMG",
   "sourceName": "Dungeon Master's Guide (2014)",
@@ -6058,6 +6760,19 @@
   "inSrd": true
  },
  {
+  "name": "Mariner's Armor",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 181,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Medallion of Thoughts",
   "source": "DMG",
   "sourceName": "Dungeon Master's Guide (2014)",
@@ -6091,6 +6806,19 @@
   "edition": "2014",
   "type": "Wondrous Item",
   "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Mithral Armor",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 182,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Uncommon",
   "attune": null,
   "magic": true,
   "consumable": false,
@@ -6225,6 +6953,19 @@
   "magic": false,
   "consumable": false,
   "inSrd": false
+ },
+ {
+  "name": "Nine Lives Stealer",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 183,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
  },
  {
   "name": "Nolzur's Marvelous Pigments",
@@ -8866,6 +9607,58 @@
   "inSrd": false
  },
  {
+  "name": "Sword of Life Stealing",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 206,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Sword of Sharpness",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 206,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Sword of Vengeance",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 206,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Uncommon",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Sword of Wounding",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 207,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Talisman of Pure Good",
   "source": "DMG",
   "sourceName": "Dungeon Master's Guide (2014)",
@@ -9074,6 +9867,32 @@
   "inSrd": true
  },
  {
+  "name": "Vicious Weapon",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 209,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Vorpal Sword",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 209,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Wand of Binding",
   "source": "DMG",
   "sourceName": "Dungeon Master's Guide (2014)",
@@ -9269,6 +10088,19 @@
   "inSrd": false
  },
  {
+  "name": "Weapon of Warning",
+  "source": "DMG",
+  "sourceName": "Dungeon Master's Guide (2014)",
+  "page": 213,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Uncommon",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Well of Many Worlds",
   "source": "DMG",
   "sourceName": "Dungeon Master's Guide (2014)",
@@ -9386,6 +10218,32 @@
   "inSrd": false
  },
  {
+  "name": "+1 Ammunition",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 228,
+  "edition": "2024",
+  "type": "Ammunition",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
+  "inSrd": true
+ },
+ {
+  "name": "+1 Armor",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 230,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "+1 Rod of the Pact Keeper",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -9399,6 +10257,19 @@
   "inSrd": false
  },
  {
+  "name": "+1 Shield",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 303,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "+1 Wand of the War Mage",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -9407,6 +10278,19 @@
   "type": "Wand",
   "rarity": "Uncommon",
   "attune": "by a spellcaster",
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "+1 Weapon",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 324,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Uncommon",
+  "attune": null,
   "magic": true,
   "consumable": false,
   "inSrd": true
@@ -9425,6 +10309,32 @@
   "inSrd": false
  },
  {
+  "name": "+2 Ammunition",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 228,
+  "edition": "2024",
+  "type": "Ammunition",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
+  "inSrd": true
+ },
+ {
+  "name": "+2 Armor",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 230,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "+2 Rod of the Pact Keeper",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -9438,6 +10348,19 @@
   "inSrd": false
  },
  {
+  "name": "+2 Shield",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 303,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "+2 Wand of the War Mage",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -9446,6 +10369,19 @@
   "type": "Wand",
   "rarity": "Rare",
   "attune": "by a spellcaster",
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "+2 Weapon",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 324,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": null,
   "magic": true,
   "consumable": false,
   "inSrd": true
@@ -9464,6 +10400,32 @@
   "inSrd": false
  },
  {
+  "name": "+3 Ammunition",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 228,
+  "edition": "2024",
+  "type": "Ammunition",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
+  "inSrd": true
+ },
+ {
+  "name": "+3 Armor",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 230,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Legendary",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "+3 Rod of the Pact Keeper",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -9475,6 +10437,19 @@
   "magic": true,
   "consumable": false,
   "inSrd": false
+ },
+ {
+  "name": "+3 Shield",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 303,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
  },
  {
   "name": "+3 Wand of the War Mage",
@@ -9490,6 +10465,19 @@
   "inSrd": true
  },
  {
+  "name": "+3 Weapon",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 324,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "+3 Wraps of Unarmed Power",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -9500,6 +10488,32 @@
   "attune": null,
   "magic": true,
   "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Adamantine Armor",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 227,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Adamantine Weapon",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 227,
+  "edition": "2024",
+  "type": "Ammunition",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
   "inSrd": false
  },
  {
@@ -9553,6 +10567,19 @@
   "magic": false,
   "consumable": false,
   "inSrd": false
+ },
+ {
+  "name": "Ammunition of Slaying",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 228,
+  "edition": "2024",
+  "type": "Ammunition",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
+  "inSrd": true
  },
  {
   "name": "Amulet of Health",
@@ -9646,6 +10673,71 @@
   "inSrd": false
  },
  {
+  "name": "Armor of Acid Resistance",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 231,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Cold Resistance",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 231,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Fire Resistance",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 231,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Force Resistance",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 231,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Gleaming",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 230,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Common",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Armor of Invulnerability",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -9653,6 +10745,123 @@
   "edition": "2024",
   "type": "Armor",
   "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Lightning Resistance",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 231,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Necrotic Resistance",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 231,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Poison Resistance",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 231,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Psychic Resistance",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 231,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Radiant Resistance",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 231,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Thunder Resistance",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 231,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Vulnerability (Bludgeoning)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 231,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Vulnerability (Piercing)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 231,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Armor of Vulnerability (Slashing)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 231,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
   "attune": true,
   "magic": true,
   "consumable": false,
@@ -9978,6 +11187,19 @@
   "edition": "2024",
   "type": "Wondrous Item",
   "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Berserker Axe",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 236,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Rare",
   "attune": true,
   "magic": true,
   "consumable": false,
@@ -10608,6 +11830,19 @@
   "inSrd": false
  },
  {
+  "name": "Cast-Off Armor",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 243,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Common",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Cauldron of Rebirth",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -11128,6 +12363,19 @@
   "inSrd": true
  },
  {
+  "name": "Dancing Sword",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 248,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Dark Shard Amulet",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -11180,6 +12428,32 @@
   "inSrd": true
  },
  {
+  "name": "Defender",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 252,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Demon Armor",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 252,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Demonomicon of Iggwilv",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -11225,6 +12499,19 @@
   "page": 254,
   "edition": "2024",
   "type": "Wondrous Item",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Dragon Slayer",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 254,
+  "edition": "2024",
+  "type": "Weapon",
   "rarity": "Rare",
   "attune": null,
   "magic": true,
@@ -11297,6 +12584,19 @@
   "inSrd": true
  },
  {
+  "name": "Dwarven Plate",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 255,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Dwarven Thrower",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -11347,6 +12647,19 @@
   "magic": true,
   "consumable": false,
   "inSrd": true
+ },
+ {
+  "name": "Efreeti Chain",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 257,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
  },
  {
   "name": "Elemental Gem, Blue Sapphire",
@@ -11411,6 +12724,19 @@
   "attune": null,
   "magic": true,
   "consumable": true,
+  "inSrd": true
+ },
+ {
+  "name": "Elven Chain",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 257,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
   "inSrd": true
  },
  {
@@ -11479,6 +12805,19 @@
   "inSrd": false
  },
  {
+  "name": "Energy Bow",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 257,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Energy Cell",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -11489,6 +12828,123 @@
   "attune": null,
   "magic": false,
   "consumable": true,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Armor (Cantrip)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Uncommon",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Armor (Level 1)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Uncommon",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Armor (Level 2)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Armor (Level 3)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Armor (Level 4)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Armor (Level 5)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Armor (Level 6)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Armor (Level 7)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Armor (Level 8)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
   "inSrd": false
  },
  {
@@ -11609,6 +13065,123 @@
   "inSrd": false
  },
  {
+  "name": "Enspelled Weapon (Cantrip)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Uncommon",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Weapon (Level 1)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Uncommon",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Weapon (Level 2)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Weapon (Level 3)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Weapon (Level 4)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Weapon (Level 5)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Weapon (Level 6)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Weapon (Level 7)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Enspelled Weapon (Level 8)",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 258,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Ersatz Eye",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -11646,6 +13219,19 @@
   "magic": true,
   "consumable": false,
   "inSrd": true
+ },
+ {
+  "name": "Executioner's Axe",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 259,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
  },
  {
   "name": "Eye Agate",
@@ -11869,6 +13455,19 @@
   "inSrd": false
  },
  {
+  "name": "Flame Tongue",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 263,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Flour",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -11906,6 +13505,19 @@
   "magic": false,
   "consumable": false,
   "inSrd": false
+ },
+ {
+  "name": "Frost Brand",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 263,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
  },
  {
   "name": "Garnet",
@@ -11955,6 +13567,19 @@
   "type": "Wondrous Item",
   "rarity": "Rare",
   "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Giant Slayer",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 264,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": null,
   "magic": true,
   "consumable": false,
   "inSrd": true
@@ -12311,6 +13936,19 @@
   "inSrd": false
  },
  {
+  "name": "Hammer of Thunderbolts",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 265,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Hand of Vecna",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -12491,6 +14129,19 @@
   "magic": true,
   "consumable": false,
   "inSrd": false
+ },
+ {
+  "name": "Holy Avenger",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 269,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Legendary",
+  "attune": "by a paladin",
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
  },
  {
   "name": "Horn of Blasting",
@@ -13182,6 +14833,19 @@
   "inSrd": true
  },
  {
+  "name": "Luck Blade",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 275,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Lute of Thunderous Thumping",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -13364,6 +15028,19 @@
   "inSrd": true
  },
  {
+  "name": "Mariner's Armor",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 278,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Medallion of Thoughts",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -13401,6 +15078,45 @@
   "magic": true,
   "consumable": false,
   "inSrd": true
+ },
+ {
+  "name": "Mithral Armor",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 279,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Moon-Touched Sword",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 280,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Common",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Moonblade",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 279,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Legendary",
+  "attune": "by a creature of the weapon's choice",
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
  },
  {
   "name": "Moonstone",
@@ -13507,6 +15223,19 @@
   "inSrd": false
  },
  {
+  "name": "Nine Lives Stealer",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 281,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Nolzur's Marvelous Pigments",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -13515,6 +15244,19 @@
   "type": "Wondrous Item",
   "rarity": "Very Rare",
   "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Oathbow",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 282,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Very Rare",
+  "attune": true,
   "magic": true,
   "consumable": false,
   "inSrd": true
@@ -13891,6 +15633,19 @@
   "edition": "2024",
   "type": "Wondrous Item",
   "rarity": "Uncommon",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Plate Armor of Etherealness",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 286,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Legendary",
   "attune": true,
   "magic": true,
   "consumable": false,
@@ -15951,6 +17706,19 @@
   "inSrd": false
  },
  {
+  "name": "Silvered Weapon",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 304,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Common",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Slippers of Spider Climbing",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -15973,6 +17741,19 @@
   "rarity": "Mundane",
   "attune": null,
   "magic": false,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Smoldering Armor",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 305,
+  "edition": "2024",
+  "type": "Armor",
+  "rarity": "Common",
+  "attune": null,
+  "magic": true,
   "consumable": false,
   "inSrd": false
  },
@@ -16484,6 +18265,71 @@
   "inSrd": false
  },
  {
+  "name": "Sword of Life Stealing",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 314,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Sword of Sharpness",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 314,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Sword of Vengeance",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 314,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Uncommon",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Sword of Wounding",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 314,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Sylvan Talon",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 314,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Talisman of Pure Good",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -16744,6 +18590,45 @@
   "inSrd": false
  },
  {
+  "name": "Vicious Weapon",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 318,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Vorpal Sword",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 318,
+  "edition": "2024",
+  "type": "Other",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Walloping Ammunition",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 318,
+  "edition": "2024",
+  "type": "Ammunition",
+  "rarity": "Common",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
+  "inSrd": false
+ },
+ {
   "name": "Wand of Binding",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -16952,6 +18837,19 @@
   "inSrd": false
  },
  {
+  "name": "Weapon of Warning",
+  "source": "XDMG",
+  "sourceName": "Dungeon Master's Guide (2024)",
+  "page": 324,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Uncommon",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
   "name": "Well of Many Worlds",
   "source": "XDMG",
   "sourceName": "Dungeon Master's Guide (2024)",
@@ -17108,6 +19006,19 @@
   "inSrd": false
  },
  {
+  "name": "Dazzling Weapon",
+  "source": "EFA",
+  "sourceName": "Eberron: Forge of the Artificer",
+  "page": 112,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Helm of Awareness",
   "source": "EFA",
   "sourceName": "Eberron: Forge of the Artificer",
@@ -17147,12 +19058,38 @@
   "inSrd": false
  },
  {
+  "name": "Repeating Shot",
+  "source": "EFA",
+  "sourceName": "Eberron: Forge of the Artificer",
+  "page": 112,
+  "edition": "2024",
+  "type": "Weapon",
+  "rarity": "Uncommon",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Repulsion Shield",
   "source": "EFA",
   "sourceName": "Eberron: Forge of the Artificer",
   "page": 112,
   "edition": "2024",
   "type": "Armor",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Returning Weapon",
+  "source": "EFA",
+  "sourceName": "Eberron: Forge of the Artificer",
+  "page": 112,
+  "edition": "2024",
+  "type": "Weapon",
   "rarity": "Uncommon",
   "attune": null,
   "magic": true,
@@ -17208,6 +19145,19 @@
   "rarity": "Mundane",
   "attune": null,
   "magic": false,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Armblade",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 276,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Common",
+  "attune": "by a warforged",
+  "magic": true,
   "consumable": false,
   "inSrd": false
  },
@@ -17381,6 +19331,110 @@
   "inSrd": false
  },
  {
+  "name": "Imbued Wood (Fernian Ash)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 277,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Imbued Wood (Irian Rosewood)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 277,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Imbued Wood (Kythrian Manchineel)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 277,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Imbued Wood (Lamannian Oak)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 277,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Imbued Wood (Mabaran Ebony)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 277,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Imbued Wood (Risian Pine)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 277,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Imbued Wood (Shavarran Birch)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 277,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Imbued Wood (Xorian Wenge)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 277,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Keycharm",
   "source": "ERLW",
   "sourceName": "Eberron: Rising from the Last War",
@@ -17420,6 +19474,19 @@
   "inSrd": false
  },
  {
+  "name": "Living Armor",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 278,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Living Gloves",
   "source": "ERLW",
   "sourceName": "Eberron: Rising from the Last War",
@@ -17442,6 +19509,110 @@
   "rarity": "Mundane",
   "attune": null,
   "magic": false,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Orb of Shielding (Fernian Basalt)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 278,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Orb of Shielding (Irian Quartz)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 278,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Orb of Shielding (Kythrian Skarn)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 278,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Orb of Shielding (Lamannian Flint)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 278,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Orb of Shielding (Mabaran Obsidian)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 278,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Orb of Shielding (Risian Shale)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 278,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Orb of Shielding (Shavarran Chert)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 278,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Orb of Shielding (Xorian Marble)",
+  "source": "ERLW",
+  "sourceName": "Eberron: Rising from the Last War",
+  "page": 278,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Common",
+  "attune": true,
+  "magic": true,
   "consumable": false,
   "inSrd": false
  },
@@ -17610,6 +19781,19 @@
   "type": "Weapon",
   "rarity": "Rare",
   "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Acheron Blade",
+  "source": "EGW",
+  "sourceName": "Explorer's Guide to Wildemount",
+  "page": 265,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
   "magic": true,
   "consumable": false,
   "inSrd": false
@@ -17792,6 +19976,19 @@
   "type": "Wondrous Item",
   "rarity": "Common",
   "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Corpse Slayer",
+  "source": "EGW",
+  "sourceName": "Explorer's Guide to Wildemount",
+  "page": 266,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
   "magic": true,
   "consumable": false,
   "inSrd": false
@@ -18105,6 +20302,19 @@
   "rarity": "Mundane",
   "attune": null,
   "magic": false,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Last Stand Armor",
+  "source": "EGW",
+  "sourceName": "Explorer's Guide to Wildemount",
+  "page": 267,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
   "consumable": false,
   "inSrd": false
  },
@@ -18629,6 +20839,19 @@
   "inSrd": false
  },
  {
+  "name": "Weapon of Certain Death",
+  "source": "EGW",
+  "sourceName": "Explorer's Guide to Wildemount",
+  "page": 270,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Will of the Talon (Awakened)",
   "source": "EGW",
   "sourceName": "Explorer's Guide to Wildemount",
@@ -18785,6 +21008,19 @@
   "inSrd": false
  },
  {
+  "name": "Ascendant Dragon's Wrath Weapon",
+  "source": "FTD",
+  "sourceName": "Fizban's Treasury of Dragons",
+  "page": 25,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Legendary",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Ascendant Dragon-Touched Focus",
   "source": "FTD",
   "sourceName": "Fizban's Treasury of Dragons",
@@ -18806,6 +21042,45 @@
   "type": "Other",
   "rarity": "Legendary",
   "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Crystal Blade",
+  "source": "FTD",
+  "sourceName": "Fizban's Treasury of Dragons",
+  "page": 22,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Dragon Wing Bow",
+  "source": "FTD",
+  "sourceName": "Fizban's Treasury of Dragons",
+  "page": 23,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Dragonlance",
+  "source": "FTD",
+  "sourceName": "Fizban's Treasury of Dragons",
+  "page": 23,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Legendary",
+  "attune": true,
   "magic": true,
   "consumable": false,
   "inSrd": false
@@ -18915,6 +21190,19 @@
   "inSrd": false
  },
  {
+  "name": "Slumbering Dragon's Wrath Weapon",
+  "source": "FTD",
+  "sourceName": "Fizban's Treasury of Dragons",
+  "page": 25,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Uncommon",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Slumbering Dragon-Touched Focus",
   "source": "FTD",
   "sourceName": "Fizban's Treasury of Dragons",
@@ -18949,6 +21237,19 @@
   "type": "Other",
   "rarity": "Rare",
   "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Stirring Dragon's Wrath Weapon",
+  "source": "FTD",
+  "sourceName": "Fizban's Treasury of Dragons",
+  "page": 25,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
   "magic": true,
   "consumable": false,
   "inSrd": false
@@ -19001,6 +21302,19 @@
   "type": "Other",
   "rarity": "Very Rare",
   "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Wakened Dragon's Wrath Weapon",
+  "source": "FTD",
+  "sourceName": "Fizban's Treasury of Dragons",
+  "page": 25,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Very Rare",
+  "attune": true,
   "magic": true,
   "consumable": false,
   "inSrd": false
@@ -19937,6 +22251,19 @@
   "type": "Wondrous Item",
   "rarity": "Uncommon",
   "attune": "by a sorcerer, warlock, or wizard",
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Mizzium Armor",
+  "source": "GGR",
+  "sourceName": "Guildmasters' Guide to Ravnica",
+  "page": 179,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": null,
   "magic": true,
   "consumable": false,
   "inSrd": false
@@ -20982,6 +23309,84 @@
   "inSrd": false
  },
  {
+  "name": "Drow +1 Armor",
+  "source": "MM",
+  "sourceName": "Monster Manual (2014)",
+  "page": 126,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Unknown",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Drow +1 Weapon",
+  "source": "MM",
+  "sourceName": "Monster Manual (2014)",
+  "page": 126,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Unknown",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Drow +2 Armor",
+  "source": "MM",
+  "sourceName": "Monster Manual (2014)",
+  "page": 126,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Unknown",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Drow +2 Weapon",
+  "source": "MM",
+  "sourceName": "Monster Manual (2014)",
+  "page": 126,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Unknown",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Drow +3 Armor",
+  "source": "MM",
+  "sourceName": "Monster Manual (2014)",
+  "page": 126,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Unknown",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Drow +3 Weapon",
+  "source": "MM",
+  "sourceName": "Monster Manual (2014)",
+  "page": 126,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Unknown",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Hag Eye",
   "source": "MM",
   "sourceName": "Monster Manual (2014)",
@@ -21184,6 +23589,19 @@
   "edition": "2014",
   "type": "Weapon",
   "rarity": "Artifact",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Molten Bronze Skin",
+  "source": "MOT",
+  "sourceName": "Mythic Odysseys of Theros",
+  "page": 197,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Rare",
   "attune": true,
   "magic": true,
   "consumable": false,
@@ -21963,6 +24381,19 @@
   "page": 151,
   "edition": "2014",
   "type": "Adventuring Gear",
+  "rarity": "Mundane",
+  "attune": null,
+  "magic": false,
+  "consumable": false,
+  "inSrd": true
+ },
+ {
+  "name": "Barding",
+  "source": "PHB",
+  "sourceName": "Player's Handbook (2014)",
+  "page": 157,
+  "edition": "2014",
+  "type": "Armor",
   "rarity": "Mundane",
   "attune": null,
   "magic": false,
@@ -24605,6 +27036,32 @@
   "rarity": "Mundane",
   "attune": null,
   "magic": false,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Silvered Ammunition",
+  "source": "PHB",
+  "sourceName": "Player's Handbook (2014)",
+  "page": 148,
+  "edition": "2014",
+  "type": "Ammunition",
+  "rarity": "Unknown",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
+  "inSrd": false
+ },
+ {
+  "name": "Silvered Weapon",
+  "source": "PHB",
+  "sourceName": "Player's Handbook (2014)",
+  "page": 148,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Unknown",
+  "attune": null,
+  "magic": true,
   "consumable": false,
   "inSrd": false
  },
@@ -30446,6 +32903,58 @@
   "inSrd": false
  },
  {
+  "name": "Antimagic Armor",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 65,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Armor of Fungal Spores",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 65,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Armor of Weightlessness",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 65,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Uncommon",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Armor of the Fallen",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 65,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Uncommon",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Balance Card",
   "source": "BMT",
   "sourceName": "The Book of Many Things",
@@ -30498,6 +33007,19 @@
   "inSrd": false
  },
  {
+  "name": "Bloodseeker Ammunition",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 66,
+  "edition": "2014",
+  "type": "Ammunition",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
+  "inSrd": false
+ },
+ {
   "name": "Boomerang Shield",
   "source": "BMT",
   "sourceName": "The Book of Many Things",
@@ -30505,6 +33027,32 @@
   "edition": "2014",
   "type": "Armor",
   "rarity": "Uncommon",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Bow of Conflagration",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 66,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Bow of Melodies",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 66,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Very Rare",
   "attune": true,
   "magic": true,
   "consumable": false,
@@ -30532,6 +33080,19 @@
   "type": "Wondrous Item",
   "rarity": "Uncommon",
   "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Clockwork Armor",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 67,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Very Rare",
+  "attune": true,
   "magic": true,
   "consumable": false,
   "inSrd": false
@@ -30680,6 +33241,19 @@
   "inSrd": false
  },
  {
+  "name": "Dried Leech",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 67,
+  "edition": "2014",
+  "type": "Ammunition",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
+  "inSrd": false
+ },
+ {
   "name": "Euryale Card",
   "source": "BMT",
   "sourceName": "The Book of Many Things",
@@ -30745,6 +33319,19 @@
   "inSrd": false
  },
  {
+  "name": "Feywrought Armor",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 67,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Flames Card",
   "source": "BMT",
   "sourceName": "The Book of Many Things",
@@ -30771,6 +33358,32 @@
   "inSrd": false
  },
  {
+  "name": "Fool's Blade",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 36,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Forcebreaker Weapon",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 67,
+  "edition": "2014",
+  "type": "Other",
+  "rarity": "Very Rare",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Gem Card",
   "source": "BMT",
   "sourceName": "The Book of Many Things",
@@ -30779,6 +33392,32 @@
   "type": "Wondrous Item",
   "rarity": "Legendary",
   "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Glimmering Moonbow",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 36,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Gloomwrought Armor",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 67,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Rare",
+  "attune": true,
   "magic": true,
   "consumable": false,
   "inSrd": false
@@ -31187,6 +33826,19 @@
   "inSrd": false
  },
  {
+  "name": "Starshot Crossbow",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 38,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Stonemaker War Pick",
   "source": "BMT",
   "sourceName": "The Book of Many Things",
@@ -31221,6 +33873,19 @@
   "type": "Staff",
   "rarity": "Rare",
   "attune": "by a cleric, druid, or wizard",
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Sword of the Planes",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 68,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Legendary",
+  "attune": true,
   "magic": true,
   "consumable": false,
   "inSrd": false
@@ -31314,6 +33979,32 @@
   "attune": true,
   "magic": true,
   "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Weapon of Throne's Command",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 39,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Very Rare",
+  "attune": true,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Winged Ammunition",
+  "source": "BMT",
+  "sourceName": "The Book of Many Things",
+  "page": 69,
+  "edition": "2014",
+  "type": "Ammunition",
+  "rarity": "Uncommon",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
   "inSrd": false
  },
  {
@@ -32066,6 +34757,32 @@
   "type": "Other",
   "rarity": "Unknown",
   "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Mind Blade",
+  "source": "VGM",
+  "sourceName": "Volo's Guide to Monsters",
+  "page": 81,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Rare",
+  "attune": "by a specific individual",
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Mind Carapace Armor",
+  "source": "VGM",
+  "sourceName": "Volo's Guide to Monsters",
+  "page": 81,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Uncommon",
+  "attune": "by a specific individual",
   "magic": true,
   "consumable": false,
   "inSrd": false
@@ -34047,6 +36764,45 @@
   "inSrd": false
  },
  {
+  "name": "Adamantine Ammunition",
+  "source": "XGE",
+  "sourceName": "Xanathar's Guide to Everything",
+  "page": 78,
+  "edition": "2014",
+  "type": "Ammunition",
+  "rarity": "Unknown",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
+  "inSrd": false
+ },
+ {
+  "name": "Adamantine Weapon",
+  "source": "XGE",
+  "sourceName": "Xanathar's Guide to Everything",
+  "page": 78,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Unknown",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Armor of Gleaming",
+  "source": "XGE",
+  "sourceName": "Xanathar's Guide to Everything",
+  "page": 136,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Common",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Bead of Nourishment",
   "source": "XGE",
   "sourceName": "Xanathar's Guide to Everything",
@@ -34092,6 +36848,19 @@
   "page": 136,
   "edition": "2014",
   "type": "Wondrous Item",
+  "rarity": "Common",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Cast-Off Armor",
+  "source": "XGE",
+  "sourceName": "Xanathar's Guide to Everything",
+  "page": 136,
+  "edition": "2014",
+  "type": "Armor",
   "rarity": "Common",
   "attune": null,
   "magic": true,
@@ -34320,6 +37089,19 @@
   "inSrd": false
  },
  {
+  "name": "Moon-Touched Sword",
+  "source": "XGE",
+  "sourceName": "Xanathar's Guide to Everything",
+  "page": 138,
+  "edition": "2014",
+  "type": "Weapon",
+  "rarity": "Common",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Mystery Key",
   "source": "XGE",
   "sourceName": "Xanathar's Guide to Everything",
@@ -34463,6 +37245,19 @@
   "inSrd": false
  },
  {
+  "name": "Smoldering Armor",
+  "source": "XGE",
+  "sourceName": "Xanathar's Guide to Everything",
+  "page": 139,
+  "edition": "2014",
+  "type": "Armor",
+  "rarity": "Common",
+  "attune": null,
+  "magic": true,
+  "consumable": false,
+  "inSrd": false
+ },
+ {
   "name": "Staff of Adornment",
   "source": "XGE",
   "sourceName": "Xanathar's Guide to Everything",
@@ -34551,6 +37346,19 @@
   "attune": null,
   "magic": true,
   "consumable": false,
+  "inSrd": false
+ },
+ {
+  "name": "Walloping Ammunition",
+  "source": "XGE",
+  "sourceName": "Xanathar's Guide to Everything",
+  "page": 139,
+  "edition": "2014",
+  "type": "Ammunition",
+  "rarity": "Common",
+  "attune": null,
+  "magic": true,
+  "consumable": true,
   "inSrd": false
  },
  {
