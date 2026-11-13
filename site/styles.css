@@ -322,7 +322,7 @@ a.srctag:hover { text-decoration: underline; }
   .card[data-rarity] { border-left-color: #000; }
   .itext.mini { border-top-color: #999; }
 }
-/* === dnd-shared v1.4 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
+/* === dnd-shared v1.5 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
 /* Paste this block unchanged at the END of each site's styles.css. Do not edit it per site;
    change it in the hub repo and re-copy it to every site. It relies on the shared tokens
    (--bg, --surface, --surface-2, --ink, --ink-2, --muted, --line, --accent, --gold, --radius). */
@@ -358,11 +358,11 @@ a.srctag:hover { text-decoration: underline; }
 @media (max-width: 480px) { .hub-nav { gap: 10px; } .tagline { font-size: .85rem; } }
 /* print: paper-friendly, no chrome. Sites add their own rules to hide tool controls. */
 @media print {
-  :root, :root:not([data-theme="light"]), :root[data-theme="dark"] { --bg: #fff; --surface: #fff; --surface-2: #f3f3f3; --ink: #000; --ink-2: #222; --muted: #555; --line: #bbb; --shadow: none; color-scheme: light; }
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"] { --bg: #fff; --surface: #fff; --surface-2: #f3f3f3; --ink: #000; --ink-2: #222; --muted: #555; --line: #bbb; --shadow: none; --accent: #2f6b4f; --accent-ink: #ffffff; --gold: #a8841c; --warn: #9a4b1c; --warn-bg: #f7e6d8; --chip: #e6efe9; color-scheme: light; }
   body { background: #fff; }
   .hub-bar, #themeBtn, .site-footer .foot-links, button, dialog::backdrop { display: none !important; }
   .site-header { border-bottom: 1px solid #000; }
   a { color: inherit; text-decoration: none; }
   .card, .change-day li, .statblock { break-inside: avoid; }
 }
-/* === end dnd-shared v1.4 === */
+/* === end dnd-shared v1.5 === */
