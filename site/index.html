@@ -70,17 +70,25 @@
   <div class="wrap filters">
     <details class="srcpick fpick" id="typePick">
       <summary id="typeSum">Type</summary>
-      <div class="srcpop"><div class="srcbtns"><button type="button" id="typeClear">Clear types</button></div><div class="chips" id="typeChips" role="group" aria-label="Item type"></div></div>
+      <div class="srcpop">
+        <div class="srcbtns"><button type="button" id="typeClear">Clear all</button><span class="small muted">Shows items of any ticked type.</span></div>
+        <div id="typeChips" class="srclist" role="group" aria-label="Item type"></div>
+      </div>
     </details>
     <details class="srcpick fpick" id="rarPick">
       <summary id="rarSum">Rarity</summary>
-      <div class="srcpop"><div class="srcbtns"><button type="button" id="rarClear">Clear rarities</button></div><div class="chips" id="rarChips" role="group" aria-label="Rarity"></div></div>
+      <div class="srcpop">
+        <div class="srcbtns"><button type="button" id="rarClear">Clear all</button><span class="small muted">Shows items of any ticked rarity.</span></div>
+        <div id="rarChips" class="srclist" role="group" aria-label="Rarity"></div>
+      </div>
     </details>
-    <select id="attune" aria-label="Attunement">
-      <option value="">Any attunement</option>
-      <option value="yes">Requires attunement</option>
-      <option value="no">No attunement</option>
-    </select>
+    <details class="srcpick fpick" id="attPick">
+      <summary id="attSum">Attunement</summary>
+      <div class="srcpop">
+        <div class="srcbtns"><button type="button" id="attClear">Clear all</button><span class="small muted">Shows items matching any ticked option.</span></div>
+        <div id="attList" class="srclist" role="group" aria-label="Attunement"></div>
+      </div>
+    </details>
     <details class="srcpick" id="srcPick">
       <summary id="srcSum">Sources</summary>
       <div class="srcpop">

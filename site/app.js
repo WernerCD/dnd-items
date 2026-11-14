@@ -12,13 +12,14 @@
   var CORE = ['SRD 5.1', 'SRD 5.2', "Player's Handbook (2014)", "Player's Handbook (2024)", "Dungeon Master's Guide (2014)",
     "Dungeon Master's Guide (2024)", 'Monster Manual (2014)', 'Monster Manual (2025)', "Xanathar's Guide to Everything", "Tasha's Cauldron of Everything"];
   var params = new URLSearchParams(location.search);
-  var DEFAULTS = { kind: 'all', types: [], rars: [], attune: '', consumable: '', show: '', q: '' };
+  var ATT_KINDS = [['none', 'No attunement'], ['req', 'Requires attunement'], ['cls', 'Limited to certain classes'], ['opt', 'Attunement optional']];
+  var DEFAULTS = { kind: 'all', types: [], rars: [], atts: [], consumable: '', show: '', q: '' };
   var state = {
     ed: params.get('ed') || store.get('di.ed', '2024'),
     kind: 'all',
     types: [],
     rars: [],
-    attune: '',
+    atts: [],            /* attunement kinds ticked: none / req / cls / opt */
     consumable: '',
     show: '',            /* '' all, 'fav', 'wish', 'att' */
     usable: store.get('di.usable', true),
@@ -45,7 +46,8 @@
     if ((v = params.get('kind')) && ['all', 'magic', 'mundane'].indexOf(v) >= 0) state.kind = v;
     if ((v = listParam('type'))) state.types = v;
     if ((v = listParam('rarity'))) state.rars = v;
-    if ((v = params.get('attune')) && ['yes', 'no'].indexOf(v) >= 0) state.attune = v;
+    /* attune=yes|no is the old single-choice form */
+    if ((v = params.get('attune'))) state.atts = v === 'yes' ? ['req', 'cls', 'opt'] : v === 'no' ? ['none'] : v.split('|').filter(function (k) { return ATT_KINDS.some(function (x) { return x[0] === k; }); });
     if ((v = params.get('cons')) && ['yes', 'no'].indexOf(v) >= 0) state.consumable = v;
     if ((v = params.get('view')) && ['basic', 'stats', 'full'].indexOf(v) >= 0) state.detail = v;
     if ((v = params.get('sort'))) state.sort = v;
@@ -223,6 +225,11 @@
       return (c.cls === 'fighter' || c.cls === 'rogue') && c.lvl >= 3 && /eldritch knight|arcane trickster/i.test((c.subName || '') + ' ' + String(c.sub || '').replace(/-/g, ' '));
     });
   }
+  function attKind(it) {
+    if (!it.attune) return 'none';
+    if (typeof it.attune === 'string' && /^optional$/i.test(it.attune)) return 'opt';
+    return attClasses(it) ? 'cls' : 'req';
+  }
   function usableBy(ch, it) {
     var r = attClasses(it);
     if (!r || !ch.classes.length) return true;
@@ -246,8 +253,7 @@
     if (state.kind === 'mundane' && it.magic) return false;
     if (skip !== 'type' && state.types.length && state.types.indexOf(it.type) < 0) return false;
     if (skip !== 'rar' && state.rars.length && state.rars.indexOf(it.rarity) < 0) return false;
-    if (state.attune === 'yes' && !it.attune) return false;
-    if (state.attune === 'no' && it.attune) return false;
+    if (skip !== 'att' && state.atts.length && state.atts.indexOf(attKind(it)) < 0) return false;
     if (state.consumable === 'yes' && !it.consumable) return false;
     if (state.consumable === 'no' && it.consumable) return false;
     if (!itemSrcOn(it)) return false;
@@ -350,7 +356,7 @@
     setP('kind', state.kind !== 'all' && state.kind);
     setP('type', state.types.join('|'));
     setP('rarity', state.rars.join('|'));
-    setP('attune', state.attune);
+    setP('attune', state.atts.join('|'));
     setP('cons', state.consumable);
     setP('view', state.detail !== 'basic' && state.detail);
     setP('sort', state.sort !== 'name' && state.sort);
@@ -417,24 +423,29 @@
   /* type and rarity chips, built from the data for this edition */
   function renderChips() {
     /* counts follow every other filter (books, kind, search...), so a chip's number is what you get */
-    var types = {}, rars = {}, all = {}, q = state.q.trim().toLowerCase(), pool = state.merge ? DATA.items.concat(DATA.others) : DATA.items;
+    var types = {}, rars = {}, atts = {}, all = {}, q = state.q.trim().toLowerCase(), pool = state.merge ? DATA.items.concat(DATA.others) : DATA.items;
     pool.forEach(function (it) {
       if (it.ed !== state.ed) return;
       all[it.type] = all[it.rarity] = 1;
       if (pass(it, q, 'type')) types[it.type] = (types[it.type] || 0) + 1;
       if (pass(it, q, 'rar')) rars[it.rarity] = (rars[it.rarity] || 0) + 1;
+      if (pass(it, q, 'att')) { var k = attKind(it); atts[k] = (atts[k] || 0) + 1; }
     });
-    function chip(kind, t, n, extra) {
-      var on = (kind === 'type' ? state.types : state.rars).indexOf(t) >= 0;
-      return '<button type="button" class="chip' + extra + (n ? '' : ' zero') + '" data-' + kind + '="' + esc(t) + '" aria-pressed="' + on + '"' +
-        (kind === 'rar' ? ' style="' + rarVars(t) + '"' : '') + '>' + esc(t) + ' <span class="n">' + (n || 0) + '</span></button>';
+    /* one tick-box row; rows with nothing to show are dimmed unless ticked */
+    function row(kind, key, label, n, on, extra) {
+      return '<label class="srcrow' + (n || on ? '' : ' zero') + (extra || '') + '"' + (kind === 'rar' ? rarAttr(key) : '') + '><input type="checkbox" data-' + kind + '="' + esc(key) + '"' + (on ? ' checked' : '') + '>' +
+        (kind === 'rar' ? '<i class="dot" aria-hidden="true"></i>' : '') + '<span>' + esc(label) + '</span><span class="n">' + (n || 0) + '</span></label>';
     }
-    $('#typeChips').innerHTML = TYPE_ORDER.filter(function (t) { return all[t]; }).map(function (t) { return chip('type', t, types[t], ''); }).join('');
-    $('#rarChips').innerHTML = RAR_ORDER.filter(function (t) { return all[t]; }).map(function (t) { return chip('rar', t, rars[t], ' rchip'); }).join('');
-    $('#typeSum').textContent = state.types.length ? 'Type (' + state.types.length + ')' : 'Type';
-    $('#rarSum').textContent = state.rars.length ? 'Rarity (' + state.rars.length + ')' : 'Rarity';
-    $('#typePick').classList.toggle('filtered', state.types.length > 0);
-    $('#rarPick').classList.toggle('filtered', state.rars.length > 0);
+    function summary(pick, sum, label, names) {
+      $(sum).textContent = names.length ? label + ': ' + (names.length > 2 ? names.length + ' picked' : names.join(' or ')) : label;
+      $(pick).classList.toggle('filtered', names.length > 0);
+    }
+    $('#typeChips').innerHTML = TYPE_ORDER.filter(function (t) { return all[t]; }).map(function (t) { return row('type', t, t, types[t], state.types.indexOf(t) >= 0); }).join('');
+    $('#rarChips').innerHTML = RAR_ORDER.filter(function (t) { return all[t]; }).map(function (t) { return row('rar', t, t, rars[t], state.rars.indexOf(t) >= 0, ' rrow'); }).join('');
+    $('#attList').innerHTML = ATT_KINDS.map(function (k) { return row('att', k[0], k[1], atts[k[0]], state.atts.indexOf(k[0]) >= 0); }).join('');
+    summary('#typePick', '#typeSum', 'Type', TYPE_ORDER.filter(function (t) { return state.types.indexOf(t) >= 0; }));
+    summary('#rarPick', '#rarSum', 'Rarity', RAR_ORDER.filter(function (t) { return state.rars.indexOf(t) >= 0; }));
+    summary('#attPick', '#attSum', 'Attunement', ATT_KINDS.filter(function (k) { return state.atts.indexOf(k[0]) >= 0; }).map(function (k) { return k[1].replace(/^Attunement optional$/, 'Optional'); }));
   }
 
   /* source picker: every source in the current edition, with counts */
@@ -557,7 +568,7 @@
     document.querySelectorAll('[data-ed]').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.ed === state.ed); });
     document.querySelectorAll('[data-kind]').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.kind === state.kind); });
     document.querySelectorAll('[data-detail]').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.detail === state.detail); });
-    $('#attune').value = state.attune; $('#consumable').value = state.consumable; $('#show').value = state.show;
+    $('#consumable').value = state.consumable; $('#show').value = state.show;
     $('#sort').value = state.sort; $('#merge').checked = state.merge; $('#groupVar').checked = state.groupVar;
     if ($('#search').value !== state.q) $('#search').value = state.q;
     var ch = CUR_CH;
@@ -584,8 +595,6 @@
     if (t.dataset.ed) return update({ ed: t.dataset.ed, types: [], rars: [] });
     if (t.dataset.kind) return update({ kind: t.dataset.kind });
     if (t.dataset.detail) return update({ detail: t.dataset.detail });
-    if (t.dataset.type) return update({ types: toggleIn(state.types, t.dataset.type) });
-    if (t.dataset.rar) return update({ rars: toggleIn(state.rars, t.dataset.rar) });
     if (t.id === 'srcAll') return setSources(allBooks(), true);
     if (t.id === 'srcNone') return setSources(allBooks(), false);
     if (t.id === 'srcShown') { var sel = {}; visibleSrcKeys().forEach(function (k) { sel[k] = true; }); return update({ srcSel: sel }); }
@@ -593,6 +602,7 @@
     if (t.id === 'resetBtn') { var p = Object.assign({}, DEFAULTS, { srcSel: coreSel(), types: [], rars: [] }); return update(p); }
     if (t.id === 'typeClear') return update({ types: [] });
     if (t.id === 'rarClear') return update({ rars: [] });
+    if (t.id === 'attClear') return update({ atts: [] });
     if (t.id === 'moreBtn') return update({ limit: state.limit + PAGE });
     if (t.id === 'moreOthersBtn') return update({ limitOthers: state.limitOthers + PAGE });
     if (t.dataset.fav || t.dataset.wish) {
@@ -628,7 +638,15 @@
   });
   var qTimer = null;
   $('#search').addEventListener('input', function () { var v = this.value; clearTimeout(qTimer); qTimer = setTimeout(function () { update({ q: v }); }, 150); });
-  $('#attune').addEventListener('change', function () { update({ attune: this.value }); });
+  /* tick boxes in the Type, Rarity and Attunement menus */
+  ['#typeChips', '#rarChips', '#attList'].forEach(function (s) {
+    $(s).addEventListener('change', function (ev) {
+      var d = ev.target.dataset;
+      if (d.type) update({ types: toggleIn(state.types, d.type) });
+      else if (d.rar) update({ rars: toggleIn(state.rars, d.rar) });
+      else if (d.att) update({ atts: toggleIn(state.atts, d.att) });
+    });
+  });
   $('#sort').addEventListener('change', function () { update({ sort: this.value }); });
   $('#consumable').addEventListener('change', function () { update({ consumable: this.value }); });
   $('#show').addEventListener('change', function () { update({ show: this.value }); });
@@ -654,7 +672,17 @@
   $('#srcList').addEventListener('change', function (ev) { var k = ev.target.dataset.src; if (k) setSources([k], ev.target.checked); });
   document.addEventListener('click', function (ev) {
     if (!ev.target.isConnected) return; /* a chip that was just re-rendered */
-    ['#srcPick', '#typePick', '#rarPick'].forEach(function (s) { var p = $(s); if (p.open && !p.contains(ev.target)) p.open = false; });
+    ['#srcPick', '#typePick', '#rarPick', '#attPick'].forEach(function (s) { var p = $(s); if (p.open && !p.contains(ev.target)) p.open = false; });
+  });
+  /* one filter menu open at a time; each opens under its own button, nudged left to stay 16px inside the screen */
+  document.querySelectorAll('details.srcpick').forEach(function (d) {
+    d.addEventListener('toggle', function () {
+      if (!d.open) return;
+      document.querySelectorAll('details.srcpick').forEach(function (o) { if (o !== d) o.open = false; });
+      var pop = d.querySelector('.srcpop'); pop.style.left = '0px';
+      var r = pop.getBoundingClientRect(), over = r.right - (document.documentElement.clientWidth - 16);
+      if (over > 0) pop.style.left = -Math.min(over, r.left - 16) + 'px';
+    });
   });
 
 
