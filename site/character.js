@@ -1,4 +1,4 @@
-/* dnd-shared character.js v1.1 (canonical copy: WernerCD/dnd shared/character.js). Copy unchanged to site/character.js.
+/* dnd-shared character.js v1.2 (canonical copy: WernerCD/dnd shared/character.js). Copy unchanged to site/character.js.
  *
  * One list of characters shared by every D&D Toolbox site. All the sites are served from
  * wernercd.github.io, so they share localStorage: a Paladin built in the Multiclass Planner shows up,
@@ -13,6 +13,8 @@
  *   ab:      [STR, DEX, CON, INT, WIS, CHA]   // scores, not modifiers
  *   updated: ISO time,  by: 'dnd-multiclass-planner' (repo that last wrote it)
  *   links:   { '<repo>': anything }   // each site keeps ITS OWN per-character data here, and only touches its own key
+ *   share:   { '<repo>': json }       // optional: what that site wants a share link to carry (setShare), max 6000 chars each
+ *   inbox:   { '<repo>': json }       // share data that arrived with a share link, waiting for that site (takeInbox)
  * }
  * Sites keep their detailed state in their own keys as before; this record is the shared summary they agree on.
  * Subclass ids differ between sites, so match with DndChar.sameSub() (id first, then name).
@@ -25,8 +27,14 @@
  *   summary(ch) -> 'Paladin 6 / Warlock 2'      short(ch) -> 'Pal 6 / Lock 2'
  *   sameSub(a, b) -> bool          url(repo, id) -> link to that tool opened on that character
  *   onChange(fn)                   fn(active, all) after any change, in this tab or another
+ *   shareUrl(ch, repo) -> link that carries the character itself (#dndchar=...), for another browser or person
+ *   copyShare(ch, repo, button)    copies shareUrl to the clipboard and says so on the button
+ *   setShare(id, repo, data|null)  what your site adds to this character's share links (for example a spell list or a build)
+ *   takeInbox(id, repo) -> data|null   share data that arrived for your site; returns it once and removes it
  *   mountPicker(el)                fills el (the header's <span class="char-pick" id="charPick">) with the switcher
  * Opening any tool with ?char=<id> makes that character active.
+ * Opening any tool with #dndchar=<data> offers to add (or update) the shared character in this browser.
+ * The data is in the #fragment, so it is never sent to the web server. Site links (links{}) are not shared.
  */
 (function () {
   var KEY = 'dnd.characters', BASE = 'https://wernercd.github.io/';
@@ -55,7 +63,13 @@
     }).filter(Boolean);
     var ab = Array.isArray(c.ab) && c.ab.length === 6 ? c.ab.map(function (n) { return Math.max(1, Math.min(30, parseInt(n, 10) || 10)); }) : [10, 10, 10, 10, 10, 10];
     return { id: String(c.id).slice(0, 40), name: String(c.name || 'Unnamed').slice(0, 60), ed: c.ed === '2014' ? '2014' : '2024',
-      classes: cl, ab: ab, updated: c.updated || null, by: c.by || null, links: c.links && typeof c.links === 'object' ? c.links : {} };
+      classes: cl, ab: ab, updated: c.updated || null, by: c.by || null, links: c.links && typeof c.links === 'object' ? c.links : {},
+      share: box(c.share), inbox: box(c.inbox) };
+  }
+  function box(o) {   // { repo: small JSON value }, anything over 6000 characters is dropped
+    var r = {}; if (!o || typeof o !== 'object') return r;
+    for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k) && o[k] != null) { try { if (JSON.stringify(o[k]).length <= 6000) r[String(k).slice(0, 40)] = o[k]; } catch (e) { /* skip */ } }
+    return r;
   }
   function uid() { return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
   function find(d, id) { for (var i = 0; i < d.list.length; i++) if (d.list[i].id === id) return i; return -1; }
@@ -104,6 +118,19 @@
     },
     url: function (repo, id) { return BASE + repo + '/' + (id ? '?char=' + encodeURIComponent(id) : ''); },
     onChange: function (fn) { subs.push(fn); },
+    shareUrl: function (ch, repo) { return BASE + (repo || here()) + '/#dndchar=' + encode(ch); },
+    copyShare: copyShare,
+    setShare: function (id, repo, data) {
+      var d = read(), i = find(d, id); if (i < 0) return false;
+      var cur = d.list[i].share[repo];
+      if (JSON.stringify(cur === undefined ? null : cur) === JSON.stringify(data == null ? null : data)) return true;
+      if (data == null) delete d.list[i].share[repo]; else d.list[i].share[repo] = data;
+      d.list[i] = clean(d.list[i]); return write(d);
+    },
+    takeInbox: function (id, repo) {
+      var d = read(), i = find(d, id); if (i < 0 || !(repo in d.list[i].inbox)) return null;
+      var v = d.list[i].inbox[repo]; delete d.list[i].inbox[repo]; write(d); return v;
+    },
     mountPicker: mountPicker
   };
 
@@ -120,6 +147,80 @@
     }
   } catch (e) { /* file:// */ }
 
+
+  // ---- share links: #dndchar=<base64url JSON> carries the character to another browser ----
+  function here() { var m = /^\/([^\/]+)/.exec(location.pathname); return m ? m[1] : 'dnd'; }
+  function b64e(s) { return btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  function b64d(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return decodeURIComponent(escape(atob(s))); }
+  function encode(ch) {
+    return b64e(JSON.stringify({ v: 1, id: ch.id, n: ch.name, ed: ch.ed, ab: ch.ab,
+      c: ch.classes.map(function (x) { return [x.cls, x.lvl, x.sub || '', x.subName || '']; }),
+      x: ch.share && Object.keys(ch.share).length ? ch.share : undefined }));
+  }
+  function decode(s) {
+    var o = JSON.parse(b64d(s));
+    if (!o || o.v !== 1 || !Array.isArray(o.c)) throw new Error('bad share');
+    var c = clean({ id: o.id || uid(), name: o.n, ed: o.ed, ab: o.ab,
+      classes: o.c.map(function (x) { return Array.isArray(x) ? { cls: x[0], lvl: x[1], sub: x[2] || null, subName: x[3] || null } : null; }),
+      inbox: o.x });
+    if (!c || !c.classes.length) throw new Error('bad share');
+    return c;
+  }
+  function copyShare(ch, repo, btn) {
+    var url = API.shareUrl(ch, repo), old = btn && btn.textContent;
+    var done = function (msg) { if (!btn) return; btn.textContent = msg; setTimeout(function () { btn.textContent = old; }, 2000); };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(url).then(function () { done('Link copied'); }, function () { window.prompt('Copy this link', url); });
+    else window.prompt('Copy this link', url);
+    return url;
+  }
+  var incoming = null, incomingBad = false;
+  function grab() {
+    try {
+      var hm = /(^#|&)dndchar=([A-Za-z0-9_-]*)/.exec(location.hash);
+      if (!hm) return false;
+      try { incoming = decode(hm[2]); incomingBad = false; } catch (e) { incoming = null; incomingBad = true; }
+      var rest = location.hash.replace(/(^#|&)dndchar=[A-Za-z0-9_-]*/, '$1').replace(/^#&/, '#').replace(/&$/, '');
+      history.replaceState(null, '', location.pathname + location.search + (rest === '#' ? '' : rest));
+      return true;
+    } catch (e) { return false; /* file:// or old browser */ }
+  }
+  grab();
+  // a share link opened in a tab that already shows this site only changes the #fragment, so there is no reload
+  window.addEventListener('hashchange', function (e) { if (grab()) { e.stopImmediatePropagation(); var old = document.querySelector('.char-import'); if (old) old.remove(); toast(); } }, true);
+  function same(a, b) { return !Object.keys(b.inbox).length && JSON.stringify([a.name, a.ed, a.ab, a.classes]) === JSON.stringify([b.name, b.ed, b.ab, b.classes]); }
+  var TOOL = { 'dnd-magic': 'Spell Planner list', 'dnd-multiclass-planner': 'Multiclass Planner build', 'dnd-druid-wildshapes': 'Wild Shape profile', 'dnd-items': 'Item Finder lists' };
+  function extras(c) { var k = Object.keys(c.inbox).map(function (r) { return TOOL[r] || r; }); return k.length ? ' It comes with its ' + k.join(' and ') + '.' : ''; }
+  function toast() {
+    if (!incoming && !incomingBad) return;
+    var inc = incoming; incoming = null; if (!inc && !incomingBad) return;
+    var bad = incomingBad; incomingBad = false;
+    var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+    var mine = inc && API.get(inc.id);
+    if (mine && same(mine, inc)) { API.setActive(mine.id); return; }
+    var box = document.createElement('div');
+    box.className = 'char-import'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-labelledby', 'charImpT');
+    var desc = inc ? esc(API.summary(inc)) + ', ' + inc.ed + ' rules' : '';
+    box.innerHTML = bad
+      ? '<p id="charImpT">That character link is damaged or incomplete, so nothing was added.</p><div class="ci-acts"><button type="button" class="ci-no">OK</button></div>'
+      : mine
+        ? '<p id="charImpT"><b>' + esc(inc.name) + '</b> (' + desc + ') was shared with you.' + extras(inc) + ' You already have this character, and yours is different.</p>' +
+          '<div class="ci-acts"><button type="button" class="ci-yes">Use the shared version</button><button type="button" class="ci-no">Keep mine</button></div>'
+        : '<p id="charImpT"><b>' + esc(inc.name) + '</b> (' + desc + ') was shared with you.' + extras(inc) + '</p>' +
+          '<div class="ci-acts"><button type="button" class="ci-yes">Add to my characters</button><button type="button" class="ci-no">No thanks</button></div>';
+    var back = document.activeElement;
+    var key = function (e) { if (e.key === 'Escape') close(); };
+    var close = function () { box.remove(); document.removeEventListener('keydown', key); if (back && back.focus && back !== document.body) back.focus(); };
+    box.addEventListener('click', function (e) {
+      if (e.target.closest('.ci-yes')) { var keep = API.get(inc.id), cp = {}; for (var k in inc) if (k !== 'links' && k !== 'share') cp[k] = inc[k];
+        if (keep) { var ib = {}; for (var k1 in keep.inbox) ib[k1] = keep.inbox[k1]; for (var k2 in inc.inbox) ib[k2] = inc.inbox[k2]; cp.inbox = ib; }
+        var s = API.save(cp, 'share'); API.setActive(s.id); close(); }
+      else if (e.target.closest('.ci-no')) close();
+    });
+    document.addEventListener('keydown', key);
+    document.body.appendChild(box);
+    box.querySelector('button').focus();
+  }
+
   var pick = null;
   function mountPicker(el) { pick = el; paint(); }
   function paint() {
@@ -133,11 +234,13 @@
     pick.innerHTML = '<label><span class="char-lbl">Character</span> <select aria-label="Active character">' +
       '<option value="">None</option>' +
       d.list.map(function (c) { return '<option value="' + esc(c.id) + '"' + (c.id === d.active ? ' selected' : '') + '>' + esc(c.name) + (c.classes.length ? ' (' + esc(API.short(c)) + ')' : '') + '</option>'; }).join('') +
-      '</select></label>';
+      '</select></label>' + (d.active && find(d, d.active) >= 0 ? ' <button type="button" class="char-share" title="Copy a link that adds this character in another browser">Share</button>' : '');
     pick.querySelector('select').addEventListener('change', function (e) { API.setActive(e.target.value || null); });
+    var sb = pick.querySelector('.char-share');
+    if (sb) sb.addEventListener('click', function () { var a = API.active(); if (a) copyShare(a, here(), sb); });
   }
 
   window.DndChar = API;
-  document.addEventListener('DOMContentLoaded', function () { var el = document.getElementById('charPick'); if (el && !pick) mountPicker(el); });
-  if (document.readyState !== 'loading') { var el0 = document.getElementById('charPick'); if (el0) mountPicker(el0); }
+  document.addEventListener('DOMContentLoaded', function () { var el = document.getElementById('charPick'); if (el && !pick) mountPicker(el); toast(); });
+  if (document.readyState !== 'loading') { var el0 = document.getElementById('charPick'); if (el0) mountPicker(el0); toast(); }
 })();
