@@ -1,4 +1,4 @@
-/* dnd-shared character.js v1 (canonical copy: WernerCD/dnd shared/character.js). Copy unchanged to site/character.js.
+/* dnd-shared character.js v1.1 (canonical copy: WernerCD/dnd shared/character.js). Copy unchanged to site/character.js.
  *
  * One list of characters shared by every D&D Toolbox site. All the sites are served from
  * wernercd.github.io, so they share localStorage: a Paladin built in the Multiclass Planner shows up,
@@ -20,7 +20,7 @@
  * API (window.DndChar):
  *   all() -> [Character]          active() -> Character|null      get(id)
  *   save(ch, repo) -> Character   (creates with an id if missing, merges, stamps updated/by, returns the stored copy)
- *   setLink(id, repo, data)       remove(id)      setActive(id|null)
+ *   setLink(id, repo, data)       remove(id) (if it was active, active becomes null)      setActive(id|null)
  *   level(ch), levelIn(ch, cls), classOf(ch, cls) -> {cls,lvl,sub,subName}|null, mod(ch, 'wis'|'str'|...)
  *   summary(ch) -> 'Paladin 6 / Warlock 2'      short(ch) -> 'Pal 6 / Lock 2'
  *   sameSub(a, b) -> bool          url(repo, id) -> link to that tool opened on that character
@@ -80,7 +80,7 @@
     },
     remove: function (id) {
       var d = read(), i = find(d, id); if (i < 0) return false;
-      d.list.splice(i, 1); if (d.active === id) d.active = d.list.length ? d.list[0].id : null;
+      d.list.splice(i, 1); if (d.active === id) d.active = null;   // never silently switch to another character
       return write(d);
     },
     setActive: function (id) { var d = read(); d.active = id && find(d, id) >= 0 ? id : null; return write(d); },

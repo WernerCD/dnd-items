@@ -51,10 +51,14 @@
     if ((v = params.get('cons')) && ['yes', 'no'].indexOf(v) >= 0) state.consumable = v;
     if ((v = params.get('view')) && ['basic', 'stats', 'full'].indexOf(v) >= 0) state.detail = v;
     if ((v = params.get('sort'))) state.sort = v;
+    if ((v = params.get('show')) && ['fav', 'wish', 'att'].indexOf(v) >= 0) state.show = v;
+    if ((v = params.get('one'))) state.merge = v !== '0';
+    if ((v = params.get('group'))) state.groupVar = v !== '0';
+    if ((v = params.get('usable'))) state.usable = v !== '0';
     if ((v = listParam('books'))) { state.srcSel = {}; state.srcAllPending = v[0] === 'all'; v.forEach(function (k) { state.srcSel[k] = true; }); }
   })();
 
-  var DATA = null, BYID = {}, GROUPS = {}, BYNAME = {}, CUR_CH = null, LISTS = { favs: {}, wish: {}, att: [] };
+  var DATA = null, BYID = {}, GROUPS = {}, BYNAME = {}, CUR_CH = null, LISTS = { favs: {}, wish: {}, att: [] }, LAST_MAIN = [], LAST_OTH = [], LINKQ = '';
   var $ = function (s) { return document.querySelector(s); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var norm = function (s) { return String(s || '').toLowerCase().replace(/'/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); };
@@ -140,7 +144,7 @@
     if (!a) return '';
     if (a === true) return 'Requires attunement';
     if (/^optional$/i.test(a)) return 'Attunement optional';
-    return 'Requires attunement ' + a.replace(/^Requires attunement\s*/i, '');
+    return 'Requires attunement ' + a.replace(/^Requires attunement\s*/i, '').replace(/\{@\w+ ([^|}]*)[^}]*\}/g, '$1');
   }
   function inline(s) {
     return esc(s).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/(^|[\s(>])_([^_]+)_(?=[\s.,;:)!?<]|$)/g, '$1<i>$2</i>').replace(/(^|[\s(>])\*([^*\s][^*]*)\*(?=[\s.,;:)!?<]|$)/g, '$1<i>$2</i>');
@@ -195,26 +199,50 @@
   var CLASSES = ['artificer', 'barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'wizard'];
   function activeCh() { try { return window.DndChar ? DndChar.active() : null; } catch (e) { return null; } }
   /* this character's lists, or the no-character favorites (di.favs) */
+  /* read fresh from storage every time, so two open tabs never write over each other's changes */
+  function validId(id) { return !DATA || !!(BYID[id] || GROUPS[id]); }
+  function cleanSet(o) {
+    var r = {}, drop = false;
+    if (o && typeof o === 'object') for (var k in o) { if (validId(k)) r[k] = true; else drop = true; }
+    return [r, drop];
+  }
   function lists() {
-    var ch = activeCh();
-    if (!ch) return { favs: state.favs, wish: {}, att: [] };
-    var l = ch.links[REPO] || {};
-    return { favs: l.favs || {}, wish: l.wish || {}, att: Array.isArray(l.att) ? l.att : [] };
+    var ch = activeCh(), l;
+    if (ch) l = ch.links[REPO] || {};
+    else { var f = store.get('di.favs', {}); state.favs = f && typeof f === 'object' ? f : {}; l = { favs: state.favs }; }
+    var fv = cleanSet(l.favs), wv = cleanSet(l.wish), raw = Array.isArray(l.att) ? l.att : [];
+    var at = raw.filter(function (id) { return !DATA || !!BYID[id]; });
+    var out = { favs: fv[0], wish: wv[0], att: at };
+    /* ids that no longer exist (an item renamed in a data update) are dropped quietly, after this redraw */
+    if (DATA && (fv[1] || wv[1] || at.length !== raw.length)) setTimeout(function () { setLists(out); }, 0);
+    return out;
   }
   function setLists(patch) {
     var ch = activeCh();
-    if (!ch) { if (patch.favs) { state.favs = patch.favs; save(); } return; }
-    var l = lists(); for (var k in patch) l[k] = patch[k];
-    DndChar.setLink(ch.id, REPO, l);
+    if (!ch) { if (patch.favs) { state.favs = patch.favs; store.set('di.favs', patch.favs); } return; }
+    /* keep any other keys another version of this site stored in its link */
+    DndChar.setLink(ch.id, REPO, Object.assign({}, ch.links[REPO] || {}, patch));
   }
   /* attunement slots: 3 in both editions; artificers get 4, 5 and 6 at levels 10, 14 and 18 */
   function attMax(ch) { var a = ch && window.DndChar ? DndChar.levelIn(ch, 'artificer') : 0; return a >= 18 ? 6 : a >= 14 ? 5 : a >= 10 ? 4 : 3; }
   /* classes an item's attunement is limited to: ['cleric','paladin'], ['*caster'], or null for anyone */
+  /* "by a cleric or paladin" -> both classes; "by a dwarf, fighter, or paladin" -> null, because a dwarf of
+     any class qualifies and the character record has no race. Every "or" alternative must name a class. */
   function attClasses(it) {
     if (it._ac === undefined) {
+      it._ac = null;
       var a = typeof it.attune === 'string' ? it.attune.toLowerCase() : '';
-      var c = CLASSES.filter(function (k) { return new RegExp('\\b' + k + 's?\\b').test(a); });
-      it._ac = c.length ? c : /spellcaster/.test(a) ? ['*caster'] : null;
+      var w = a.indexOf('who must be');
+      if (w >= 0) a = a.slice(w + 11);
+      var alts = a.replace(/^\s*by\s+/, '').split(/,|\bor\b/).map(function (x) { return x.trim(); }).filter(Boolean);
+      var all = [], ok = alts.length > 0;
+      alts.forEach(function (x) {
+        var words = x.split(/[^a-z]+/);
+        var hit = CLASSES.filter(function (c) { return words.indexOf(c) >= 0 || words.indexOf(c + 's') >= 0; });
+        if (words.indexOf('spellcaster') >= 0 || words.indexOf('spellcasters') >= 0) hit.push('*caster');
+        if (!hit.length) ok = false; else all = all.concat(hit);
+      });
+      if (ok && all.length) it._ac = all;
     }
     return it._ac;
   }
@@ -233,8 +261,7 @@
   function usableBy(ch, it) {
     var r = attClasses(it);
     if (!r || !ch.classes.length) return true;
-    if (r[0] === '*caster') return casts(ch);
-    return ch.classes.some(function (c) { return r.indexOf(c.cls) >= 0; });
+    return r.some(function (k) { return k === '*caster' ? casts(ch) : ch.classes.some(function (c) { return c.cls === k; }); });
   }
 
   /* ---------- filtering ---------- */
@@ -286,9 +313,14 @@
   function isFav(id) { return !!LISTS.favs[id]; }
   function isWish(id) { return !!LISTS.wish[id]; }
   function isAtt(id) { return LISTS.att.indexOf(id) >= 0; }
+  /* in a set by its own id, its variant group's id, or (a group card) any of its variants' ids */
+  function inSet(set, r) {
+    if (set[r.id] || (r.group && set[r.group])) return true;
+    return !!(r.isGroup && r.members.some(function (m) { return set[m.id]; }));
+  }
   function inShow(r) {
-    if (state.show === 'fav') return isFav(r.id);
-    if (state.show === 'wish') return isWish(r.id);
+    if (state.show === 'fav') return inSet(LISTS.favs, r);
+    if (state.show === 'wish') return inSet(LISTS.wish, r);
     if (state.show === 'att') return r.isGroup ? r.members.some(function (m) { return isAtt(m.id); }) : isAtt(r.id);
     return true;
   }
@@ -325,13 +357,14 @@
     var main = toRows(state.merge ? srd.concat(oth) : srd);
     if (state.show) main = main.filter(inShow);
     sortRows(main);
+    writeUrl();
+    LAST_MAIN = main;
     var nItems = main.reduce(function (n, r) { return n + (r.isGroup ? r.members.length : 1); }, 0);
     $('#count').textContent = nItems.toLocaleString() + ' item' + (nItems === 1 ? '' : 's') + (nItems !== main.length ? ' (' + main.length.toLocaleString() + ' card' + (main.length === 1 ? '' : 's') + ')' : '');
     var list = $('#list');
     list.className = 'list detail-' + state.detail;
     list.innerHTML = main.slice(0, state.limit).map(card).join('');
-    $('#moreBtn').hidden = main.length <= state.limit;
-    $('#moreBtn').textContent = 'Show more (' + (main.length - state.limit).toLocaleString() + ' left)';
+    pager('#moreBtn', main.length, state.limit);
     $('#empty').hidden = main.length > 0;
     var emptyList = state.show === 'fav' ? !Object.keys(LISTS.favs).length : state.show === 'wish' ? !Object.keys(LISTS.wish).length : state.show === 'att' ? !LISTS.att.length : false;
     $('#empty').textContent = emptyList
@@ -341,14 +374,33 @@
     else {
       if (state.show) oth = oth.filter(inShow);
       sortRows(oth);
+      LAST_OTH = oth;
       $('#othersSec').hidden = !oth.length;
       $('#others').innerHTML = oth.slice(0, state.limitOthers).map(otherRow).join('');
-      $('#moreOthersBtn').hidden = oth.length <= state.limitOthers;
-      $('#moreOthersBtn').textContent = 'Show more (' + (oth.length - state.limitOthers).toLocaleString() + ' left)';
+      pager('#moreOthersBtn', oth.length, state.limitOthers);
     }
     renderChips();
     renderSources();
     syncControls();
+  }
+  function pager(sel, total, limit) {
+    $(sel).hidden = total <= limit;
+    $(sel).textContent = 'Show more (' + Math.max(0, total - limit).toLocaleString() + ' left)';
+  }
+  /* "Show more" appends the next page instead of redrawing every card */
+  function more(which) {
+    if (which === 'main') {
+      var from = state.limit; state.limit += PAGE;
+      $('#list').insertAdjacentHTML('beforeend', LAST_MAIN.slice(from, state.limit).map(card).join(''));
+      pager('#moreBtn', LAST_MAIN.length, state.limit);
+    } else {
+      var f2 = state.limitOthers; state.limitOthers += PAGE;
+      $('#others').insertAdjacentHTML('beforeend', LAST_OTH.slice(f2, state.limitOthers).map(otherRow).join(''));
+      pager('#moreOthersBtn', LAST_OTH.length, state.limitOthers);
+    }
+  }
+  /* every setting goes in the link, so Copy link reproduces the view exactly */
+  function writeUrl() {
     var u = new URL(location.href);
     u.searchParams.set('ed', state.ed);
     if (state.q) u.searchParams.set('q', state.q); else u.searchParams.delete('q');
@@ -363,9 +415,17 @@
     var books = Object.keys(state.srcSel).sort(), core = CORE.slice().sort();
     var every = allBooks().every(srcOn);
     setP('books', every ? 'all' : books.join('|') !== core.join('|') && books.join('|'));
+    setP('show', state.show);
+    setP('one', !state.merge && '0');
+    setP('group', !state.groupVar && '0');
+    setP('usable', !state.usable && '0');
     if (!$('#detail').open) u.searchParams.delete('item');
     if (u.href !== location.href) history.replaceState(null, '', u);
+    var lq = new URLSearchParams(u.search); lq.delete('item'); lq.delete('char');
+    LINKQ = lq.toString();
   }
+  function itemHref(id) { return '?' + (LINKQ ? LINKQ + '&' : '') + 'item=' + encodeURIComponent(id); }
+  function openLink(id, name) { return '<a class="open" href="' + esc(itemHref(id)) + '" data-open="' + esc(id) + '">' + esc(name) + '</a>'; }
 
   var STAR = '<svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>';
   function favBtn(id, name) {
@@ -382,13 +442,13 @@
   }
   function marks(r) {
     var att = r.isGroup ? r.members.some(function (m) { return isAtt(m.id); }) : isAtt(r.id);
-    return (att ? ' <span class="mark att">Attuned</span>' : '') + (isWish(r.id) ? ' <span class="mark wish">Wishlist</span>' : '');
+    return (att ? ' <span class="mark att">Attuned</span>' : '') + (inSet(LISTS.wish, r) ? ' <span class="mark wish">Wishlist</span>' : '') +
+      (r.isGroup && !isFav(r.id) && inSet(LISTS.favs, r) ? ' <span class="mark fav">&#9733; variant</span>' : '');
   }
   function card(r) {
     if (r.isGroup) return groupCard(r);
-    var h = '<article class="card' + (r.srd ? '' : ' book') + '"' + rarAttr(r.rarity) + ' data-id="' + esc(r.id) + '" tabindex="0" role="button" aria-label="' + esc(r.name) + ' details">' +
-      favBtn(r.id, r.name) +
-      '<div class="card-top"><div><h3>' + esc(r.name) + '</h3></div></div>' +
+    var h = '<article class="card' + (r.srd ? '' : ' book') + '"' + rarAttr(r.rarity) + ' data-id="' + esc(r.id) + '">' +
+      '<div class="card-top"><div><h3>' + openLink(r.id, r.name) + '</h3></div></div>' + favBtn(r.id, r.name) +
       '<div class="pills">' + rarPill(r.rarity) + marks(r) + '</div>' + metaLine(r) +
       '<div class="src">' + srcTag(r) + alsoTags(r) + (r.srd ? '' : ' <span class="small">facts only</span>') + '</div>';
     if (state.detail !== 'basic') {
@@ -402,9 +462,8 @@
   function groupCard(g) {
     var names = g.members.map(function (m) { var x = m.name.match(/\(([^)]*)\)$/); return x ? x[1] : m.name; });
     var shown = names.slice(0, 6).join(', ') + (names.length > 6 ? ', and ' + (names.length - 6) + ' more' : '');
-    var h = '<article class="card group"' + rarAttr(g.rarity) + ' data-group="' + esc(g.id) + '" tabindex="0" role="button" aria-label="' + esc(g.name) + ' details">' +
-      favBtn(g.id, g.name) +
-      '<div class="card-top"><div><h3>' + esc(g.name) + '</h3><div class="alt">' + g.members.length + ' variants</div></div></div>' +
+    var h = '<article class="card group"' + rarAttr(g.rarity) + ' data-group="' + esc(g.id) + '">' +
+      '<div class="card-top"><div><h3>' + openLink(g.id, g.name) + '</h3><div class="alt">' + g.members.length + ' variants</div></div></div>' + favBtn(g.id, g.name) +
       '<div class="pills">' + (g.rarLo !== g.rarity ? rarPill(g.rarLo) + '<span class="small">to</span>' + rarPill(g.rarity) : rarPill(g.rarity)) + marks(g) + '</div>' + metaLine(g) +
       '<div class="src">' + srcTag(g) + alsoTags(g.members[0]) + '</div>';
     if (state.detail !== 'basic') {
@@ -415,8 +474,8 @@
     return h + '</article>';
   }
   function otherRow(o) {
-    return '<div class="other"' + rarAttr(o.rarity) + ' data-id="' + esc(o.id) + '" tabindex="0" role="button" aria-label="' + esc(o.name) + ' details">' + favBtn(o.id, o.name) +
-      '<b>' + esc(o.name) + '</b><div class="pills">' + rarPill(o.rarity) + marks(o) + '</div>' + metaLine(o) +
+    return '<div class="other"' + rarAttr(o.rarity) + ' data-id="' + esc(o.id) + '">' +
+      '<b>' + openLink(o.id, o.name) + '</b>' + favBtn(o.id, o.name) + '<div class="pills">' + rarPill(o.rarity) + marks(o) + '</div>' + metaLine(o) +
       '<div class="src">' + srcTag(o) + '</div></div>';
   }
 
@@ -522,7 +581,7 @@
         '<p class="sb-sub">' + esc(first.type + ', ' + m.length + ' variants') + ' ' + bookLink(first) + alsoLinks(first) + '</p></div>' +
         '<div class="mn-actions">' + favDlgBtn(id) + wishBtn(id) + '</div>' +
         '<div class="itext">' + md(first.desc) + '</div><div class="sb-sec">Variants</div><ul class="variants">' +
-        m.map(function (x) { return '<li><button type="button" class="linkish" data-open="' + esc(x.id) + '">' + esc(x.name) + '</button> ' + rarPill(x.rarity) + (x.attune ? ' <span class="small">attunement</span>' : '') + '</li>'; }).join('') + '</ul>';
+        m.map(function (x) { return '<li><button type="button" class="linkish" data-open="' + esc(x.id) + '">' + esc(x.name) + '</button> ' + rarPill(x.rarity) + (x.attune ? ' <span class="small">attunement</span>' : '') + (isFav(x.id) ? ' <span class="mark fav">&#9733;</span>' : '') + marks(x) + '</li>'; }).join('') + '</ul>';
     } else {
       var alt = otherEd(it);
       h = '<div class="sb-head"><h2 id="dTitle">' + esc(it.name) + '</h2>' +
@@ -575,21 +634,44 @@
     document.querySelectorAll('.ch-only').forEach(function (e) { e.hidden = !ch; if ('disabled' in e) e.disabled = !ch; });
     $('#usable').checked = state.usable;
     $('#usableTxt').textContent = ch ? 'Usable by ' + ch.name : 'Usable by character';
-    if (ch) $('#show option[value="att"]').textContent = 'Attuned (' + LISTS.att.length + '/' + attMax(ch) + ')';
+    if (ch) {
+      $('#show option[value="att"]').textContent = 'Attuned (' + LISTS.att.length + '/' + attMax(ch) + ')';
+      $('#attCount').textContent = 'Attuned ' + LISTS.att.length + '/' + attMax(ch);
+    }
   }
   function save() {
     store.set('di.ed', state.ed); store.set('di.sort', state.sort); store.set('di.detail', state.detail);
-    store.set('di.merge', state.merge); store.set('di.groupVar', state.groupVar); store.set('di.srcSel', state.srcSel); store.set('di.favs', state.favs); store.set('di.usable', state.usable);
+    store.set('di.merge', state.merge); store.set('di.groupVar', state.groupVar); store.set('di.srcSel', state.srcSel); store.set('di.usable', state.usable);
   }
   function update(patch) {
     for (var k in patch) state[k] = patch[k];
     if (!('limit' in patch)) state.limit = PAGE;
     if (!('limitOthers' in patch)) state.limitOthers = PAGE;
+    var ae = document.activeElement, keep = null, scrolls = {};
+    if (ae && ae.matches && ae.matches('.srclist input')) { var k = Object.keys(ae.dataset)[0]; keep = { list: ae.closest('.srclist').id, attr: k, val: ae.dataset[k] }; }
+    document.querySelectorAll('.srclist').forEach(function (l) { scrolls[l.id] = l.scrollTop; });
     save(); render();
+    document.querySelectorAll('.srclist').forEach(function (l) { if (scrolls[l.id]) l.scrollTop = scrolls[l.id]; });
+    if (keep) {
+      var el = Array.prototype.filter.call(document.querySelectorAll('#' + keep.list + ' input'), function (i) { return i.dataset[keep.attr] === keep.val; })[0];
+      if (el) el.focus({ preventScroll: true });
+    }
+  }
+  function copyLink(btn) {
+    var url = location.href, done = function () { var t = btn.textContent; btn.textContent = 'Link copied'; setTimeout(function () { btn.textContent = t; }, 1500); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, fallback); else fallback();
+    function fallback() {
+      var i = document.createElement('input'); i.value = url; document.body.appendChild(i); i.select();
+      try { document.execCommand('copy'); done(); } catch (e) { window.prompt('Copy this link:', url); }
+      i.remove();
+    }
   }
   function toggleIn(arr, v) { var a = arr.slice(), i = a.indexOf(v); if (i >= 0) a.splice(i, 1); else a.push(v); return a; }
 
   document.addEventListener('click', function (ev) {
+    /* a card's title link opens the dialog in place; ctrl/cmd/middle click still opens a new tab */
+    var lk = ev.target.closest('a.open');
+    if (lk) { if (ev.button === 0 && !ev.ctrlKey && !ev.metaKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); openDetail(lk.dataset.open); } return; }
     var t = ev.target.closest('button, .card, .other');
     if (!t) return;
     if (t.dataset.ed) return update({ ed: t.dataset.ed, types: [], rars: [] });
@@ -599,12 +681,13 @@
     if (t.id === 'srcNone') return setSources(allBooks(), false);
     if (t.id === 'srcShown') { var sel = {}; visibleSrcKeys().forEach(function (k) { sel[k] = true; }); return update({ srcSel: sel }); }
     if (t.id === 'srcCore') return update({ srcSel: coreSel() });
-    if (t.id === 'resetBtn') { var p = Object.assign({}, DEFAULTS, { srcSel: coreSel(), types: [], rars: [] }); return update(p); }
+    if (t.id === 'resetBtn') { var p = Object.assign({}, DEFAULTS, { srcSel: coreSel(), types: [], rars: [], atts: [], detail: 'basic', sort: 'name', merge: true, groupVar: true, usable: true }); return update(p); }
     if (t.id === 'typeClear') return update({ types: [] });
     if (t.id === 'rarClear') return update({ rars: [] });
     if (t.id === 'attClear') return update({ atts: [] });
-    if (t.id === 'moreBtn') return update({ limit: state.limit + PAGE });
-    if (t.id === 'moreOthersBtn') return update({ limitOthers: state.limitOthers + PAGE });
+    if (t.id === 'moreBtn') return more('main');
+    if (t.id === 'moreOthersBtn') return more('others');
+    if (t.id === 'copyLink') return copyLink(t);
     if (t.dataset.fav || t.dataset.wish) {
       ev.stopPropagation();
       var which = t.dataset.fav ? 'favs' : 'wish', k = t.dataset.fav || t.dataset.wish, f = Object.assign({}, lists()[which]), pf = {};
@@ -623,11 +706,11 @@
     if (t.dataset.group) return openDetail(t.dataset.group);
     if (t.dataset.id) return openDetail(t.dataset.id);
   });
+  /* Escape closes an open filter menu and puts focus back on its button */
   document.addEventListener('keydown', function (ev) {
-    var t = ev.target;
-    if ((ev.key === 'Enter' || ev.key === ' ') && t.classList && (t.classList.contains('card') || t.classList.contains('other'))) {
-      ev.preventDefault(); openDetail(t.dataset.group || t.dataset.id);
-    }
+    if (ev.key !== 'Escape') return;
+    var open = document.querySelector('details.srcpick[open]');
+    if (open) { ev.preventDefault(); open.open = false; open.querySelector('summary').focus(); }
   });
   $('#detail').addEventListener('click', function (ev) { if (ev.target === this) this.close(); });
   $('#detail').addEventListener('close', function () {
@@ -654,18 +737,33 @@
   /* after a list change: with the dialog open only the dialog redraws, the list follows on close */
   function refresh() { if ($('#detail').open) openDetail(dlgId); else render(); }
   /* the header picker or another tab changed the character: follow its edition and redraw */
-  var lastChId = activeCh() ? activeCh().id : null;
+  /* fields this site reads: which character, its edition, its classes (Usable by) and its own link */
+  function chSig(ch) { return ch ? [ch.id, ch.ed, JSON.stringify(ch.classes), JSON.stringify(ch.links[REPO] || {})].join('|') : ''; }
+  var appliedSig = chSig(activeCh()), appliedId = activeCh() ? activeCh().id : '', appliedEd = activeCh() ? activeCh().ed : null;
   if (window.DndChar) DndChar.onChange(function (ch) {
     if (!DATA) return;
-    var id = ch ? ch.id : null;
-    if (id === lastChId) return refresh();
-    lastChId = id;
-    var patch = {};
-    if (ch && ch.ed !== state.ed) { patch.ed = ch.ed; patch.types = []; patch.rars = []; }
-    if (!ch && (state.show === 'wish' || state.show === 'att')) patch.show = '';
-    if ($('#detail').open) $('#detail').close();
-    update(patch);
+    var sig = chSig(ch);
+    if (sig === appliedSig) return; /* another site re-saved it: nothing this site uses changed */
+    appliedSig = sig;
+    var id = ch ? ch.id : '';
+    if (id !== appliedId) {
+      appliedId = id; appliedEd = ch ? ch.ed : null;
+      var patch = {};
+      if (ch && ch.ed !== state.ed) { patch.ed = ch.ed; patch.types = []; patch.rars = []; }
+      if (!ch && (state.show === 'wish' || state.show === 'att')) patch.show = '';
+      if ($('#detail').open) $('#detail').close();
+      return update(patch);
+    }
+    if (ch.ed !== appliedEd) {
+      /* follow the character's new edition only if the user hasn't picked another edition here */
+      var userPicked = state.ed !== appliedEd;
+      appliedEd = ch.ed;
+      if (!userPicked && ch.ed !== state.ed) return update({ ed: ch.ed, types: [], rars: [] });
+    }
+    refresh();
   });
+  /* favorites changed in another tab (no character picked) */
+  window.addEventListener('storage', function (e) { if (e.key === 'di.favs' && DATA && !activeCh()) refresh(); });
   $('#merge').addEventListener('change', function () { update({ merge: this.checked }); });
   $('#groupVar').addEventListener('change', function () { update({ groupVar: this.checked }); });
   $('#srcQ').addEventListener('input', function () { state.srcQ = this.value; renderSources(); });
@@ -695,6 +793,11 @@
       if (it.groupName) { var k2 = it.ed + '|' + norm(it.name); (BYNAME[k2] = BYNAME[k2] || []).push(it); }
       if (it.group) (GROUPS[it.group] = GROUPS[it.group] || []).push(it);
     });
+    /* variants share one copy of their rules text and summary in the data file */
+    DATA.items.forEach(function (it) {
+      if (it.descRef && BYID[it.descRef]) it.desc = BYID[it.descRef].desc;
+      if (it.summaryRef && BYID[it.summaryRef]) it.summary = BYID[it.summaryRef].summary;
+    });
     var n14 = d.items.filter(function (i) { return i.ed === '2014'; }).length;
     $('#generated').textContent = 'Data built ' + d.generated + ' · ' + d.items.length.toLocaleString() + ' SRD items with full text (2014: ' + n14 + ', 2024: ' + (d.items.length - n14) + '), ' + d.others.length.toLocaleString() + ' more from other books (facts only).';
     if (state.srcAllPending) { state.srcSel = {}; allBooks().forEach(function (k) { state.srcSel[k] = true; }); delete state.srcAllPending; }
@@ -710,8 +813,7 @@
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (!e.isIntersecting || e.target.hidden || !DATA) return;
-        if (e.target.id === 'moreBtn') update({ limit: state.limit + PAGE });
-        else update({ limitOthers: state.limitOthers + PAGE });
+        more(e.target.id === 'moreBtn' ? 'main' : 'others');
         io.unobserve(e.target); io.observe(e.target); /* re-check: still in view after a short page */
       });
     }, { rootMargin: '600px 0px' });

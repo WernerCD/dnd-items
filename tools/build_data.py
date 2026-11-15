@@ -37,6 +37,9 @@ CONSUMABLE_NAME = re.compile(
     r"|(Acid|Alchemist's Fire|Antitoxin|Holy Water|Oil|Ball Bearings|Caltrops|Rations|Healer's Kit|Torch)"
     r"( \([^)]*\))?$)", re.I)
 NAME_FIX = {"Essense of either": "Essence of ether"}
+NAME_TYPO = {"Figurine of Wondrous Power (Obsidian Stead)": "Figurine of Wondrous Power (Obsidian Steed)"}
+# 5etools markup such as {@skill Arcana} or {@item belt of dwarvenkind|dmg} -> its display text
+TAG = re.compile(r"\{@\w+ ([^|}]*)[^}]*\}")
 RARITY_ORDER = ["Mundane", "Common", "Uncommon", "Rare", "Very Rare", "Legendary", "Artifact", "Varies", "Unknown"]
 
 
@@ -85,6 +88,55 @@ def base_name(name, typ=""):
     if re.fullmatch(r"\+\d", inner) and typ == "Weapon" and base not in ("Ammunition", "Weapon"):
         return "+N Weapon"
     return base
+
+
+def harmonize(members):
+    """Open5e lists variants one by one and their facts drift: one Figurine marked for attunement,
+    some Armor of Resistance not, only the base Holy Avenger "by a Paladin", a Mithral Armor typed
+    Weapon. Inside one variant family the majority wins (the specific wording beats a bare True);
+    rarity is left alone, since it really does vary between variants."""
+    from collections import Counter
+    yes = [m for m in members if m.get("attune")]
+    if len(yes) * 2 > len(members):
+        words = Counter(m["attune"] for m in yes if isinstance(m["attune"], str))
+        want = words.most_common(1)[0][0] if words else True
+    elif len(yes) * 2 < len(members):
+        want = None
+    else:
+        want = "keep"
+    types = Counter(m["type"] for m in members).most_common(2)
+    want_type = types[0][0] if len(types) == 1 or types[0][1] > types[1][1] else None
+    for m in members:
+        if want != "keep" and m.get("attune") != want and m.get("magic"):
+            FIXES.append(f'{m["ed"]} {m["name"]}: attunement {m.get("attune")!r} -> {want!r}')
+            m["attune"] = want
+        if want_type and m["type"] != want_type:
+            FIXES.append(f'{m["ed"]} {m["name"]}: type {m["type"]} -> {want_type}')
+            m["type"] = want_type
+
+
+FIXES = []
+
+
+def slim(it):
+    """Leave out empty and false fields (the site treats a missing field as empty/false)."""
+    return {k: v for k, v in it.items() if v not in (None, False, "", [], {})}
+
+
+def share_text(items):
+    """Variants repeat the same rules text and summary (37 Holy Avengers). Keep the first copy;
+    later items point at it with descRef / summaryRef, and app.js fills them back in on load."""
+    for field in ("desc", "summary"):
+        first = {}
+        for it in items:
+            t = it.get(field)
+            if not t or len(t) < 80:
+                continue
+            if t in first:
+                it[field + "Ref"] = first[t]
+                del it[field]
+            else:
+                first[t] = it["id"]
 
 
 def num(x):
@@ -196,6 +248,16 @@ def main():
         items.append(it)
         seen.add((it["ed"], norm(it["name"])))
 
+    # Open5e name slips: "Obsidian Stead", "Horn of Valhalla (silver)", "Mithral Armor (Chain-Mail)"
+    for it in items:
+        n = NAME_TYPO.get(it["name"], it["name"])
+        m = re.match(r"^(.*\()([^)]*)(\))$", n)
+        if m:
+            inner = re.sub(r"(?<=[A-Za-z])-(?=[A-Z])", " ", m.group(2))
+            inner = inner[:1].upper() + inner[1:]
+            n = m.group(1) + inner + m.group(3)
+        it["name"] = n
+
     # variant groups: several SRD items sharing a base name in one edition
     groups = {}
     # the 2024 SRD lists some variants per weapon/armor with no parentheses ("Flame Tongue Longsword",
@@ -224,6 +286,7 @@ def main():
             for it in members:
                 it["group"] = gid
                 it["groupName"] = base
+            harmonize(members)
 
     summaries = {}
     sp = DSRC / "summaries.json"
@@ -298,7 +361,7 @@ def main():
             "srd": False,
             "type": o["type"],
             "rarity": "Unknown" if o["rarity"] == "Mundane" and o.get("attune") else o["rarity"],
-            "attune": o.get("attune"),
+            "attune": TAG.sub(r"\1", o["attune"]) if isinstance(o.get("attune"), str) else o.get("attune"),
             "magic": o["rarity"] != "Mundane" or bool(o.get("attune")),  # attunement means magic
             "consumable": o["type"] in CONSUMABLE_TYPES or bool(CONSUMABLE_NAME.match(o["name"])),
         })
@@ -315,6 +378,9 @@ def main():
         for src in [x["src"]] + [a["src"] for a in x.get("also", [])]:
             k = f'{x["ed"]} | {src}'
             counts[k] = counts.get(k, 0) + 1
+    items = [slim(it) for it in items]
+    others = [slim(it) for it in others]
+    share_text(items)
     data = {
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "rarities": RARITY_ORDER,
@@ -328,6 +394,9 @@ def main():
     print(f"SRD items: {len(items)} (2014: {n14}, 2024: {len(items) - n14}); "
           f"index of other books: {len(others)} ({merged} book entries matched to SRD items as also-in)")
     print(f"wrote {OUT.relative_to(ROOT)} ({OUT.stat().st_size // 1024} KB)")
+    print(f"variant fixes: {len(FIXES)}")
+    for f in FIXES:
+        print("  " + f)
 
 
 if __name__ == "__main__":

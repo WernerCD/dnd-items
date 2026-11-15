@@ -324,6 +324,14 @@ a.srctag:hover { text-decoration: underline; }
   .card[data-rarity] { border-left-color: #000; }
   .itext.mini { border-top-color: #999; }
 }
+/* cards: the title link covers the card, the favorite star sits above it (no buttons inside a button) */
+.card, .other { position: relative; }
+a.open { color: inherit; text-decoration: none; }
+a.open::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+a.open:focus { outline: none; }
+.card:focus-within, .other:focus-within { outline: 2px solid var(--accent); outline-offset: -2px; }
+.card .fav, .other .fav { z-index: 2; }
+.mark.fav { border-color: var(--gold); color: var(--ink-2); }
 /* per-character marks (character.js) */
 .ch-only[hidden] { display: none !important; }
 .mark { display: inline-block; font-size: .72rem; font-weight: 600; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--accent); color: var(--accent); }
