@@ -360,7 +360,12 @@
     writeUrl();
     LAST_MAIN = main;
     var nItems = main.reduce(function (n, r) { return n + (r.isGroup ? r.members.length : 1); }, 0);
-    $('#count').textContent = nItems.toLocaleString() + ' item' + (nItems === 1 ? '' : 's') + (nItems !== main.length ? ' (' + main.length.toLocaleString() + ' card' + (main.length === 1 ? '' : 's') + ')' : '');
+    var cn = $('#countN');
+    if (window.DndUI && DndUI.count && cn.dataset.n && !TYPING) DndUI.count(cn, nItems, function (v) { return Math.round(v).toLocaleString(); });
+    else cn.textContent = nItems.toLocaleString();
+    cn.dataset.n = nItems;
+    $('#countRest').textContent = ' item' + (nItems === 1 ? '' : 's') + (nItems !== main.length ? ' (' + main.length.toLocaleString() + ' card' + (main.length === 1 ? '' : 's') + ')' : '');
+    drawChart(main);
     var list = $('#list');
     list.className = 'list detail-' + state.detail;
     list.innerHTML = main.slice(0, state.limit).map(card).join('');
@@ -382,6 +387,21 @@
     renderChips();
     renderSources();
     syncControls();
+  }
+  /* bar chart of the current results by rarity (items, not cards); drawn only while its panel is open */
+  var chart = null, LAST_ROWS = [];
+  function drawChart(rows) {
+    LAST_ROWS = rows;
+    var box = $('#chartBox');
+    if (!box.open || !window.DndPlot || !DATA) return;
+    var by = {}, seen = {};
+    DATA.items.concat(DATA.others).forEach(function (it) { if (it.ed === state.ed) seen[it.rarity] = 1; });
+    rows.forEach(function (r) { (r.isGroup ? r.members : [r]).forEach(function (m) { by[m.rarity] = (by[m.rarity] || 0) + 1; }); });
+    var labels = RAR_ORDER.filter(function (k) { return seen[k]; });
+    var o = { labels: labels, values: labels.map(function (k) { return by[k] || 0; }), name: 'Items', xLabel: 'Rarity', yLabel: 'Items',
+      title: 'Items in the current results by rarity (' + state.ed + ' rules)', fmt: function (v) { return Math.round(v).toLocaleString(); } };
+    $('#chartHead').textContent = 'Current results by rarity (' + state.ed + ' rules)';
+    if (chart) chart.update(o); else chart = DndPlot.bars($('#rarChart'), o);
   }
   function pager(sel, total, limit) {
     $(sel).hidden = total <= limit;
@@ -447,7 +467,7 @@
   }
   function card(r) {
     if (r.isGroup) return groupCard(r);
-    var h = '<article class="card' + (r.srd ? '' : ' book') + '"' + rarAttr(r.rarity) + ' data-id="' + esc(r.id) + '">' +
+    var h = '<article class="card' + (r.srd ? '' : ' book') + '"' + rarAttr(r.rarity) + ' data-id="' + esc(r.id) + '" data-spot>' +
       '<div class="card-top"><div><h3>' + openLink(r.id, r.name) + '</h3></div></div>' + favBtn(r.id, r.name) +
       '<div class="pills">' + rarPill(r.rarity) + marks(r) + '</div>' + metaLine(r) +
       '<div class="src">' + srcTag(r) + alsoTags(r) + (r.srd ? '' : ' <span class="small">facts only</span>') + '</div>';
@@ -462,7 +482,7 @@
   function groupCard(g) {
     var names = g.members.map(function (m) { var x = m.name.match(/\(([^)]*)\)$/); return x ? x[1] : m.name; });
     var shown = names.slice(0, 6).join(', ') + (names.length > 6 ? ', and ' + (names.length - 6) + ' more' : '');
-    var h = '<article class="card group"' + rarAttr(g.rarity) + ' data-group="' + esc(g.id) + '">' +
+    var h = '<article class="card group"' + rarAttr(g.rarity) + ' data-group="' + esc(g.id) + '" data-spot>' +
       '<div class="card-top"><div><h3>' + openLink(g.id, g.name) + '</h3><div class="alt">' + g.members.length + ' variants</div></div></div>' + favBtn(g.id, g.name) +
       '<div class="pills">' + (g.rarLo !== g.rarity ? rarPill(g.rarLo) + '<span class="small">to</span>' + rarPill(g.rarity) : rarPill(g.rarity)) + marks(g) + '</div>' + metaLine(g) +
       '<div class="src">' + srcTag(g) + alsoTags(g.members[0]) + '</div>';
@@ -598,7 +618,10 @@
     }
     $('#dBody').innerHTML = h;
     var d = $('#detail');
-    if (!d.open) { if (d.showModal) d.showModal(); else d.setAttribute('open', ''); }
+    if (!d.open) {
+      if (d.showModal) d.showModal(); else d.setAttribute('open', '');
+      if (window.DndUI && DndUI.enter) DndUI.enter(d.querySelector('.dlg'));
+    }
     d.querySelector('.dlg').scrollTop = 0;
     var u = new URL(location.href); u.searchParams.set('item', id); history.replaceState(null, '', u);
   }
@@ -658,7 +681,7 @@
     }
   }
   function copyLink(btn) {
-    var url = location.href, done = function () { var t = btn.textContent; btn.textContent = 'Link copied'; setTimeout(function () { btn.textContent = t; }, 1500); };
+    var url = location.href, done = function () { var t = btn.textContent; btn.textContent = 'Link copied'; if (window.DndUI && DndUI.pop) DndUI.pop(btn); setTimeout(function () { btn.textContent = t; }, 1500); };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, fallback); else fallback();
     function fallback() {
       var i = document.createElement('input'); i.value = url; document.body.appendChild(i); i.select();
@@ -719,8 +742,10 @@
     if (JSON.stringify(lists()) !== favsAtOpen) render();
     favsAtOpen = null;
   });
-  var qTimer = null;
-  $('#search').addEventListener('input', function () { var v = this.value; clearTimeout(qTimer); qTimer = setTimeout(function () { update({ q: v }); }, 150); });
+  var qTimer = null, TYPING = false;
+  $('#search').addEventListener('input', function () { var v = this.value; clearTimeout(qTimer); qTimer = setTimeout(function () { TYPING = true; update({ q: v }); TYPING = false; }, 150); });
+  $('#chartBox').addEventListener('toggle', function () { store.set('di.chart', this.open); if (this.open) drawChart(LAST_ROWS); });
+  if (store.get('di.chart', false)) $('#chartBox').open = true;
   /* tick boxes in the Type, Rarity and Attunement menus */
   ['#typeChips', '#rarChips', '#attList'].forEach(function (s) {
     $(s).addEventListener('change', function (ev) {

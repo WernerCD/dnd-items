@@ -1,4 +1,4 @@
-/* dnd-shared character.js v1.2 (canonical copy: WernerCD/dnd shared/character.js). Copy unchanged to site/character.js.
+/* dnd-shared character.js v1.3 (canonical copy: WernerCD/dnd shared/character.js). Copy unchanged to site/character.js.
  *
  * One list of characters shared by every D&D Toolbox site. All the sites are served from
  * wernercd.github.io, so they share localStorage: a Paladin built in the Multiclass Planner shows up,
@@ -168,7 +168,7 @@
   }
   function copyShare(ch, repo, btn) {
     var url = API.shareUrl(ch, repo), old = btn && btn.textContent;
-    var done = function (msg) { if (!btn) return; btn.textContent = msg; setTimeout(function () { btn.textContent = old; }, 2000); };
+    var done = function (msg) { if (!btn) return; btn.textContent = msg; if (window.DndUI) DndUI.pop(btn); setTimeout(function () { btn.textContent = old; }, 2000); };
     if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(url).then(function () { done('Link copied'); }, function () { window.prompt('Copy this link', url); });
     else window.prompt('Copy this link', url);
     return url;
@@ -218,6 +218,7 @@
     });
     document.addEventListener('keydown', key);
     document.body.appendChild(box);
+    if (window.DndUI) DndUI.enter(box);
     box.querySelector('button').focus();
   }
 

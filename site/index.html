@@ -118,7 +118,7 @@
 <main class="wrap">
   <section class="results">
     <div class="results-head">
-      <h2 id="count">Items</h2>
+      <h2 id="count"><span id="countN">Items</span><span id="countRest"></span></h2>
       <div class="view-ctl">
         <div class="seg seg-sm" role="radiogroup" aria-label="Card detail">
           <button type="button" role="radio" data-detail="basic" title="Name, type, rarity and source">Basic</button>
@@ -140,6 +140,13 @@
         </select>
       </div>
     </div>
+    <details class="chart-box" id="chartBox">
+      <summary>Chart: these results by rarity</summary>
+      <div class="chart-in">
+        <h3 id="chartHead">Current results by rarity</h3>
+        <div id="rarChart"></div>
+      </div>
+    </details>
     <div id="list" class="list"></div>
     <p id="empty" class="empty" hidden>No items match. Try clearing a filter or switching the rules edition.</p>
     <p class="more-row"><button type="button" class="btn" id="moreBtn" hidden>Show more</button></p>
@@ -152,7 +159,7 @@
     <p class="more-row"><button type="button" class="btn" id="moreOthersBtn" hidden>Show more</button></p>
   </section>
 
-  <section class="about" id="about">
+  <section class="about" id="about" data-reveal>
     <h2>About</h2>
     <p>Search every item in the free D&amp;D 5e System Reference Documents, with full rules text, for the 2014 rules (SRD 5.1) and the 2024 rules (SRD 5.2). Items from the other official books are listed as an index: name, type, rarity, attunement, book and page, so you know where to look them up.</p>
     <p>Item text marked <em>SRD 5.1</em> or <em>SRD 5.2</em> comes from the System Reference Documents 5.1 and 5.2 by Wizards of the Coast LLC, available at <a href="https://dnd.wizards.com/resources/systems-reference-document" rel="noopener">dnd.wizards.com</a> and licensed under the <a href="https://creativecommons.org/licenses/by/4.0/legalcode" rel="noopener">Creative Commons Attribution 4.0 International License</a>. It was retrieved through the <a href="https://open5e.com" rel="noopener">Open5e</a> API. The index of items from other books (facts only, no rules text) was compiled from the community <a href="https://github.com/5etools-mirror-3/5etools-src" rel="noopener">5etools</a> dataset. Unofficial fan content; not affiliated with or endorsed by Wizards of the Coast.</p>
@@ -160,7 +167,7 @@
     <p><a href="changes.html">See what's changed</a></p>
   </section>
 
-  <section class="about" id="sources">
+  <section class="about" id="sources" data-reveal>
     <h2>Source material</h2>
     <p class="muted">Every book the items on this site come from, with item counts per rules edition. The SRDs are free; the others are official books, linked to their D&amp;D Beyond pages where one exists.</p>
     <ul id="srcLinks" class="srclinks"></ul>
@@ -195,8 +202,10 @@
 </dialog>
 
 <script src="character.js?v=dev"></script>
+<script src="chart.js?v=dev"></script>
 <script src="app.js?v=dev"></script>
 <script src="theme.js?v=dev"></script>
 <script src="version.js?v=dev"></script>
+<script src="motion.js?v=dev" defer></script><script src="ui.js?v=dev" defer></script>
 </body>
 </html>

@@ -332,6 +332,13 @@ a.open:focus { outline: none; }
 .card:focus-within, .other:focus-within { outline: 2px solid var(--accent); outline-offset: -2px; }
 .card .fav, .other .fav { z-index: 2; }
 .mark.fav { border-color: var(--gold); color: var(--ink-2); }
+/* rarity chart panel above the results (shared chart.js) */
+.chart-box { margin: 0 0 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.chart-box > summary { cursor: pointer; padding: 8px 14px; font-size: .9rem; color: var(--ink-2); }
+.chart-box[open] > summary { border-bottom: 1px solid var(--line); }
+.chart-box .chart-in { padding: 10px 14px 12px; }
+.chart-box h3 { margin: 0 0 6px; font-size: 1rem; }
+@media print { .chart-box { display: none; } }
 /* per-character marks (character.js) */
 .ch-only[hidden] { display: none !important; }
 .mark { display: inline-block; font-size: .72rem; font-weight: 600; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--accent); color: var(--accent); }
@@ -339,7 +346,7 @@ a.open:focus { outline: none; }
 .warn-txt { color: var(--warn); margin: 4px 0 0; flex-basis: 100%; }
 #show { max-width: 12rem; }
 
-/* === dnd-shared v1.7 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
+/* === dnd-shared v1.8 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
 /* Paste this block unchanged at the END of each site's styles.css. Do not edit it per site;
    change it in the hub repo and re-copy it to every site. It relies on the shared tokens
    (--bg, --surface, --surface-2, --ink, --ink-2, --muted, --line, --accent, --gold, --radius). */
@@ -355,7 +362,7 @@ a.open:focus { outline: none; }
 @media (max-width: 520px) { .char-pick .char-lbl { display: none; } }
 .char-pick .char-share { font: inherit; font-size: .8rem; color: var(--ink-2); background: none; border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; min-height: 26px; margin-left: 6px; cursor: pointer; }
 .char-pick .char-share:hover, .char-pick .char-share:focus-visible { color: var(--accent); border-color: var(--accent); }
-.char-import { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 1000; width: min(520px, calc(100vw - 32px)); background: var(--surface); color: var(--ink); border: 1px solid var(--accent); border-radius: var(--radius); box-shadow: 0 6px 24px rgba(0, 0, 0, .25); padding: 12px 14px; font-size: .92rem; }
+.char-import { position: fixed; top: 12px; left: 0; right: 0; margin: 0 auto; z-index: 1000; width: min(520px, calc(100vw - 32px)); background: var(--surface); color: var(--ink); border: 1px solid var(--accent); border-radius: var(--radius); box-shadow: 0 6px 24px rgba(0, 0, 0, .25); padding: 12px 14px; font-size: .92rem; }
 .char-import p { margin: 0 0 10px; }
 .char-import .ci-acts { display: flex; flex-wrap: wrap; gap: 8px; }
 .char-import button { font: inherit; font-size: .88rem; min-height: 32px; padding: 4px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); cursor: pointer; }
@@ -384,13 +391,64 @@ a.open:focus { outline: none; }
 .change-day li { margin: 6px 0; color: var(--ink-2); line-height: 1.5; }
 .change-day li b { color: var(--ink); }
 @media (max-width: 480px) { .hub-nav { gap: 10px; } .tagline { font-size: .85rem; } }
+/* motion (ui.js) and charts (chart.js), v1.8 */
+.ui-anim [data-reveal] > :not(.ui-in) { opacity: 0; }
+[data-spot] { position: relative; isolation: isolate; }
+[data-spot]::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1; opacity: 0; transition: opacity .25s ease;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%); }
+[data-spot]:hover::before { opacity: 1; }
+.plot { --p1: #25875a; --p2: #6a5acd; --p3: #b07d10; --p-fill: 22%; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .plot { --p1: #3fa673; --p2: #9483e6; --p3: #b08822; --p-fill: 30%; } }
+:root[data-theme="dark"] .plot { --p1: #3fa673; --p2: #9483e6; --p3: #b08822; --p-fill: 30%; }
+.plot-fig { margin: 0; }
+.plot-box { position: relative; width: 100%; }
+.plot-box svg { display: block; width: 100%; height: auto; overflow: visible; touch-action: pan-y; }
+.plot-box svg:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+.plot-grid line { stroke: var(--line); stroke-width: 1; }
+.plot-grid line.plot-base { stroke: var(--muted); }
+.plot-tick { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.plot-axis { fill: var(--ink-2); font-size: 12px; }
+.plot-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.plot-line.s1, .plot-dot.s1, .plot-bar.s1, .sw.s1 { stroke: var(--p1); color: var(--p1); }
+.plot-line.s2, .plot-dot.s2, .sw.s2 { stroke: var(--p2); color: var(--p2); }
+.plot-line.s2 { stroke-dasharray: 6 4; }
+.plot-line.s3, .plot-dot.s3, .sw.s3 { stroke: var(--p3); color: var(--p3); }
+.plot-line.s3 { stroke-dasharray: 2 4; }
+.plot-bar.s1 { fill: var(--p1); stroke: none; }
+.plot-stop1 { stop-color: var(--p1); stop-opacity: var(--p-fill); }
+.plot-stop2 { stop-color: var(--p1); stop-opacity: 0; }
+.plot-dl { fill: var(--ink-2); font-size: 11px; font-weight: 600; }
+.plot-cross { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; }
+.plot-dot { fill: currentColor; stroke: var(--surface) !important; stroke-width: 2; }
+.plot-tip { position: absolute; z-index: 2; pointer-events: none; min-width: 120px; max-width: 240px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 4px 16px rgba(0, 0, 0, .14); padding: 6px 10px; font-size: .8rem; display: flex; flex-direction: column; gap: 2px; }
+.plot-tip span, .plot-legend span { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.sw { display: inline-block; width: 14px; height: 0; border-top: 2px solid currentColor; }
+.sw.s2 { border-top-style: dashed; } .sw.s3 { border-top-style: dotted; }
+.plot-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 6px; font-size: .82rem; }
+.plot-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.plot-table { margin-top: 6px; font-size: .82rem; color: var(--ink-2); }
+.plot-table summary { cursor: pointer; color: var(--accent); min-height: 24px; display: inline-flex; align-items: center; }
+.plot-tw { overflow-x: auto; max-height: 320px; overflow-y: auto; }
+.plot-table table { border-collapse: collapse; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.plot-table caption { text-align: left; color: var(--muted); padding-bottom: 4px; }
+.plot-table th, .plot-table td { border-bottom: 1px solid var(--line); padding: 3px 10px 3px 0; text-align: right; }
+.plot-table th[scope="row"], .plot-table thead th:first-child { text-align: left; }
+.ui-anim .plot-new .plot-line, .ui-anim .plot-new .plot-area { animation: plot-wipe .9s cubic-bezier(.22, 1, .36, 1) both; }
+.ui-anim .plot-new .plot-dl { animation: plot-fade .4s .7s ease both; }
+.ui-anim .plot-new .plot-bar { transform-box: fill-box; transform-origin: 50% 100%; animation: plot-grow .55s cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes plot-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes plot-fade { from { opacity: 0; } }
+@keyframes plot-grow { from { transform: scaleY(0); } }
+@media (prefers-reduced-motion: reduce) { [data-spot]::before { transition: none; } }
 /* print: paper-friendly, no chrome. Sites add their own rules to hide tool controls. */
 @media print {
   :root, :root:not([data-theme="light"]), :root[data-theme="dark"] { --bg: #fff; --surface: #fff; --surface-2: #f3f3f3; --ink: #000; --ink-2: #222; --muted: #555; --line: #bbb; --shadow: none; --accent: #2f6b4f; --accent-ink: #ffffff; --gold: #a8841c; --warn: #9a4b1c; --warn-bg: #f7e6d8; --chip: #e6efe9; color-scheme: light; }
   body { background: #fff; }
-  .hub-bar, .char-pick, .char-import, #themeBtn, .site-footer .foot-links, button, dialog::backdrop { display: none !important; }
+  .hub-bar, .char-pick, .char-import, .plot-tip, .plot-table summary, #themeBtn, .site-footer .foot-links, button, dialog::backdrop { display: none !important; }
   .site-header { border-bottom: 1px solid #000; }
   a { color: inherit; text-decoration: none; }
   .card, .change-day li, .statblock { break-inside: avoid; }
+  .ui-anim [data-reveal] > * { opacity: 1 !important; }
+  .plot-fig { break-inside: avoid; }
 }
-/* === end dnd-shared v1.7 === */
+/* === end dnd-shared v1.8 === */
