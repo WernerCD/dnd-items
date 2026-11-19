@@ -1,4 +1,4 @@
-/* dnd-shared links.js v1.0.1 (canonical copy: WernerCD/dnd shared/links.js). Copy unchanged to site/links.js.
+/* dnd-shared links.js v1.0.2 (canonical copy: WernerCD/dnd shared/links.js). Copy unchanged to site/links.js.
  * Links the tools to each other (STYLE.md 6k), using the search lists every tool already publishes (6j).
  * Works inside any .dsb stat block and any element with a data-links attribute; content added later is
  * picked up automatically. Links into the page's own site are left out (each tool links itself).
@@ -13,6 +13,8 @@
  * v1.0.1: names of two or more words written in Title Case also link without italics (the 2024 SRD prints
  *   "cast Magic Missile"); italics ending in . or : are run-in headings ("Slow.") and never link;
  *   data-nolink works on the element itself as well as on a container.
+ * v1.0.2: 2014 text links to a tool's 2014 entry when its search list gives one (u14, STYLE 6j). The edition is
+ *   the nearest data-ed attribute (statblock.js v1.1.1 sets it), else the page's ?ed=, else 2024.
  * Opt out inside a block with data-nolink. The lists come from wernercd.github.io (also when testing
  * locally); with no connection and nothing cached, the text simply stays plain.
  */
@@ -40,7 +42,7 @@
       if (!loading[repo]) loading[repo] = fetch(BASE + repo + '/search.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
         var m = {}, t = [];
         ((d && d.items) || []).forEach(function (it) {
-          var f = fold(it.n); if (f && !m[f + '|' + it.k]) m[f + '|' + it.k] = it.u || '';
+          var f = fold(it.n); if (f && !m[f + '|' + it.k]) { m[f + '|' + it.k] = it.u || ''; if (it.u14) m[f + '|' + it.k + '|14'] = it.u14; }
           if ((it.k === 'Spell' || it.k === 'Item') && /^[A-Z][\w'\u2019-]*( (of|the|and|from|to|in|on|a|[A-Z][\w'\u2019-]*))* [A-Z][\w'\u2019-]*$/.test(it.n) && it.n.indexOf(' ') > 0) t.push(it.n);
         });
         idx[repo] = m; titles[repo] = t; TRX = null;
@@ -48,11 +50,13 @@
       return loading[repo];
     }));
   }
-  function url(kind, name) {
+  var PAGE_ED = (/[?&]ed=(2014|2024)/.exec(location.search) || [])[1] || '';
+  function edOf(el) { var e = el && el.closest && el.closest('[data-ed]'); return (e && e.getAttribute('data-ed')) || PAGE_ED || '2024'; }
+  function url(kind, name, ed) {
     if (off(kind)) return '';
     var K = KINDS[kind], m = idx[K[0]]; if (!m) return '';   // not loaded (yet): stays plain text
     var f = fold(name);
-    for (var i = 0; i < K[1].length; i++) { var u = m[f + '|' + K[1][i]]; if (u != null) return BASE + K[0] + '/' + u; }
+    for (var i = 0; i < K[1].length; i++) { var u = m[f + '|' + K[1][i]]; if (u != null) return BASE + K[0] + '/' + (ed === '2014' && m[f + '|' + K[1][i] + '|14'] != null ? m[f + '|' + K[1][i] + '|14'] : u); }
     return '';
   }
   function typeUrl(t) { var c = String(t || '').trim().toLowerCase(); return c && HERE !== 'dnd-monsters' ? BASE + 'dnd-monsters/?t=' + encodeURIComponent(c.charAt(0).toUpperCase() + c.slice(1)) : ''; }
@@ -78,7 +82,7 @@
   function scan(root) {
     // explicit marks and creature types
     root.querySelectorAll('[data-link]:not([data-dlx])').forEach(function (el) {
-      el.setAttribute('data-dlx', '1'); var k = el.getAttribute('data-link'), u = url(k, el.getAttribute('data-link-name') || el.textContent);
+      el.setAttribute('data-dlx', '1'); var k = el.getAttribute('data-link'), u = url(k, el.getAttribute('data-link-name') || el.textContent, edOf(el));
       if (u && !blocked(el, root)) link(el, u, k);
     });
     root.querySelectorAll('.dsb-ctype:not([data-dlx])').forEach(function (el) {
@@ -89,7 +93,7 @@
       el.setAttribute('data-dlx', '1');
       if (el.children.length || blocked(el, root)) return;
       var t = el.textContent; if (t.length > 60 || /[.:]\s*$/.test(t)) return;   // "Slow." is a run-in heading
-      var u = url('spell', t), k = 'spell'; if (!u) { u = url('item', t); k = 'item'; }
+      var e = edOf(el), u = url('spell', t, e), k = 'spell'; if (!u) { u = url('item', t, e); k = 'item'; }
       if (u) link(el, u, k);
     });
     // Title Case names in plain text: first mention of each in a paragraph
@@ -100,7 +104,7 @@
       var one = function (n) {   // every name in the node; each one once per paragraph
         var m = rx.exec(n.nodeValue); if (!m) return;
         var name = m[2], at = m.index + m[1].length, blk = n.parentNode.closest('p, li, td, dd, .dsb-blk, div') || root, seen = (blk.getAttribute('data-dln') || '').split('|');
-        var u = seen.indexOf(name) >= 0 ? '' : url('spell', name), k = 'spell'; if (!u && seen.indexOf(name) < 0) { u = url('item', name); k = 'item'; }
+        var e = edOf(n.parentNode), u = seen.indexOf(name) >= 0 ? '' : url('spell', name, e), k = 'spell'; if (!u && seen.indexOf(name) < 0) { u = url('item', name, e); k = 'item'; }
         var rest = n.splitText(at + name.length);
         if (u) {
           seen.push(name); blk.setAttribute('data-dln', seen.join('|'));
@@ -119,7 +123,7 @@
       var blk = n.parentNode.closest('p, li, td, dd, .dsb-blk, div') || root, seen = (blk.getAttribute('data-dlc') || '').split(',');
       var m = CRX.exec(n.nodeValue), c = m[1].toLowerCase();
       if (seen.indexOf(c) >= 0) return;
-      var u = url('condition', c); if (!u) return;
+      var u = url('condition', c, edOf(n.parentNode)); if (!u) return;
       seen.push(c); blk.setAttribute('data-dlc', seen.join(','));
       var a = document.createElement('a'); a.className = 'dlx'; a.href = u; a.title = 'Open in Rules Reference'; a.textContent = m[1];
       var rest = n.splitText(m.index); rest.nodeValue = rest.nodeValue.slice(m[1].length);

@@ -174,3 +174,13 @@ def run(page, base, check):
     except Exception:
         ok = False
     check(ok, "[links] the spell name in the Wand of Magic Missiles links to the Spell Planner")
+
+    # --- u14: the 2014 link of a name that is in both editions opens the 2014 entry ---
+    e = by.get("Bag of Holding", {})
+    check("u14" in e, "[search.json] Bag of Holding has a u14 link for 2014 text")
+    if e.get("u14"):
+        page.goto(base + e["u14"], wait_until="load")
+        wait_ready(page)
+        page.wait_for_timeout(300)
+        st = page.evaluate("() => ({ open: document.querySelector('#detail').open, ed: document.querySelector('#dBody').dataset.ed, t: (document.querySelector('#dTitle') || {}).textContent })")
+        check(st["open"] and st["ed"] == "2014" and st["t"] == "Bag of Holding", f"[search.json] the u14 link opens the 2014 Bag of Holding ({st})")

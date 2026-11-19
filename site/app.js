@@ -765,6 +765,7 @@
     $('#dBody').innerHTML = h;
     /* dice.js names rolls after the item (STYLE 6k) */
     $('#dBody').setAttribute('data-roll-ctx', it ? it.name : groupLabel(g[0].groupName));
+    $('#dBody').setAttribute('data-ed', (it || g[0]).ed); /* links.js picks 2014 or 2024 links */
     var d = $('#detail');
     if (!d.open) {
       if (d.showModal) d.showModal(); else d.setAttribute('open', '');

@@ -270,6 +270,8 @@ def search_list(rows):
     for e in sorted(entries, key=lambda e: e["ed"], reverse=True):  # 2024 first, so it owns the link
         k = norm(e["name"])
         if k in out:
+            if e["ed"] == "2014" and "2014" not in out[k]["eds"]:
+                out[k]["id14"] = e["id"]  # the 2014 version, for links from 2014 text (u14)
             out[k]["eds"].add(e["ed"])
             continue
         e["eds"] = {e["ed"]}
@@ -283,8 +285,10 @@ def search_list(rows):
         if e["att"]:
             bits.append("attunement")
         t = ", ".join(bits) + ("" if len(e["eds"]) > 1 else f" ({e['ed']})")
-        items.append({"n": e["name"], "t": t, "k": "Item" if e["magic"] else "Gear",
-                      "u": f"?ed={e['ed']}&item={e['id']}"})
+        x = {"n": e["name"], "t": t, "k": "Item" if e["magic"] else "Gear", "u": f"?ed={e['ed']}&item={e['id']}"}
+        if e.get("id14"):
+            x["u14"] = f"?ed=2014&item={e['id14']}"
+        items.append(x)
     return {"v": 1, "items": items}
 
 

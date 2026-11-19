@@ -1,4 +1,4 @@
-/* dnd-shared dice.js v1.0.1 (canonical copy: WernerCD/dnd shared/dice.js). Copy unchanged to site/dice.js.
+/* dnd-shared dice.js v1.0.2 (canonical copy: WernerCD/dnd shared/dice.js). Copy unchanged to site/dice.js.
  * Click-to-roll dice for every D&D Toolbox page (STYLE.md 6k). Styles are the .dd- rules in the dnd-shared
  * CSS block (v1.11+). The roll log is shared by every tool (localStorage dnd.rolls, last 30 rolls).
  *
@@ -200,7 +200,7 @@
     if (!window.MutationObserver) return;
     obs = new MutationObserver(function () {
       if (pending) return; pending = true;
-      (window.requestAnimationFrame || setTimeout)(function () { pending = false; apply(document.body); });
+      setTimeout(function () { pending = false; apply(document.body); }, 50);   // v1.0.2: not rAF, which never runs in a hidden tab
     });
     watch();
   }
