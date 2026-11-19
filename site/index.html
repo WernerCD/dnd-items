@@ -107,6 +107,7 @@
       <option value="fav">Favorites</option>
       <option value="wish" class="ch-only">Wishlist</option>
       <option value="att" class="ch-only">Attuned</option>
+      <option value="inv" class="ch-only">Inventory</option>
     </select>
     <label class="tog ch-only" id="usableLbl" title="Hide items whose attunement is limited to classes this character doesn't have"><input type="checkbox" id="usable"> <span id="usableTxt">Usable by character</span></label>
     <span class="small muted ch-only" id="attCount"></span>
@@ -116,6 +117,7 @@
 </section>
 
 <main class="wrap">
+  <div class="imp-note" id="impNote" role="status" hidden></div>
   <section class="results">
     <div class="results-head">
       <h2 id="count"><span id="countN">Items</span><span id="countRest"></span></h2>
@@ -206,6 +208,7 @@
 
 <script src="character.js?v=dev"></script>
 <script src="chart.js?v=dev"></script>
+<script src="sources.js?v=dev"></script>
 <script src="app.js?v=dev"></script>
 <script src="theme.js?v=dev"></script>
 <script src="version.js?v=dev"></script>

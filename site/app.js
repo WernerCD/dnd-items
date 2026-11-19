@@ -9,7 +9,8 @@
 
   var PAGE = 120;
   /* the main rulebooks: listed first in the Sources picker and selected by default */
-  var CORE = ['SRD 5.1', 'SRD 5.2', "Player's Handbook (2014)", "Player's Handbook (2024)", "Dungeon Master's Guide (2014)",
+  /* the default before shared sources.js (kept only to recognise an untouched old default) */
+  var OLD_CORE = ['SRD 5.1', 'SRD 5.2', "Player's Handbook (2014)", "Player's Handbook (2024)", "Dungeon Master's Guide (2014)",
     "Dungeon Master's Guide (2024)", 'Monster Manual (2014)', 'Monster Manual (2025)', "Xanathar's Guide to Everything", "Tasha's Cauldron of Everything"];
   var params = new URLSearchParams(location.search);
   var ATT_KINDS = [['none', 'No attunement'], ['req', 'Requires attunement'], ['cls', 'Limited to certain classes'], ['opt', 'Attunement optional']];
@@ -38,7 +39,8 @@
   if (['2014', '2024'].indexOf(state.ed) < 0) state.ed = '2024';
   if (['basic', 'stats', 'full'].indexOf(state.detail) < 0) state.detail = 'basic';
   if (!state.favs || typeof state.favs !== 'object') state.favs = {};
-  if (!state.srcSel || typeof state.srcSel !== 'object') state.srcSel = coreSel();
+  /* no saved choice (or the old untouched default): the core books are picked once the data has loaded */
+  if (!state.srcSel || typeof state.srcSel !== 'object' || sameKeys(state.srcSel, OLD_CORE)) { state.srcSel = {}; state.srcDefault = true; }
   /* filters carried in the link (?kind=magic&rarity=Rare|Legendary&books=...), so a view can be shared or bookmarked */
   function listParam(n) { var v = params.get(n); return v ? v.split('|').filter(Boolean) : null; }
   (function () {
@@ -51,14 +53,15 @@
     if ((v = params.get('cons')) && ['yes', 'no'].indexOf(v) >= 0) state.consumable = v;
     if ((v = params.get('view')) && ['basic', 'stats', 'full'].indexOf(v) >= 0) state.detail = v;
     if ((v = params.get('sort'))) state.sort = v;
-    if ((v = params.get('show')) && ['fav', 'wish', 'att'].indexOf(v) >= 0) state.show = v;
+    if ((v = params.get('show')) && ['fav', 'wish', 'att', 'inv'].indexOf(v) >= 0) state.show = v;
     if ((v = params.get('one'))) state.merge = v !== '0';
     if ((v = params.get('group'))) state.groupVar = v !== '0';
     if ((v = params.get('usable'))) state.usable = v !== '0';
     if ((v = listParam('books'))) { state.srcSel = {}; state.srcAllPending = v[0] === 'all'; v.forEach(function (k) { state.srcSel[k] = true; }); }
   })();
 
-  var DATA = null, BYID = {}, GROUPS = {}, BYNAME = {}, CUR_CH = null, LISTS = { favs: {}, wish: {}, att: [] }, LAST_MAIN = [], LAST_OTH = [], LINKQ = '';
+  var LISTS_EMPTY = { favs: {}, wish: {}, att: [], inv: {} };
+  var DATA = null, BYID = {}, GROUPS = {}, BYNAME = {}, CUR_CH = null, LISTS = LISTS_EMPTY, LAST_MAIN = [], LAST_OTH = [], LINKQ = '';
   var $ = function (s) { return document.querySelector(s); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var norm = function (s) { return String(s || '').toLowerCase().replace(/'/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); };
@@ -83,7 +86,10 @@
   function alsoLinks(it) {
     return (it.also || []).map(function (a) { return ' ' + bookLink({ src: a.src, page: a.page }); }).join('');
   }
-  function coreSel() { var o = {}; CORE.forEach(function (k) { o[k] = true; }); return o; }
+  /* core rules (SRDs, PHB, DMG, MM, both editions) from the shared table (STYLE.md 6f) */
+  function coreList() { return DATA && window.DndSources ? DndSources.defaults(allBooks()) : []; }
+  function coreSel() { var o = {}; coreList().forEach(function (k) { o[k] = true; }); return o; }
+  function sameKeys(sel, list) { var k = Object.keys(sel || {}); return k.length === list.length && list.every(function (x) { return sel[x]; }); }
   var BOOK_HUE = {
     'SRD 5.1': 145, 'SRD 5.2': 165,
     "Player's Handbook (2014)": 0, "Player's Handbook (2024)": 0,
@@ -212,9 +218,11 @@
     else { var f = store.get('di.favs', {}); state.favs = f && typeof f === 'object' ? f : {}; l = { favs: state.favs }; }
     var fv = cleanSet(l.favs), wv = cleanSet(l.wish), raw = Array.isArray(l.att) ? l.att : [];
     var at = raw.filter(function (id) { return !DATA || !!BYID[id]; });
-    var out = { favs: fv[0], wish: wv[0], att: at };
+    var inv = {}, invDrop = false;
+    if (l.inv && typeof l.inv === 'object') for (var k in l.inv) { if (validId(k)) inv[k] = Math.max(1, parseInt(l.inv[k], 10) || 1); else invDrop = true; }
+    var out = { favs: fv[0], wish: wv[0], att: at, inv: inv };
     /* ids that no longer exist (an item renamed in a data update) are dropped quietly, after this redraw */
-    if (DATA && (fv[1] || wv[1] || at.length !== raw.length)) setTimeout(function () { setLists(out); }, 0);
+    if (DATA && (fv[1] || wv[1] || invDrop || at.length !== raw.length)) setTimeout(function () { setLists(out); }, 0);
     return out;
   }
   function setLists(patch) {
@@ -318,9 +326,24 @@
     if (set[r.id] || (r.group && set[r.group])) return true;
     return !!(r.isGroup && r.members.some(function (m) { return set[m.id]; }));
   }
+  /* in the list views, a variant group shows only the variants on that list (all of them if the group itself was added) */
+  function narrow(rows) {
+    var set = state.show === 'fav' ? LISTS.favs : state.show === 'wish' ? LISTS.wish : state.show === 'inv' ? LISTS.inv : null;
+    return rows.map(function (r) {
+      if (!r.isGroup || (set && set[r.id])) return r;
+      var m = r.members.filter(function (x) { return set ? set[x.id] : isAtt(x.id); });
+      if (m.length === 1) return m[0];
+      if (!m.length || m.length === r.members.length) return r;
+      var g = Object.assign({}, r, { members: m });
+      g.rarity = m.reduce(function (a, x) { return rarIdx(x.rarity) > rarIdx(a) ? x.rarity : a; }, m[0].rarity);
+      g.rarLo = m.reduce(function (a, x) { return rarIdx(x.rarity) < rarIdx(a) ? x.rarity : a; }, m[0].rarity);
+      return g;
+    });
+  }
   function inShow(r) {
     if (state.show === 'fav') return inSet(LISTS.favs, r);
     if (state.show === 'wish') return inSet(LISTS.wish, r);
+    if (state.show === 'inv') return inSet(LISTS.inv, r);
     if (state.show === 'att') return r.isGroup ? r.members.some(function (m) { return isAtt(m.id); }) : isAtt(r.id);
     return true;
   }
@@ -355,7 +378,7 @@
     var srd = DATA.items.filter(function (it) { return pass(it, q); });
     var oth = DATA.others.filter(function (it) { return pass(it, q); });
     var main = toRows(state.merge ? srd.concat(oth) : srd);
-    if (state.show) main = main.filter(inShow);
+    if (state.show) main = narrow(main.filter(inShow));
     sortRows(main);
     writeUrl();
     LAST_MAIN = main;
@@ -371,9 +394,9 @@
     list.innerHTML = main.slice(0, state.limit).map(card).join('');
     pager('#moreBtn', main.length, state.limit);
     $('#empty').hidden = main.length > 0;
-    var emptyList = state.show === 'fav' ? !Object.keys(LISTS.favs).length : state.show === 'wish' ? !Object.keys(LISTS.wish).length : state.show === 'att' ? !LISTS.att.length : false;
+    var emptyList = state.show === 'fav' ? !Object.keys(LISTS.favs).length : state.show === 'wish' ? !Object.keys(LISTS.wish).length : state.show === 'att' ? !LISTS.att.length : state.show === 'inv' ? !Object.keys(LISTS.inv).length : false;
     $('#empty').textContent = emptyList
-      ? { fav: 'No favorites yet. Tap the star on any card to add it.', wish: 'Nothing on the wishlist yet. Open an item and choose Add to wishlist.', att: 'Nothing attuned yet. Open an item that needs attunement and choose Attune.' }[state.show]
+      ? { fav: 'No favorites yet. Tap the star on any card to add it.', wish: 'Nothing on the wishlist yet. Open an item and choose Add to wishlist.', att: 'Nothing attuned yet. Open an item that needs attunement and choose Attune.', inv: 'Nothing in the inventory yet. Open an item and choose Add to inventory, or import the character in the D&D Toolbox.' }[state.show]
       : 'No items match. Try clearing a filter, adding books in Sources, or switching the rules edition.' + (state.usable && CUR_CH ? ' (Usable by ' + CUR_CH.name + ' is on.)' : '');
     if (state.merge) $('#othersSec').hidden = true;
     else {
@@ -420,8 +443,10 @@
         order.push(id);
       }
       if (tag === 'att') r.att = true; else if (r.l.indexOf(tag) < 0) r.l.push(tag);
+      if (tag === 'inv' && l.inv[id] > 1) r.qty = l.inv[id];
     }
     l.att.forEach(function (id) { add(id, 'att'); });
+    Object.keys(l.inv).sort().forEach(function (id) { add(id, 'inv'); });
     Object.keys(l.wish).sort().forEach(function (id) { add(id, 'wish'); });
     Object.keys(l.favs).sort().forEach(function (id) { add(id, 'fav'); });
     var items = order.map(function (id) { return rows[id]; });
@@ -435,6 +460,84 @@
     var ch = activeCh();
     if (!ch || !DATA || !window.DndChar || !DndChar.setSheet) return;
     DndChar.setSheet(ch.id, REPO, sheetSummary(ch));
+  }
+  var IMP_SRC = { ddb: 'D&D Beyond', foundry: 'Foundry VTT', fc5: 'Fight Club 5' };
+  function impOf(ch) { var i = ch && ch.imp; return i && Array.isArray(i.items) && i.items.length && i.at ? i : null; }
+  function impPending(ch) { var i = impOf(ch), l = ch && (ch.links[REPO] || {}); return !!(i && (!l.impAt || String(i.at) > String(l.impAt))); }
+  function hideImp() { $('#impNote').hidden = true; $('#impNote').innerHTML = ''; }
+  function checkImport() {
+    var ch = activeCh(), box = $('#impNote');
+    if (!DATA || !impPending(ch)) { if (!box.dataset.result) hideImp(); return; }
+    var i = impOf(ch), src = IMP_SRC[i.src] || 'another site';
+    delete box.dataset.result;
+    box.innerHTML = '<p><b>' + i.items.length + ' item' + (i.items.length === 1 ? '' : 's') + '</b> came with ' + esc(ch.name) + '\'s import from ' + esc(src) + '.</p>' +
+      '<div class="imp-btns"><button type="button" class="btn" data-imp-add="1">Add the items imported from ' + esc(src) + ' to ' + esc(ch.name) + '\'s inventory</button>' +
+      '<button type="button" class="chip" data-imp-skip="1">Not now</button></div>';
+    box.hidden = false;
+    if (window.DndUI && DndUI.enter) DndUI.enter(box);
+  }
+  function markImported() {
+    var ch = activeCh(), i = impOf(ch); if (!ch || !i) return;
+    setLists({ impAt: i.at });
+  }
+  /* names to try for an imported item: "Longsword, +1" -> "+1 Longsword" -> "Longsword (+1)"; "Rope, hempen (50 feet)" -> "Hempen Rope" */
+  function impKeys(n) {
+    var s = String(n || '').replace(/[\u2018\u2019]/g, "'").trim(), out = [];
+    function push(x) { var k = norm(x); if (k && out.indexOf(k) < 0) out.push(k); }
+    push(s);
+    var bare = s.replace(/\s*\([^)]*\)\s*$/, ''); push(bare);
+    var m = bare.match(/^([^,]+),\s*(.+)$/); if (m) { push(m[2] + ' ' + m[1]); bare = m[2] + ' ' + m[1]; }
+    var p = bare.match(/^\+(\d)\s+(.+)$/); if (p) push(p[2] + ' (+' + p[1] + ')');
+    return out;
+  }
+  var KEYIDX = null;
+  function keyIndex() {
+    if (KEYIDX) return KEYIDX;
+    KEYIDX = {};
+    /* SRD items win over book entries (added last), and an exact name wins over a derived one
+       ("Holy Avenger" is the base item, not "Holy Avenger (Whip)" with its parentheses dropped) */
+    var all = DATA.others.concat(DATA.items);
+    all.forEach(function (it) {
+      impKeys(it.name).slice(1).forEach(function (k) { KEYIDX[it.ed + '|' + k] = it.id; });
+      if (it.group && it.groupName) KEYIDX[it.ed + '|g|' + norm(it.groupName)] = KEYIDX[it.ed + '|g|' + norm(it.groupName)] || it.group;
+    });
+    all.forEach(function (it) { KEYIDX[it.ed + '|' + norm(it.name)] = it.id; });
+    return KEYIDX;
+  }
+  function findItem(n, ed) {
+    var idx = keyIndex(), eds = ed === '2014' ? ['2014', '2024'] : ['2024', '2014'], ks = impKeys(n);
+    /* last resort, own edition only: the part before a comma ("Rope, Hempen (50 feet)" -> "Rope") */
+    var head = String(n || '').split(',')[0], hk = head !== String(n || '') ? norm(head) : '';
+    for (var e = 0; e < eds.length; e++) {
+      for (var j = 0; j < ks.length; j++) if (idx[eds[e] + '|' + ks[j]]) return idx[eds[e] + '|' + ks[j]];
+      for (var j2 = 0; j2 < ks.length; j2++) if (idx[eds[e] + '|g|' + ks[j2]]) return idx[eds[e] + '|g|' + ks[j2]];
+      if (e === 0 && hk && idx[eds[e] + '|' + hk]) return idx[eds[e] + '|' + hk];
+    }
+    return null;
+  }
+  /* adds to the inventory (and attuned list) without removing or changing anything already there */
+  function importItems() {
+    var ch = activeCh(), i = impOf(ch); if (!ch || !i) return;
+    var l = lists(), inv = Object.assign({}, l.inv), att = l.att.slice(), max = attMax(ch), ed = i.ed || ch.ed;
+    var added = 0, kept = 0, nAtt = 0, missed = [], full = [];
+    i.items.forEach(function (x) {
+      var id = findItem(x.n, ed);
+      if (!id) { if (missed.indexOf(x.n) < 0) missed.push(x.n); return; }
+      if (inv[id]) kept++; else { inv[id] = Math.max(1, parseInt(x.qty, 10) || 1); added++; }
+      if (x.att && BYID[id] && BYID[id].attune && att.indexOf(id) < 0) {
+        if (att.length < max) { att.push(id); nAtt++; } else full.push(BYID[id].name);
+      }
+    });
+    setLists({ inv: inv, att: att, impAt: i.at });
+    var box = $('#impNote');
+    box.dataset.result = '1';
+    box.innerHTML = '<p>Added <b>' + added + '</b> item' + (added === 1 ? '' : 's') + ' to ' + esc(ch.name) + '\'s inventory' +
+      (nAtt ? ' and marked ' + nAtt + ' attuned' : '') + (kept ? '; ' + kept + (kept === 1 ? ' was' : ' were') + ' already there' : '') + '.</p>' +
+      (full.length ? '<p class="small">Not attuned (all ' + max + ' slots used): ' + esc(full.join(', ')) + '.</p>' : '') +
+      (missed.length ? '<p class="small">Not found on this site (homebrew, renamed, or not in any book here): ' + esc(missed.join(', ')) + '.</p>' : '') +
+      '<div class="imp-btns"><button type="button" class="btn" data-imp-show="1">Show the inventory</button><button type="button" class="chip" data-imp-close="1">Close</button></div>';
+    box.hidden = false;
+    render();
   }
   function pager(sel, total, limit) {
     $(sel).hidden = total <= limit;
@@ -465,7 +568,7 @@
     setP('cons', state.consumable);
     setP('view', state.detail !== 'basic' && state.detail);
     setP('sort', state.sort !== 'name' && state.sort);
-    var books = Object.keys(state.srcSel).sort(), core = CORE.slice().sort();
+    var books = Object.keys(state.srcSel).sort(), core = coreList().sort();
     var every = allBooks().every(srcOn);
     setP('books', every ? 'all' : books.join('|') !== core.join('|') && books.join('|'));
     setP('show', state.show);
@@ -495,7 +598,9 @@
   }
   function marks(r) {
     var att = r.isGroup ? r.members.some(function (m) { return isAtt(m.id); }) : isAtt(r.id);
-    return (att ? ' <span class="mark att">Attuned</span>' : '') + (inSet(LISTS.wish, r) ? ' <span class="mark wish">Wishlist</span>' : '') +
+    var q = !r.isGroup && LISTS.inv[r.id];
+    return (att ? ' <span class="mark att">Attuned</span>' : '') + (inSet(LISTS.inv, r) ? ' <span class="mark inv">Owned' + (q > 1 ? ' &times;' + q : '') + '</span>' : '') +
+      (inSet(LISTS.wish, r) ? ' <span class="mark wish">Wishlist</span>' : '') +
       (r.isGroup && !isFav(r.id) && inSet(LISTS.favs, r) ? ' <span class="mark fav">&#9733; variant</span>' : '');
   }
   function card(r) {
@@ -566,16 +671,18 @@
     DATA.items.concat(DATA.others).forEach(function (it) { if (it.ed === state.ed) itemSrcs(it).forEach(function (k) { c[k] = (c[k] || 0) + 1; }); });
     return c;
   }
-  function coreIdx(k) { var i = CORE.indexOf(k); return i < 0 ? 99 : i; }
-  function srcSort(a, b) { return coreIdx(a) - coreIdx(b) || a.localeCompare(b); }
+  function srcOrder(keys) { return window.DndSources ? DndSources.sort(keys) : keys.slice().sort(); }
+  function srcGroup(k) { return window.DndSources ? DndSources.info(k).groupName : ''; }
   function renderSources() {
-    var c = sourceCounts(), keys = Object.keys(c).sort(srcSort);
+    var c = sourceCounts(), keys = srcOrder(Object.keys(c));
     var on = keys.filter(srcOn).length, q = state.srcQ.trim().toLowerCase();
-    var firstOther = keys.filter(function (k) { return coreIdx(k) === 99 && (!q || k.toLowerCase().indexOf(q) >= 0); })[0];
+    var lastGroup = null;
     $('#srcSum').textContent = 'Sources' + (on === keys.length ? '' : ' (' + on + ' of ' + keys.length + ')');
     $('#srcPick').classList.toggle('filtered', on !== keys.length);
     $('#srcList').innerHTML = keys.filter(function (k) { return !q || k.toLowerCase().indexOf(q) >= 0; }).map(function (k) {
-      return (k === firstOther ? '<div class="srcsep">Other books</div>' : '') + '<label class="srcrow"' + hueAttr(k) + '><input type="checkbox" data-src="' + esc(k) + '"' + (srcOn(k) ? ' checked' : '') + '> <i class="dot" aria-hidden="true"></i><span>' + esc(k) + '</span><span class="n">' + c[k] + '</span></label>';
+      var g = srcGroup(k), head = g && g !== lastGroup ? '<div class="src-group">' + esc(g) + '</div>' : '';
+      lastGroup = g;
+      return head + '<label class="srcrow"' + hueAttr(k) + '><input type="checkbox" data-src="' + esc(k) + '"' + (srcOn(k) ? ' checked' : '') + '> <i class="dot" aria-hidden="true"></i><span>' + esc(k) + '</span><span class="n">' + c[k] + '</span></label>';
     }).join('') || '<p class="small muted">No book matches.</p>';
   }
   function allBooks() { var o = {}; DATA.items.concat(DATA.others).forEach(function (it) { itemSrcs(it).forEach(function (k) { o[k] = 1; }); }); return Object.keys(o); }
@@ -590,7 +697,7 @@
   function renderSourceLinks() {
     var per = {};
     DATA.items.concat(DATA.others).forEach(function (it) { itemSrcs(it).forEach(function (k) { per[k] = per[k] || { 2014: 0, 2024: 0 }; per[k][it.ed]++; }); });
-    $('#srcLinks').innerHTML = Object.keys(per).sort(srcSort).map(function (k) {
+    $('#srcLinks').innerHTML = srcOrder(Object.keys(per)).map(function (k) {
       var u = bookUrl(k), n = per[k], cnt = [n[2014] ? '2014: ' + n[2014] : '', n[2024] ? '2024: ' + n[2024] : ''].filter(Boolean).join(', ');
       var note = /^SRD/.test(k) ? ' (free, CC-BY-4.0, full text)' : '';
       return '<li><i class="dot"' + hueAttr(k) + '></i><span>' + (u ? '<a href="' + u + '" target="_blank" rel="noopener">' + esc(k) + '</a>' : esc(k)) + esc(note) +
@@ -643,7 +750,7 @@
         var target = e === it.ed ? it : alt && alt.ed === e ? alt : null;
         return target ? '<button type="button" data-open="' + esc(target.id) + '" aria-selected="' + (e === it.ed) + '">' + e + ' rules</button>' : '';
       }).join('') + (it.group ? '<button type="button" data-open="' + esc(it.group) + '">All variants</button>' : '') + '</div>';
-      h += '<div class="mn-actions">' + favDlgBtn(id) + wishBtn(id) + attBtn(it) + '</div>';
+      h += '<div class="mn-actions">' + favDlgBtn(id) + invBtn(id) + wishBtn(id) + attBtn(it) + '</div>';
       h += factsTable(it);
       if (it.summary) h += '<p class="summary">' + esc(it.summary) + '</p>';
       if (it.srd) h += '<div class="itext">' + md(it.desc) + '</div><p class="small">Text from the ' + (it.src === 'SRD 5.1' ? 'System Reference Document 5.1' : 'System Reference Document 5.2') + ', CC-BY-4.0.</p>';
@@ -657,6 +764,11 @@
     }
     d.querySelector('.dlg').scrollTop = 0;
     var u = new URL(location.href); u.searchParams.set('item', id); history.replaceState(null, '', u);
+  }
+  function invBtn(id) {
+    if (!activeCh()) return '';
+    var n = LISTS.inv[id];
+    return '<button type="button" class="btn" data-inv="' + esc(id) + '" aria-pressed="' + !!n + '">' + (n ? '&#10003; In inventory' + (n > 1 ? ' (' + n + ')' : '') : 'Add to inventory') + '</button>';
   }
   function wishBtn(id) {
     if (!activeCh()) return '';
@@ -692,12 +804,13 @@
     $('#usableTxt').textContent = ch ? 'Usable by ' + ch.name : 'Usable by character';
     if (ch) {
       $('#show option[value="att"]').textContent = 'Attuned (' + LISTS.att.length + '/' + attMax(ch) + ')';
+      $('#show option[value="inv"]').textContent = 'Inventory (' + Object.keys(LISTS.inv).length + ')';
       $('#attCount').textContent = 'Attuned ' + LISTS.att.length + '/' + attMax(ch);
     }
   }
   function save() {
     store.set('di.ed', state.ed); store.set('di.sort', state.sort); store.set('di.detail', state.detail);
-    store.set('di.merge', state.merge); store.set('di.groupVar', state.groupVar); store.set('di.srcSel', state.srcSel); store.set('di.usable', state.usable);
+    store.set('di.merge', state.merge); store.set('di.groupVar', state.groupVar); if (DATA) store.set('di.srcSel', sameKeys(state.srcSel, coreList()) ? null : state.srcSel); store.set('di.usable', state.usable);
   }
   function update(patch) {
     for (var k in patch) state[k] = patch[k];
@@ -751,6 +864,16 @@
       pf[which] = f; setLists(pf);
       return refresh();
     }
+    if (t.dataset.inv) {
+      var iv = Object.assign({}, lists().inv);
+      if (iv[t.dataset.inv]) delete iv[t.dataset.inv]; else iv[t.dataset.inv] = 1;
+      setLists({ inv: iv });
+      return refresh();
+    }
+    if (t.dataset.impAdd) return importItems();
+    if (t.dataset.impSkip) { markImported(); return hideImp(); }
+    if (t.dataset.impShow) { hideImp(); return update({ show: 'inv' }); }
+    if (t.dataset.impClose) return hideImp();
     if (t.dataset.att) {
       var al = lists().att.slice(), i = al.indexOf(t.dataset.att);
       if (i >= 0) al.splice(i, 1); else if (al.length < attMax(activeCh())) al.push(t.dataset.att);
@@ -796,19 +919,21 @@
   function refresh() { if ($('#detail').open) { openDetail(dlgId); publishSheet(); } else render(); }
   /* the header picker or another tab changed the character: follow its edition and redraw */
   /* fields this site reads: which character, its edition, its classes (Usable by) and its own link */
-  function chSig(ch) { return ch ? [ch.id, ch.ed, JSON.stringify(ch.classes), JSON.stringify(ch.links[REPO] || {})].join('|') : ''; }
+  function chSig(ch) { return ch ? [ch.id, ch.ed, JSON.stringify(ch.classes), JSON.stringify(ch.links[REPO] || {}), ch.imp && ch.imp.at || ''].join('|') : ''; }
   var appliedSig = chSig(activeCh()), appliedId = activeCh() ? activeCh().id : '', appliedEd = activeCh() ? activeCh().ed : null;
   if (window.DndChar) DndChar.onChange(function (ch) {
     if (!DATA) return;
     var sig = chSig(ch);
     if (sig === appliedSig) return; /* another site re-saved it: nothing this site uses changed */
     appliedSig = sig;
+    setTimeout(checkImport, 0);
     var id = ch ? ch.id : '';
     if (id !== appliedId) {
       appliedId = id; appliedEd = ch ? ch.ed : null;
       var patch = {};
       if (ch && ch.ed !== state.ed) { patch.ed = ch.ed; patch.types = []; patch.rars = []; }
-      if (!ch && (state.show === 'wish' || state.show === 'att')) patch.show = '';
+      if (!ch && (state.show === 'wish' || state.show === 'att' || state.show === 'inv')) patch.show = '';
+      hideImp();
       if ($('#detail').open) $('#detail').close();
       return update(patch);
     }
@@ -859,8 +984,11 @@
     var n14 = d.items.filter(function (i) { return i.ed === '2014'; }).length;
     $('#generated').textContent = 'Data built ' + d.generated + ' · ' + d.items.length.toLocaleString() + ' SRD items with full text (2014: ' + n14 + ', 2024: ' + (d.items.length - n14) + '), ' + d.others.length.toLocaleString() + ' more from other books (facts only).';
     if (state.srcAllPending) { state.srcSel = {}; allBooks().forEach(function (k) { state.srcSel[k] = true; }); delete state.srcAllPending; }
+    else if (state.srcDefault) state.srcSel = coreSel();
+    delete state.srcDefault;
     renderSourceLinks();
     render();
+    checkImport();
     var open = params.get('item');
     if (open && (BYID[open] || GROUPS[open])) openDetail(open);
   }).catch(function (err) {

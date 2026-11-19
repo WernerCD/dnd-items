@@ -1,4 +1,4 @@
-/* dnd-shared character.js v1.5 (canonical copy: WernerCD/dnd shared/character.js). Copy unchanged to site/character.js.
+/* dnd-shared character.js v1.6 (canonical copy: WernerCD/dnd shared/character.js). Copy unchanged to site/character.js.
  *
  * One list of characters shared by every D&D Toolbox site. All the sites are served from
  * wernercd.github.io, so they share localStorage: a Paladin built in the Multiclass Planner shows up,
@@ -16,6 +16,7 @@
  *   share:   { '<repo>': json }       // optional: what that site wants a share link to carry (setShare), max 6000 chars each
  *   inbox:   { '<repo>': json }       // share data that arrived with a share link, waiting for that site (takeInbox)
  *   sheet:   { '<repo>': json }       // v1.4: that site's computed summary for the character sheet and party pages (setSheet), max 6000 chars each
+ *   imp:     json | null              // v1.6: the last import from another site (D&D Beyond, Foundry, Fight Club 5), names only (STYLE.md 6g); max 40000 chars; not in share links
  * }
  * Sites keep their detailed state in their own keys as before; this record is the shared summary they agree on.
  * Subclass ids differ between sites, so match with DndChar.sameSub() (id first, then name).
@@ -66,8 +67,9 @@
     var ab = Array.isArray(c.ab) && c.ab.length === 6 ? c.ab.map(function (n) { return Math.max(1, Math.min(30, parseInt(n, 10) || 10)); }) : [10, 10, 10, 10, 10, 10];
     return { id: String(c.id).slice(0, 40), name: String(c.name || 'Unnamed').slice(0, 60), ed: c.ed === '2014' ? '2014' : '2024',
       classes: cl, ab: ab, updated: c.updated || null, by: c.by || null, links: c.links && typeof c.links === 'object' ? c.links : {},
-      share: box(c.share), inbox: box(c.inbox), sheet: box(c.sheet) };
+      share: box(c.share), inbox: box(c.inbox), sheet: box(c.sheet), imp: imp(c.imp) };
   }
+  function imp(o) { try { return o && typeof o === 'object' && JSON.stringify(o).length <= 40000 ? o : null; } catch (e) { return null; } }
   function box(o) {   // { repo: small JSON value }, anything over 6000 characters is dropped
     var r = {}; if (!o || typeof o !== 'object') return r;
     for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k) && o[k] != null) { try { if (JSON.stringify(o[k]).length <= 6000) r[String(k).slice(0, 40)] = o[k]; } catch (e) { /* skip */ } }

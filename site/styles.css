@@ -339,6 +339,14 @@ a.open:focus { outline: none; }
 .chart-box .chart-in { padding: 10px 14px 12px; }
 .chart-box h3 { margin: 0 0 6px; font-size: 1rem; }
 @media print { .chart-box { display: none; } }
+/* source picker group headings (shared sources.js order) */
+.src-group { font-size: .72rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); padding: 8px 2px 2px; }
+.src-group:not(:first-child) { border-top: 1px solid var(--line); margin-top: 6px; }
+/* offer to add the items of a character imported in the hub */
+.imp-note { margin: 0 0 14px; padding: 12px 14px; border: 1px solid var(--accent); border-radius: var(--radius); background: var(--surface); }
+.imp-note p { margin: 0 0 8px; }
+.imp-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.mark.inv { border-color: var(--ink-2); color: var(--ink-2); }
 /* per-character marks (character.js) */
 .ch-only[hidden] { display: none !important; }
 .mark { display: inline-block; font-size: .72rem; font-weight: 600; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--accent); color: var(--accent); }
