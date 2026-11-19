@@ -1,4 +1,4 @@
-/* dnd-shared links.js v1.0 (canonical copy: WernerCD/dnd shared/links.js). Copy unchanged to site/links.js.
+/* dnd-shared links.js v1.0.1 (canonical copy: WernerCD/dnd shared/links.js). Copy unchanged to site/links.js.
  * Links the tools to each other (STYLE.md 6k), using the search lists every tool already publishes (6j).
  * Works inside any .dsb stat block and any element with a data-links attribute; content added later is
  * picked up automatically. Links into the page's own site are left out (each tool links itself).
@@ -10,6 +10,9 @@
  *
  *   DndLinks.url(kind, name) -> URL or '' (after DndLinks.load), DndLinks.load(kinds) -> Promise,
  *   DndLinks.apply(root)
+ * v1.0.1: names of two or more words written in Title Case also link without italics (the 2024 SRD prints
+ *   "cast Magic Missile"); italics ending in . or : are run-in headings ("Slow.") and never link;
+ *   data-nolink works on the element itself as well as on a container.
  * Opt out inside a block with data-nolink. The lists come from wernercd.github.io (also when testing
  * locally); with no connection and nothing cached, the text simply stays plain.
  */
@@ -26,7 +29,7 @@
   var CONDS = ['blinded', 'charmed', 'deafened', 'exhaustion', 'frightened', 'grappled', 'incapacitated', 'invisible', 'paralyzed', 'petrified', 'poisoned', 'prone', 'restrained', 'stunned', 'unconscious'];
   var CRX = new RegExp('\\b(' + CONDS.join('|') + ')\\b', 'i');
   var SKIP = /^(A|BUTTON|SCRIPT|STYLE|INPUT|TEXTAREA|SELECT|OPTION|LABEL|SUMMARY|H1|H2|H3)$/;
-  var idx = {}, loading = {};
+  var idx = {}, loading = {}, titles = {}, TRX = null;
   var fold = function (s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[‘’ʼ]/g, "'").toLowerCase().replace(/\s+/g, ' ').replace(/[\s.,;:!?]+$/, '').trim(); };
   var off = function (kind) { return !KINDS[kind] || KINDS[kind][0] === HERE; };
 
@@ -35,9 +38,12 @@
     kinds.forEach(function (k) { if (!off(k)) repos[KINDS[k][0]] = 1; });
     return Promise.all(Object.keys(repos).map(function (repo) {
       if (!loading[repo]) loading[repo] = fetch(BASE + repo + '/search.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
-        var m = {};
-        ((d && d.items) || []).forEach(function (it) { var f = fold(it.n); if (f && !m[f + '|' + it.k]) m[f + '|' + it.k] = it.u || ''; });
-        idx[repo] = m;
+        var m = {}, t = [];
+        ((d && d.items) || []).forEach(function (it) {
+          var f = fold(it.n); if (f && !m[f + '|' + it.k]) m[f + '|' + it.k] = it.u || '';
+          if ((it.k === 'Spell' || it.k === 'Item') && /^[A-Z][\w'\u2019-]*( (of|the|and|from|to|in|on|a|[A-Z][\w'\u2019-]*))* [A-Z][\w'\u2019-]*$/.test(it.n) && it.n.indexOf(' ') > 0) t.push(it.n);
+        });
+        idx[repo] = m; titles[repo] = t; TRX = null;
       }).catch(function () { idx[repo] = {}; });
       return loading[repo];
     }));
@@ -56,6 +62,14 @@
     while (el.firstChild) a.appendChild(el.firstChild);
     el.appendChild(a);
   }
+  function titleRx() {   // multi-word Title Case spell and magic item names, longest first
+    if (TRX !== null) return TRX;
+    var n = [];
+    ['spell', 'item'].forEach(function (k) { if (!off(k)) n = n.concat(titles[KINDS[k][0]] || []); });
+    n.sort(function (a, b) { return b.length - a.length; });
+    TRX = n.length ? new RegExp('(^|[^\\w])(' + n.map(function (x) { return x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|') + ')(?![\\w])') : false;
+    return TRX;
+  }
   function blocked(el, root) {
     for (var p = el; p && p !== root.parentNode; p = p.parentNode) if (p.nodeType === 1 && (SKIP.test(p.nodeName) || p.hasAttribute('data-nolink') || p.classList.contains('dd-roll'))) return true;
     return false;
@@ -65,7 +79,7 @@
     // explicit marks and creature types
     root.querySelectorAll('[data-link]:not([data-dlx])').forEach(function (el) {
       el.setAttribute('data-dlx', '1'); var k = el.getAttribute('data-link'), u = url(k, el.getAttribute('data-link-name') || el.textContent);
-      if (u && !blocked(el.parentNode, root)) link(el, u, k);
+      if (u && !blocked(el, root)) link(el, u, k);
     });
     root.querySelectorAll('.dsb-ctype:not([data-dlx])').forEach(function (el) {
       el.setAttribute('data-dlx', '1'); var u = typeUrl(el.getAttribute('data-ctype') || el.textContent); if (u) link(el, u, 'type');
@@ -73,11 +87,30 @@
     // italic names: spells first, then magic items
     root.querySelectorAll('i:not([data-dlx]), em:not([data-dlx])').forEach(function (el) {
       el.setAttribute('data-dlx', '1');
-      if (el.children.length || blocked(el.parentNode, root)) return;
-      var t = el.textContent; if (t.length > 60) return;
+      if (el.children.length || blocked(el, root)) return;
+      var t = el.textContent; if (t.length > 60 || /[.:]\s*$/.test(t)) return;   // "Slow." is a run-in heading
       var u = url('spell', t), k = 'spell'; if (!u) { u = url('item', t); k = 'item'; }
       if (u) link(el, u, k);
     });
+    // Title Case names in plain text: first mention of each in a paragraph
+    var rx = titleRx();
+    if (rx) {
+      var tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: function (n) { return rx.test(n.nodeValue) && !blocked(n.parentNode, root) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT; } }), tn = [];
+      while (tw.nextNode()) tn.push(tw.currentNode);
+      var one = function (n) {   // every name in the node; each one once per paragraph
+        var m = rx.exec(n.nodeValue); if (!m) return;
+        var name = m[2], at = m.index + m[1].length, blk = n.parentNode.closest('p, li, td, dd, .dsb-blk, div') || root, seen = (blk.getAttribute('data-dln') || '').split('|');
+        var u = seen.indexOf(name) >= 0 ? '' : url('spell', name), k = 'spell'; if (!u && seen.indexOf(name) < 0) { u = url('item', name); k = 'item'; }
+        var rest = n.splitText(at + name.length);
+        if (u) {
+          seen.push(name); blk.setAttribute('data-dln', seen.join('|'));
+          var a = document.createElement('a'); a.className = 'dlx'; a.href = u; a.title = 'Open in ' + KINDS[k][2]; a.textContent = name;
+          n.nodeValue = n.nodeValue.slice(0, at); n.parentNode.insertBefore(a, rest);
+        }
+        one(rest);
+      };
+      tn.forEach(one);
+    }
     // conditions: first mention in each paragraph / entry
     if (off('condition')) return;
     var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: function (n) { return CRX.test(n.nodeValue) && !blocked(n.parentNode, root) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT; } }), nodes = [];
@@ -106,7 +139,7 @@
     var list = roots(root); if (!list.length) return Promise.resolve();
     var need = { condition: 1 };   // load only the lists this content can use (the item list is the big one)
     list.forEach(function (r) {
-      if (r.querySelector('i, em')) { need.spell = 1; need.item = 1; }
+      need.spell = 1; need.item = 1;   // italics and Title Case names
       r.querySelectorAll('[data-link]').forEach(function (e) { need[e.getAttribute('data-link')] = 1; });
     });
     return load(Object.keys(need).filter(function (k) { return KINDS[k]; })).then(function () {

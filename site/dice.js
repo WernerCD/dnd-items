@@ -1,4 +1,4 @@
-/* dnd-shared dice.js v1.0 (canonical copy: WernerCD/dnd shared/dice.js). Copy unchanged to site/dice.js.
+/* dnd-shared dice.js v1.0.1 (canonical copy: WernerCD/dnd shared/dice.js). Copy unchanged to site/dice.js.
  * Click-to-roll dice for every D&D Toolbox page (STYLE.md 6k). Styles are the .dd- rules in the dnd-shared
  * CSS block (v1.11+). The roll log is shared by every tool (localStorage dnd.rolls, last 30 rolls).
  *
@@ -15,6 +15,8 @@
  *   DndDice.apply(root)        -> mark up rolls inside root now (normally not needed)
  *   DndDice.open()             -> show the roll tray (free-form roller and log)
  * d20 rolls always roll two d20: the tray shows the plain result and the advantage / disadvantage result.
+ * v1.0.1: a roll from inside an open modal <dialog> shows the tray inside that dialog (top layer); data-roll
+ *   must contain a die ("1d20+2"), so other uses of data-roll (e.g. data-roll="0") are left alone.
  */
 (function () {
   var KEY = 'dnd.rolls', MAX = 30, DIE = '(?:4|6|8|10|12|20|100)';
@@ -63,7 +65,7 @@
     }
     var l = getLog(); l.unshift({ t: res.t, l: res.label, e: res.expr + (res.crit ? ' (crit)' : ''), v: total, a: res.adv, b: res.dis, n: res.nat, r: dice.map(function (x) { return x.r.join(', '); }).join(' | ') });
     setLog(l);
-    show(res);
+    show(res, opt.from);
     return res;
   }
 
@@ -83,11 +85,11 @@
     tray.querySelector('.dd-x').addEventListener('click', function () { tray.hidden = true; });
     tray.querySelector('.dd-free').addEventListener('submit', function (e) {
       e.preventDefault(); var i = tray.querySelector('#ddExpr'), v = i.value.trim(); if (!v) return;
-      if (!roll(v, '')) { tray.querySelector('.dd-last').innerHTML = '<p class="dd-hint">Try dice like 2d6+3, d20 or 4d6.</p>'; }
+      if (!roll(v, '', { from: i })) { tray.querySelector('.dd-last').innerHTML = '<p class="dd-hint">Try dice like 2d6+3, d20 or 4d6.</p>'; }
     });
     tray.addEventListener('click', function (e) {
-      var q = e.target.closest('[data-q]'); if (q) { roll(q.getAttribute('data-q'), ''); return; }
-      if (e.target.closest('.dd-crit') && lastRes) { roll(lastRes.expr, (lastRes.label ? lastRes.label + ', ' : '') + 'critical hit', { crit: true }); return; }
+      var q = e.target.closest('[data-q]'); if (q) { roll(q.getAttribute('data-q'), '', { from: q }); return; }
+      if (e.target.closest('.dd-crit') && lastRes) { roll(lastRes.expr, (lastRes.label ? lastRes.label + ', ' : '') + 'critical hit', { crit: true, from: e.target }); return; }
       if (e.target.closest('.dd-clear')) { setLog([]); renderLog(); }
     });
     tray.querySelector('.dd-more').addEventListener('toggle', renderLog);
@@ -101,8 +103,10 @@
         (x.a != null ? ' <span class="dd-ad">adv ' + x.a + ' &middot; dis ' + x.b + '</span>' : '') + '</li>';
     }).join('') : '<li class="dd-hint">No rolls yet.</li>';
   }
-  function show(r) {
+  function show(r, from) {
     build(); lastRes = r;
+    var dlg = from && from.closest && from.closest('dialog[open]'), host = dlg || document.body;   // a modal dialog is in the top layer: the tray must be inside it to be seen
+    if (tray.parentNode !== host && !(from && tray.contains(from))) host.appendChild(tray);
     var parts = r.dice.map(function (x) { return (x.s < 0 ? '−' : '') + '[' + x.r.join(', ') + ']'; }).join(' ') + (r.k ? ' ' + sg(r.k) : '');
     var nat = r.nat === 20 ? ' <span class="dd-nat hi">natural 20</span>' : r.nat === 1 ? ' <span class="dd-nat lo">natural 1</span>' : '';
     var h = (r.label ? '<p class="dd-lbl">' + esc(r.label) + '</p>' : '') +
@@ -131,7 +135,7 @@
   }
   function marks(root) {   // explicit data-roll elements, anywhere on the page
     root.querySelectorAll('[data-roll]:not(.dd-roll)').forEach(function (el) {
-      if (!parse(el.getAttribute('data-roll'))) return;
+      if (!/d/i.test(el.getAttribute('data-roll') || '') || !parse(el.getAttribute('data-roll'))) return;
       el.classList.add('dd-roll'); el.setAttribute('role', 'button'); el.tabIndex = 0;
       if (!el.title) el.title = 'Roll ' + el.getAttribute('data-roll').replace(/-/g, '−');
     });
@@ -179,7 +183,7 @@
 
   function fire(el) {
     var label = el.getAttribute('data-roll-label') || ctxLabel(el, '');
-    roll(el.getAttribute('data-roll'), label);
+    roll(el.getAttribute('data-roll'), label, { from: el });
   }
   document.addEventListener('click', function (e) {
     var el = e.target.closest && e.target.closest('.dd-roll'); if (!el || (tray && tray.contains(el))) return;
@@ -202,5 +206,5 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
-  window.DndDice = { roll: roll, parse: parse, apply: apply, open: function () { build().hidden = false; var i = tray.querySelector('#ddExpr'); if (i) i.focus(); }, log: getLog };
+  window.DndDice = { roll: roll, parse: parse, apply: apply, open: function () { build(); var d = document.querySelector('dialog[open]'); if (tray.parentNode !== (d || document.body)) (d || document.body).appendChild(tray); tray.hidden = false; var i = tray.querySelector('#ddExpr'); if (i) i.focus(); }, log: getLog };
 })();
