@@ -1,4 +1,4 @@
-/* dnd-shared character.js v1.3 (canonical copy: WernerCD/dnd shared/character.js). Copy unchanged to site/character.js.
+/* dnd-shared character.js v1.4 (canonical copy: WernerCD/dnd shared/character.js). Copy unchanged to site/character.js.
  *
  * One list of characters shared by every D&D Toolbox site. All the sites are served from
  * wernercd.github.io, so they share localStorage: a Paladin built in the Multiclass Planner shows up,
@@ -15,6 +15,7 @@
  *   links:   { '<repo>': anything }   // each site keeps ITS OWN per-character data here, and only touches its own key
  *   share:   { '<repo>': json }       // optional: what that site wants a share link to carry (setShare), max 6000 chars each
  *   inbox:   { '<repo>': json }       // share data that arrived with a share link, waiting for that site (takeInbox)
+ *   sheet:   { '<repo>': json }       // v1.4: that site's computed summary for the character sheet and party pages (setSheet), max 6000 chars each
  * }
  * Sites keep their detailed state in their own keys as before; this record is the shared summary they agree on.
  * Subclass ids differ between sites, so match with DndChar.sameSub() (id first, then name).
@@ -31,6 +32,7 @@
  *   copyShare(ch, repo, button)    copies shareUrl to the clipboard and says so on the button
  *   setShare(id, repo, data|null)  what your site adds to this character's share links (for example a spell list or a build)
  *   takeInbox(id, repo) -> data|null   share data that arrived for your site; returns it once and removes it
+ *   setSheet(id, repo, data|null)  your site's read-only summary for the sheet/party pages (STYLE.md 6e); travels in share links
  *   mountPicker(el)                fills el (the header's <span class="char-pick" id="charPick">) with the switcher
  * Opening any tool with ?char=<id> makes that character active.
  * Opening any tool with #dndchar=<data> offers to add (or update) the shared character in this browser.
@@ -64,7 +66,7 @@
     var ab = Array.isArray(c.ab) && c.ab.length === 6 ? c.ab.map(function (n) { return Math.max(1, Math.min(30, parseInt(n, 10) || 10)); }) : [10, 10, 10, 10, 10, 10];
     return { id: String(c.id).slice(0, 40), name: String(c.name || 'Unnamed').slice(0, 60), ed: c.ed === '2014' ? '2014' : '2024',
       classes: cl, ab: ab, updated: c.updated || null, by: c.by || null, links: c.links && typeof c.links === 'object' ? c.links : {},
-      share: box(c.share), inbox: box(c.inbox) };
+      share: box(c.share), inbox: box(c.inbox), sheet: box(c.sheet) };
   }
   function box(o) {   // { repo: small JSON value }, anything over 6000 characters is dropped
     var r = {}; if (!o || typeof o !== 'object') return r;
@@ -127,6 +129,13 @@
       if (data == null) delete d.list[i].share[repo]; else d.list[i].share[repo] = data;
       d.list[i] = clean(d.list[i]); return write(d);
     },
+    setSheet: function (id, repo, data) {
+      var d = read(), i = find(d, id); if (i < 0) return false;
+      var cur = d.list[i].sheet[repo];
+      if (JSON.stringify(cur === undefined ? null : cur) === JSON.stringify(data == null ? null : data)) return true;
+      if (data == null) delete d.list[i].sheet[repo]; else d.list[i].sheet[repo] = data;
+      d.list[i] = clean(d.list[i]); return write(d);
+    },
     takeInbox: function (id, repo) {
       var d = read(), i = find(d, id); if (i < 0 || !(repo in d.list[i].inbox)) return null;
       var v = d.list[i].inbox[repo]; delete d.list[i].inbox[repo]; write(d); return v;
@@ -155,14 +164,15 @@
   function encode(ch) {
     return b64e(JSON.stringify({ v: 1, id: ch.id, n: ch.name, ed: ch.ed, ab: ch.ab,
       c: ch.classes.map(function (x) { return [x.cls, x.lvl, x.sub || '', x.subName || '']; }),
-      x: ch.share && Object.keys(ch.share).length ? ch.share : undefined }));
+      x: ch.share && Object.keys(ch.share).length ? ch.share : undefined,
+      s: ch.sheet && Object.keys(ch.sheet).length ? ch.sheet : undefined }));
   }
   function decode(s) {
     var o = JSON.parse(b64d(s));
     if (!o || o.v !== 1 || !Array.isArray(o.c)) throw new Error('bad share');
     var c = clean({ id: o.id || uid(), name: o.n, ed: o.ed, ab: o.ab,
       classes: o.c.map(function (x) { return Array.isArray(x) ? { cls: x[0], lvl: x[1], sub: x[2] || null, subName: x[3] || null } : null; }),
-      inbox: o.x });
+      inbox: o.x, sheet: o.s });
     if (!c || !c.classes.length) throw new Error('bad share');
     return c;
   }

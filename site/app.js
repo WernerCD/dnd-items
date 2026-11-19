@@ -387,6 +387,7 @@
     renderChips();
     renderSources();
     syncControls();
+    publishSheet();
   }
   /* bar chart of the current results by rarity (items, not cards); drawn only while its panel is open */
   var chart = null, LAST_ROWS = [];
@@ -402,6 +403,38 @@
       title: 'Items in the current results by rarity (' + state.ed + ' rules)', fmt: function (v) { return Math.round(v).toLocaleString(); } };
     $('#chartHead').textContent = 'Current results by rarity (' + state.ed + ' rules)';
     if (chart) chart.update(o); else chart = DndPlot.bars($('#rarChart'), o);
+  }
+  /* summary for the hub's Character Sheet and Party pages (STYLE.md 6e): the items on the active
+     character's lists. Built in a fixed order, so setSheet sees "no change" and writes nothing. */
+  function sheetSummary(ch) {
+    var l = lists(), rows = {}, order = [];
+    function add(id, tag) {
+      var it = BYID[id], g = GROUPS[id], r = rows[id];
+      if (!it && !g) return;
+      if (!r) {
+        var name = it ? it.name : groupLabel(g[0].groupName), rar = it ? it.rarity : g.reduce(function (a, x) { return rarIdx(x.rarity) > rarIdx(a) ? x.rarity : a; }, g[0].rarity);
+        r = rows[id] = { n: name, rar: rar, att: false, l: [] };
+        var need = it ? it.attune : g[0].attune;
+        if (need) r.need = attuneText(need).replace(/^Requires attunement\s*/, '') || 'yes';
+        if (it && it.ed) r.ed = it.ed; else if (g) r.ed = g[0].ed;
+        order.push(id);
+      }
+      if (tag === 'att') r.att = true; else if (r.l.indexOf(tag) < 0) r.l.push(tag);
+    }
+    l.att.forEach(function (id) { add(id, 'att'); });
+    Object.keys(l.wish).sort().forEach(function (id) { add(id, 'wish'); });
+    Object.keys(l.favs).sort().forEach(function (id) { add(id, 'fav'); });
+    var items = order.map(function (id) { return rows[id]; });
+    items.sort(function (a, b) { return (b.att - a.att) || a.n.localeCompare(b.n); });
+    var out = { v: 1, items: items, attuned: l.att.length, attMax: attMax(ch) };
+    /* stay under the 6000-character limit: drop list-only items from the end, keep a count */
+    while (JSON.stringify(out).length > 5900 && out.items.length) { out.items.pop(); out.more = (out.more || 0) + 1; }
+    return out;
+  }
+  function publishSheet() {
+    var ch = activeCh();
+    if (!ch || !DATA || !window.DndChar || !DndChar.setSheet) return;
+    DndChar.setSheet(ch.id, REPO, sheetSummary(ch));
   }
   function pager(sel, total, limit) {
     $(sel).hidden = total <= limit;
@@ -760,7 +793,7 @@
   $('#show').addEventListener('change', function () { update({ show: this.value }); });
   $('#usable').addEventListener('change', function () { update({ usable: this.checked }); });
   /* after a list change: with the dialog open only the dialog redraws, the list follows on close */
-  function refresh() { if ($('#detail').open) openDetail(dlgId); else render(); }
+  function refresh() { if ($('#detail').open) { openDetail(dlgId); publishSheet(); } else render(); }
   /* the header picker or another tab changed the character: follow its edition and redraw */
   /* fields this site reads: which character, its edition, its classes (Usable by) and its own link */
   function chSig(ch) { return ch ? [ch.id, ch.ed, JSON.stringify(ch.classes), JSON.stringify(ch.links[REPO] || {})].join('|') : ''; }
