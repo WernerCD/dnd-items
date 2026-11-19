@@ -13,8 +13,13 @@
 <meta property="og:title" content="Changes &middot; D&amp;D Item Finder">
 <meta property="og:description" content="What has changed on the D&amp;D Item Finder.">
 <meta property="og:url" content="https://wernercd.github.io/dnd-items/changes.html">
-<meta name="twitter:card" content="summary">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2l11 7v14l-11 7-11-7V9z' fill='%23c9a227'/%3E%3C/svg%3E">
+<meta property="og:image" content="https://wernercd.github.io/dnd-items/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -50,6 +55,9 @@
   <section class="change-day">
     <h3><time datetime="2026-11-19">November 19, 2026</time></h3>
     <ul>
+      <li><b>Works offline.</b> After one visit the Item Finder opens and searches with no signal, items and all. You can also add it to your phone's home screen like an app, with its own icon. The <a href="https://wernercd.github.io/dnd/">D&amp;D Toolbox</a> can save every tool for offline use at once.</li>
+      <li><b>Search from the hub.</b> The D&amp;D Toolbox's "Search every tool" box now finds items by name, and the link opens that item here.</li>
+      <li><b>Preview cards.</b> A link to the Item Finder shared in a chat or post now shows a picture card.</li>
       <li><b>Sources, tidied.</b> The Sources menu now lists books in groups, the same way on every D&amp;D Toolbox site: Core rules (the SRDs, Player's Handbook, Dungeon Master's Guide and Monster Manual) first and ticked, then Official supplements, Settings and adventures, and Partner and licensed books such as World of Warcraft, all still there to tick. Xanathar's and Tasha's are now off by default. If you had picked your own books, your choice is kept.</li>
       <li><b>Inventory and imported characters.</b> With a character picked, each item has <b>Add to inventory</b>, and Show has an Inventory view. If you imported the character in the <a href="https://wernercd.github.io/dnd/">D&amp;D Toolbox</a> from D&amp;D Beyond, Foundry or Fight Club 5, the site offers to add its items to the inventory (attuned items fill the attunement slots). Nothing already on your lists is changed, and anything it can't find is listed. Imports from DiceCloud work too. The 2024 Belts of Giant Strength and the Potion of Giant Strength now link to their Dungeon Master's Guide (2024) pages. The Favorites, Wishlist and Inventory views now show just the variants you picked rather than whole groups.</li>
       <li><b>Tested before every update.</b> Each change to the site now runs a browser test suite first (search, item details, Sources defaults, links, the rarity chart, characters and imports, on desktop and phone), and the update only goes live if every test passes.</li>
@@ -116,5 +124,6 @@
 <script src="theme.js?v=dev"></script>
 <script src="nav.js?v=dev"></script>
 <script src="version.js?v=dev"></script>
+<script src="offline.js?v=dev"></script>
 </body>
 </html>

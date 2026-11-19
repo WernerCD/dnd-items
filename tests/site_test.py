@@ -132,3 +132,20 @@ def run(page, base, check):
     sheet = page.evaluate("() => (DndChar.active().sheet || {})['dnd-items']")
     check(bool(sheet) and sheet.get("v") == 1 and sheet.get("attuned") == 1 and len(sheet.get("items", [])) == 7,
           "[sheet] the character sheet summary is published (STYLE.md 6e)")
+
+    # --- hub search list: its links open the right entry (STYLE.md 6j) ---
+    import json, pathlib
+    sj = json.loads((pathlib.Path(__file__).resolve().parents[1] / "site" / "search.json").read_text(encoding="utf-8"))
+    by = {x["n"]: x for x in sj["items"]}
+    check(len(by) == len(sj["items"]), "[search.json] one entry per name")
+    for name, title in (("Bag of Holding", "Bag of Holding"), ("Orcsplitter", "Orcsplitter"), ("+1, +2 and +3 Weapons", "+1, +2 and +3 Weapons")):
+        e = by.get(name)
+        check(e is not None, f"[search.json] lists {name}")
+        if not e:
+            continue
+        page.goto(base + e["u"], wait_until="load")
+        wait_ready(page)
+        page.wait_for_timeout(300)
+        got = page.evaluate("() => document.querySelector('#detail').open ? document.querySelector('#dTitle').textContent : null")
+        check(got == title, f"[search.json] the {name} link opens its entry (got {got!r})")
+    check(all("desc" not in x and len(x.get("t", "")) < 90 for x in sj["items"]), "[search.json] names and short facts only")

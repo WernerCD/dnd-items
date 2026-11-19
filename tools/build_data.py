@@ -9,6 +9,8 @@ Inputs (all in the repo, refreshed by tools/fetch_sources.py):
                                   (name, type, rarity, attunement, book, page). No text.
   data-src/summaries.json         original one-line summaries, keyed by item id or normalized name
 
+Also writes site/search.json, the hub's "Search every tool" list (STYLE.md 6j): names and short facts only.
+
 Run:  python tools/build_data.py
 """
 import json
@@ -20,6 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "source"
 DSRC = ROOT / "data-src"
 OUT = ROOT / "site" / "data" / "items.json"
+SEARCH_OUT = ROOT / "site" / "search.json"
 
 DOC = {"srd-2014": ("2014", "SRD 5.1"), "srd-2024": ("2024", "SRD 5.2")}
 
@@ -244,6 +247,48 @@ def from_open5e(r, magic, wtable):
     return it
 
 
+
+def search_list(rows):
+    """One hub search entry per name (STYLE.md 6j): a variant family is one entry that opens the family,
+    2014 and 2024 merge, and the link opens the newest edition's entry. Names and short facts only."""
+    def low(x):
+        return x[:1].upper() + x[1:].lower() if x else x
+    fams, out = {}, {}
+    for r in rows:
+        if r.get("group"):
+            fams.setdefault(r["group"], []).append(r)
+    entries = []
+    for g, m in fams.items():
+        first = m[0]
+        rars = [x for x in RARITY_ORDER if any(v["rarity"] == x for v in m)]
+        entries.append({"name": "+1, +2 and +3 Weapons" if first["groupName"] == "+N Weapon" else first["groupName"],
+                        "ed": first["ed"], "id": g, "type": first["type"], "magic": any(v.get("magic") for v in m),
+                        "rar": rars, "att": any(v.get("attune") for v in m)})
+    for r in rows:
+        if not r.get("group"):
+            entries.append({"name": r["name"], "ed": r["ed"], "id": r["id"], "type": r["type"], "magic": bool(r.get("magic")),
+                            "rar": [r["rarity"]], "att": bool(r.get("attune"))})
+    for e in sorted(entries, key=lambda e: e["ed"], reverse=True):  # 2024 first, so it owns the link
+        k = norm(e["name"])
+        if k in out:
+            out[k]["eds"].add(e["ed"])
+            continue
+        e["eds"] = {e["ed"]}
+        out[k] = e
+    items = []
+    for e in sorted(out.values(), key=lambda e: e["name"].lower()):
+        rar = [x for x in e["rar"] if x != "Mundane"]
+        bits = [low(e["type"])]
+        if rar:
+            bits.append(rar[0].lower() if len(rar) == 1 else f"{rar[0].lower()} to {rar[-1].lower()}")
+        if e["att"]:
+            bits.append("attunement")
+        t = ", ".join(bits) + ("" if len(e["eds"]) > 1 else f" ({e['ed']})")
+        items.append({"n": e["name"], "t": t, "k": "Item" if e["magic"] else "Gear",
+                      "u": f"?ed={e['ed']}&item={e['id']}"})
+    return {"v": 1, "items": items}
+
+
 def main():
     wtable = {w["key"]: w for w in load(SRC / "open5e-weapons.json")}
     items, seen = [], set()
@@ -404,6 +449,8 @@ def main():
     print(f"SRD items: {len(items)} (2014: {n14}, 2024: {len(items) - n14}); "
           f"index of other books: {len(others)} ({merged} book entries matched to SRD items as also-in)")
     print(f"wrote {OUT.relative_to(ROOT)} ({OUT.stat().st_size // 1024} KB)")
+    SEARCH_OUT.write_text(json.dumps(search_list(items + others), ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print(f"wrote {SEARCH_OUT.relative_to(ROOT)} ({SEARCH_OUT.stat().st_size // 1024} KB)")
     print(f"variant fixes: {len(FIXES)}")
     for f in FIXES:
         print("  " + f)

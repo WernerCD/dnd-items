@@ -1,4 +1,4 @@
-"""dnd-shared smoke_test.py v1.0 (canonical copy: WernerCD/dnd shared/smoke_test.py). Copy unchanged to tools/smoke_test.py.
+"""dnd-shared smoke_test.py v1.1 (canonical copy: WernerCD/dnd shared/smoke_test.py). Copy unchanged to tools/smoke_test.py.
 
 Browser test suite every D&D Toolbox site runs before it deploys (STYLE.md section 7). It serves the
 site/ folder at http://127.0.0.1:<port>/<repo>/ (the same path as on GitHub Pages) and checks, in a real
@@ -9,6 +9,8 @@ Chromium, at desktop and phone width:
   - nothing scrolls sideways at 375 px, and the phone "Tools" menu is shown
   - with "reduce motion" on, nothing is left hidden
   - on the main page: the shared character list works (save, reload, picker) and a share link imports
+  - (v1.1) with site/sw.js: the site still opens with the network off after one visit; the manifest and its
+    icons load; site/search.json (if any) has the hub search shape; statblock.js (if any) draws a stat block
 Site-specific tests: tests/smoke.json ({"pages": [...], "ignore_console": [regex...]}) and an optional
 tests/site_test.py with  def run(page, base, check): ...  (check(cond, message) records a failure).
 
@@ -125,6 +127,47 @@ def main():
                 check(False, "[characters] character.js not loaded on the main page")
             for e in errors: check(False, f"[characters] {e}")
             ctx.close()
+
+            # offline cache, manifest, search list, stat block (v1.1)
+            if (ROOT / "site" / "sw.js").exists():
+                ctx = browser.new_context(viewport={"width": 1280, "height": 900})
+                page = ctx.new_page(); errors = []; watch(page, errors, origin)
+                page.goto(base + "?sw=1", wait_until="load")
+                try:
+                    page.wait_for_function("navigator.serviceWorker.controller !== null", timeout=15000)
+                    page.wait_for_timeout(1500)
+                    ctx.set_offline(True)
+                    page.reload(wait_until="load"); page.wait_for_timeout(800)
+                    check(page.locator(".hub-bar").count() == 1 and page.locator(".site-footer").count() == 1, "[offline] main page opens with the network off")
+                    check(page.evaluate("getComputedStyle(document.body).backgroundColor") not in ("", "rgba(0, 0, 0, 0)"), "[offline] styles load with the network off")
+                    ctx.set_offline(False)
+                except Exception as e:
+                    check(False, f"[offline] service worker did not take control ({str(e)[:120]})")
+                ctx.close()
+            man = ROOT / "site" / "manifest.webmanifest"
+            if man.exists():
+                m = json.loads(man.read_text(encoding="utf-8"))
+                check(m.get("start_url") == "./" and m.get("display") == "standalone", "[manifest] start_url ./ and display standalone")
+                for ic in m.get("icons", []):
+                    check((ROOT / "site" / ic["src"]).exists(), f"[manifest] icon {ic['src']} exists")
+            sj = ROOT / "site" / "search.json"
+            if sj.exists():
+                d = json.loads(sj.read_text(encoding="utf-8")); items = d.get("items") or []
+                check(d.get("v") == 1 and len(items) > 0, f"[search.json] v 1 with items ({len(items)})")
+                bad = [x for x in items if not isinstance(x.get("n"), str) or not x["n"] or not isinstance(x.get("u", ""), str) or str(x.get("u", "")).startswith("http")]
+                check(not bad, f"[search.json] every item has a name n and a relative link u ({len(bad)} bad, e.g. {bad[:1]})")
+                check(sj.stat().st_size < 600_000, f"[search.json] under 600 KB ({sj.stat().st_size // 1024} KB)")
+            if (ROOT / "site" / "statblock.js").exists():
+                ctx = browser.new_context(viewport={"width": 1280, "height": 900})
+                page = ctx.new_page(); page.goto(base, wait_until="load")
+                page.add_script_tag(path=str(ROOT / "site" / "statblock.js"))
+                n = page.evaluate("""() => { const d = document.createElement('div'); d.innerHTML = DndStatblock.html({name: 'Wolf', size: 'Medium', type: 'Beast', ac: 13, hp: 11, hd: '2d8+2',
+                    speed: {walk: 40}, abilities: {str: 12, dex: 15, con: 12, int: 3, wis: 12, cha: 6}, cr: 0.25, crText: '1/4', xp: 50,
+                    actions: [{name: 'Bite', desc: '**Melee:** +4 to hit'}]}, {ed: '2014', head: true}); document.body.appendChild(d);
+                    return [d.querySelectorAll('.dsb-abil > div').length, d.querySelector('.dsb-sec') ? 1 : 0, getComputedStyle(d.querySelector('.dsb')).borderTopWidth]; }""")
+                check(n[0] == 6 and n[1] == 1, f"[statblock] draws six abilities and an Actions section ({n})")
+                check(n[2] != "0px", "[statblock] .dsb styles are in styles.css (dnd-shared v1.10+)")
+                ctx.close()
 
             # site-specific tests
             st = ROOT / "tests" / "site_test.py"

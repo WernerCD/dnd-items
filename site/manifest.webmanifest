@@ -1,0 +1,28 @@
+{
+  "name": "Item Finder - D&D Toolbox",
+  "short_name": "Items",
+  "description": "Magic items and gear, searchable by type, rarity, attunement and source book.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#12171a",
+  "theme_color": "#12171a",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -354,7 +354,7 @@ a.open:focus { outline: none; }
 .warn-txt { color: var(--warn); margin: 4px 0 0; flex-basis: 100%; }
 #show { max-width: 12rem; }
 
-/* === dnd-shared v1.9.1 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
+/* === dnd-shared v1.10 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
 /* Paste this block unchanged at the END of each site's styles.css. Do not edit it per site;
    change it in the hub repo and re-copy it to every site. It relies on the shared tokens
    (--bg, --surface, --surface-2, --ink, --ink-2, --muted, --line, --accent, --gold, --radius). */
@@ -476,6 +476,27 @@ a.open:focus { outline: none; }
   .tm-btn span { display: none; }
   .tm-list, .tm-btn[aria-expanded="true"] + .tm-list { display: block; position: static; transform: none; box-shadow: none; border: 0; padding: 0; min-width: 0; }
 }
+/* stat blocks (statblock.js) */
+.dsb { border-top: 3px solid var(--gold); border-bottom: 3px solid var(--gold); padding: 10px 0; line-height: 1.45; }
+.dsb p { margin: 3px 0; }
+.dsb-head { margin-bottom: 6px; }
+.dsb-name { font-family: Fraunces, Georgia, serif; font-size: 1.35rem; margin: 0; }
+.dsb-type { color: var(--muted); font-style: italic; margin: 0; }
+.dsb-abil { display: grid; grid-template-columns: repeat(6, 1fr); text-align: center; gap: 4px; margin: 8px 0; padding: 8px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.dsb-abil div { background: var(--surface-2); border-radius: 6px; padding: 4px 0; font-size: .85rem; }
+.dsb-abil b { display: block; font-size: .7rem; letter-spacing: .06em; color: var(--muted); }
+.dsb-mod { color: var(--ink-2); }
+.dsb-sv { display: block; font-size: .72rem; color: var(--muted); }
+.dsb-sec { font-family: Fraunces, Georgia, serif; font-size: 1.05rem; font-weight: 600; color: var(--gold); border-bottom: 1px solid var(--line); margin: 12px 0 6px; padding-bottom: 2px; }
+.dsb-blk { margin: 6px 0; }
+.dsb-blk > b { font-style: italic; }
+.dsb ul { margin: 4px 0; padding-left: 20px; }
+.dsb ul li { margin: 2px 0; }
+.dsb-src { font-size: .78rem; color: var(--muted); margin-top: 10px !important; }
+.dsb.mini { font-size: .84rem; border-width: 2px; padding: 8px 0; }
+.dsb.mini .dsb-abil div { font-size: .76rem; }
+.dsb.mini .dsb-sec { font-size: .95rem; margin: 8px 0 4px; }
+@media (max-width: 520px) { .dsb-abil { grid-template-columns: repeat(3, 1fr); } }
 /* print: paper-friendly, no chrome. Sites add their own rules to hide tool controls. */
 @media print {
   :root, :root:not([data-theme="light"]), :root[data-theme="dark"] { --bg: #fff; --surface: #fff; --surface-2: #f3f3f3; --ink: #000; --ink-2: #222; --muted: #555; --line: #bbb; --shadow: none; --accent: #2f6b4f; --accent-ink: #ffffff; --gold: #a8841c; --warn: #9a4b1c; --warn-bg: #f7e6d8; --chip: #e6efe9; color-scheme: light; }
@@ -483,8 +504,8 @@ a.open:focus { outline: none; }
   .hub-bar, .tool-menu, .char-pick, .char-import, .plot-tip, .plot-table summary, #themeBtn, .site-footer .foot-links, button, dialog::backdrop { display: none !important; }
   .site-header { border-bottom: 1px solid #000; }
   a { color: inherit; text-decoration: none; }
-  .card, .change-day li, .statblock { break-inside: avoid; }
+  .card, .change-day li, .statblock, .dsb { break-inside: avoid; }
   .ui-anim [data-reveal] > * { opacity: 1 !important; }
   .plot-fig { break-inside: avoid; }
 }
-/* === end dnd-shared v1.9.1 === */
+/* === end dnd-shared v1.10 === */
