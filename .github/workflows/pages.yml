@@ -15,7 +15,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test:
+    # Playwright's own image already has Chromium and its system libraries, so the tests start in seconds
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright/python:v1.65.2-noble
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build data
+        run: python tools/build_data.py
+      - name: Check site
+        run: python tools/check_site.py
+      - name: Browser smoke tests (STYLE.md 7)
+        run: python -c "import playwright" 2>/dev/null || pip install -q --break-system-packages playwright==1.65.2; python tools/smoke_test.py
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -31,10 +45,6 @@ jobs:
         run: sed -i "s/?v=dev/?v=${GITHUB_SHA::8}/g" site/*.html site/app.js
       - name: Check site
         run: python tools/check_site.py
-      - name: Install the browser test runner
-        run: pip install playwright==1.65.2 && python -m playwright install --with-deps chromium
-      - name: Browser smoke tests (STYLE.md 7)
-        run: python tools/smoke_test.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
