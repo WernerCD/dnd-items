@@ -354,7 +354,7 @@ a.open:focus { outline: none; }
 .warn-txt { color: var(--warn); margin: 4px 0 0; flex-basis: 100%; }
 #show { max-width: 12rem; }
 
-/* === dnd-shared v1.8 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
+/* === dnd-shared v1.9.1 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
 /* Paste this block unchanged at the END of each site's styles.css. Do not edit it per site;
    change it in the hub repo and re-copy it to every site. It relies on the shared tokens
    (--bg, --surface, --surface-2, --ink, --ink-2, --muted, --line, --accent, --gold, --radius). */
@@ -448,15 +448,43 @@ a.open:focus { outline: none; }
 @keyframes plot-fade { from { opacity: 0; } }
 @keyframes plot-grow { from { transform: scaleY(0); } }
 @media (prefers-reduced-motion: reduce) { [data-spot]::before { transition: none; } }
+/* top-bar tool menu (nav.js), v1.9 */
+.tool-menu { flex: 1 1 auto; display: flex; justify-content: center; position: relative; min-width: 0; }
+.hub-bar.has-menu .char-pick { margin-left: 0; }
+.tool-menu ul { list-style: none; margin: 0; padding: 0; }
+.tm-groups { display: flex; gap: 2px; }
+.tm-g { position: relative; }
+.tm-btn, .tm-all { font: inherit; font-size: .85rem; font-weight: 500; color: var(--muted); background: none; border: 0; border-radius: 6px; padding: 3px 9px; min-height: 26px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.tm-btn span, .tm-all span { font-size: .7em; }
+.tm-btn:hover, .tm-btn:focus-visible, .tm-btn[aria-expanded="true"], .tm-all:hover, .tm-all:focus-visible { color: var(--accent); background: var(--surface-2); }
+.tm-g.tm-cur > .tm-btn { color: var(--ink); }
+.tm-list { display: none; position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); z-index: 900; min-width: 190px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0, 0, 0, .16); padding: 6px; }
+.tm-btn[aria-expanded="true"] + .tm-list { display: block; }
+.tm-list a { display: flex; align-items: center; min-height: 32px; padding: 4px 10px; border-radius: 6px; color: var(--ink-2); text-decoration: none; white-space: nowrap; font-size: .9rem; }
+.tm-list a:hover, .tm-list a:focus-visible { background: var(--surface-2); color: var(--accent); }
+.tm-list a[aria-current="page"] { color: var(--ink); font-weight: 600; }
+.tm-all { display: none; }
+@media (max-width: 720px) {
+  .hub-bar.has-menu { position: relative; flex-wrap: wrap; row-gap: 6px; }
+  .hub-bar.has-menu .tool-menu { position: static; flex: 0 0 auto; order: 1; }
+  .hub-bar.has-menu .hub-nav { order: 2; margin-left: auto; }
+  .hub-bar.has-menu .char-pick { order: 3; flex: 1 1 100%; white-space: nowrap; }
+  .tm-all { display: inline-flex; }
+  .tm-groups { display: none; position: absolute; top: 36px; left: 16px; right: 16px; z-index: 900; width: auto; max-width: 340px; flex-direction: column; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0, 0, 0, .16); padding: 8px; }
+  .tool-menu.open .tm-groups { display: flex; }
+  .tm-btn { pointer-events: none; color: var(--muted); font-size: .75rem; letter-spacing: .05em; text-transform: uppercase; padding: 2px 10px; }
+  .tm-btn span { display: none; }
+  .tm-list, .tm-btn[aria-expanded="true"] + .tm-list { display: block; position: static; transform: none; box-shadow: none; border: 0; padding: 0; min-width: 0; }
+}
 /* print: paper-friendly, no chrome. Sites add their own rules to hide tool controls. */
 @media print {
   :root, :root:not([data-theme="light"]), :root[data-theme="dark"] { --bg: #fff; --surface: #fff; --surface-2: #f3f3f3; --ink: #000; --ink-2: #222; --muted: #555; --line: #bbb; --shadow: none; --accent: #2f6b4f; --accent-ink: #ffffff; --gold: #a8841c; --warn: #9a4b1c; --warn-bg: #f7e6d8; --chip: #e6efe9; color-scheme: light; }
   body { background: #fff; }
-  .hub-bar, .char-pick, .char-import, .plot-tip, .plot-table summary, #themeBtn, .site-footer .foot-links, button, dialog::backdrop { display: none !important; }
+  .hub-bar, .tool-menu, .char-pick, .char-import, .plot-tip, .plot-table summary, #themeBtn, .site-footer .foot-links, button, dialog::backdrop { display: none !important; }
   .site-header { border-bottom: 1px solid #000; }
   a { color: inherit; text-decoration: none; }
   .card, .change-day li, .statblock { break-inside: avoid; }
   .ui-anim [data-reveal] > * { opacity: 1 !important; }
   .plot-fig { break-inside: avoid; }
 }
-/* === end dnd-shared v1.8 === */
+/* === end dnd-shared v1.9.1 === */
