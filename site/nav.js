@@ -1,4 +1,4 @@
-/* dnd-shared nav.js v1.0.1 (canonical copy: WernerCD/dnd shared/nav.js). Copy unchanged to site/nav.js.
+/* dnd-shared nav.js v1.0.2 (canonical copy: WernerCD/dnd shared/nav.js). Copy unchanged to site/nav.js.
  * Centred drop-down menus of every D&D Toolbox page in the top bar (STYLE.md 3). It inserts itself into
  * .hub-bar after the "D&D Toolbox" link, so pages need no markup, only <script src="nav.js?v=dev"></script>.
  * Adding a site or page = one line in MENU below, then re-copy this file to every site.
@@ -9,11 +9,12 @@
     ['Characters', [['Characters', 'dnd/characters.html'], ['Character Sheet', 'dnd/sheet.html'], ['Party', 'dnd/party.html']]],
     ['Build', [['Multiclass Planner', 'dnd-multiclass-planner/'], ['Spell Planner', 'dnd-magic/'], ['Feats & Origins', 'dnd-feats/']]],
     ['Play', [['Wild Shape', 'dnd-druid-wildshapes/'], ['Item Finder', 'dnd-items/'], ['Rules Reference', 'dnd-rules/']]],
-    ['Run', [['Monster Lookup', 'dnd-monsters/'], ['Party', 'dnd/party.html']]]
+    ['Run', [['Monster Lookup', 'dnd-monsters/'], ['Encounter Builder', 'dnd-monsters/#encounter'], ['Party', 'dnd/party.html']]]
   ];
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   function here(path) {   // is this menu entry the page we're on?
-    var p = location.pathname.replace(/index\.html$/, ''), t = '/' + path;
+    var p = location.pathname.replace(/index\.html$/, ''), t = '/' + path, h = t.split('#');
+    if (h.length > 1) return p === h[0] && location.hash.indexOf('#' + h[1]) === 0;   // a view inside a site, e.g. #encounter
     return /\/$/.test(t) ? p.indexOf(t) === 0 : p === t;   // a tool site counts on any of its pages; hub pages match exactly
   }
   function build(bar) {
