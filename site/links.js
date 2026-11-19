@@ -1,4 +1,4 @@
-/* dnd-shared links.js v1.0.2 (canonical copy: WernerCD/dnd shared/links.js). Copy unchanged to site/links.js.
+/* dnd-shared links.js v1.0.3 (canonical copy: WernerCD/dnd shared/links.js). Copy unchanged to site/links.js.
  * Links the tools to each other (STYLE.md 6k), using the search lists every tool already publishes (6j).
  * Works inside any .dsb stat block and any element with a data-links attribute; content added later is
  * picked up automatically. Links into the page's own site are left out (each tool links itself).
@@ -15,6 +15,7 @@
  *   data-nolink works on the element itself as well as on a container.
  * v1.0.2: 2014 text links to a tool's 2014 entry when its search list gives one (u14, STYLE 6j). The edition is
  *   the nearest data-ed attribute (statblock.js v1.1.1 sets it), else the page's ?ed=, else 2024.
+ * v1.0.3: Title Case names inside a bold run-in heading (<b>/<strong> ending in . or :, e.g. "Divine Smite.") never link.
  * Opt out inside a block with data-nolink. The lists come from wernercd.github.io (also when testing
  * locally); with no connection and nothing cached, the text simply stays plain.
  */
@@ -99,7 +100,7 @@
     // Title Case names in plain text: first mention of each in a paragraph
     var rx = titleRx();
     if (rx) {
-      var tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: function (n) { return rx.test(n.nodeValue) && !blocked(n.parentNode, root) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT; } }), tn = [];
+      var tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: function (n) { var h = n.parentNode.closest && n.parentNode.closest('b, strong'); return rx.test(n.nodeValue) && !blocked(n.parentNode, root) && !(h && /[.:]\s*$/.test(h.textContent)) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT; } }), tn = [];
       while (tw.nextNode()) tn.push(tw.currentNode);
       var one = function (n) {   // every name in the node; each one once per paragraph
         var m = rx.exec(n.nodeValue); if (!m) return;
