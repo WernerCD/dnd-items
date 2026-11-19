@@ -149,3 +149,28 @@ def run(page, base, check):
         got = page.evaluate("() => document.querySelector('#detail').open ? document.querySelector('#dTitle').textContent : null")
         check(got == title, f"[search.json] the {name} link opens its entry (got {got!r})")
     check(all("desc" not in x and len(x.get("t", "")) < 90 for x in sj["items"]), "[search.json] names and short facts only")
+
+    # --- dice and links between tools (STYLE.md 6k) ---
+    page.goto(base + "?ed=2024&item=srd-2024_longsword", wait_until="load")
+    wait_ready(page)
+    page.wait_for_timeout(500)
+    dmg = page.locator("#dBody dd[data-roll-entry='Damage'] .dd-roll")
+    check(dmg.count() == 1 and "1d8" in dmg.first.text_content(), "[dice] the Longsword's damage 1d8 is a roll")
+    if dmg.count():
+        before = page.evaluate("() => JSON.parse(localStorage.getItem('dnd.rolls') || '[]').length")
+        dmg.first.click()
+        page.wait_for_timeout(400)
+        log = page.evaluate("() => JSON.parse(localStorage.getItem('dnd.rolls') || '[]')")
+        check(len(log) == before + 1 and "Longsword" in json.dumps(log[0]), f"[dice] clicking it rolls and logs it under the item's name ({log[:1]})")
+        page.keyboard.press("Escape")
+    page.goto(base + "?ed=2014&item=srd_wand-of-magic-missiles", wait_until="load")
+    wait_ready(page)
+    page.wait_for_timeout(500)
+    rolls = page.locator("#dBody .itext .dd-roll").count()
+    check(rolls > 0, f"[dice] dice in the item text become rolls ({rolls})")
+    try:
+        page.wait_for_selector("#dBody .itext a.dlx[href*='dnd-magic']", timeout=8000)
+        ok = True
+    except Exception:
+        ok = False
+    check(ok, "[links] the spell name in the Wand of Magic Missiles links to the Spell Planner")

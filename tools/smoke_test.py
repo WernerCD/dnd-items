@@ -1,4 +1,4 @@
-"""dnd-shared smoke_test.py v1.1 (canonical copy: WernerCD/dnd shared/smoke_test.py). Copy unchanged to tools/smoke_test.py.
+"""dnd-shared smoke_test.py v1.2 (canonical copy: WernerCD/dnd shared/smoke_test.py). Copy unchanged to tools/smoke_test.py.
 
 Browser test suite every D&D Toolbox site runs before it deploys (STYLE.md section 7). It serves the
 site/ folder at http://127.0.0.1:<port>/<repo>/ (the same path as on GitHub Pages) and checks, in a real
@@ -11,6 +11,8 @@ Chromium, at desktop and phone width:
   - on the main page: the shared character list works (save, reload, picker) and a share link imports
   - (v1.1) with site/sw.js: the site still opens with the network off after one visit; the manifest and its
     icons load; site/search.json (if any) has the hub search shape; statblock.js (if any) draws a stat block
+  - (v1.2) with site/dice.js: dice.js loads, dice in a data-dice block become rolls and a click shows a
+    total in the tray; with site/links.js: links.js loads
 Site-specific tests: tests/smoke.json ({"pages": [...], "ignore_console": [regex...]}) and an optional
 tests/site_test.py with  def run(page, base, check): ...  (check(cond, message) records a failure).
 
@@ -167,6 +169,31 @@ def main():
                     return [d.querySelectorAll('.dsb-abil > div').length, d.querySelector('.dsb-sec') ? 1 : 0, getComputedStyle(d.querySelector('.dsb')).borderTopWidth]; }""")
                 check(n[0] == 6 and n[1] == 1, f"[statblock] draws six abilities and an Actions section ({n})")
                 check(n[2] != "0px", "[statblock] .dsb styles are in styles.css (dnd-shared v1.10+)")
+                ctx.close()
+
+            # dice and cross-links (v1.2, STYLE 6k)
+            if (ROOT / "site" / "dice.js").exists():
+                ctx = browser.new_context(viewport={"width": 1280, "height": 900})
+                page = ctx.new_page(); errors = []; watch(page, errors, origin)
+                page.goto(base, wait_until="load"); page.wait_for_timeout(300)
+                check(page.evaluate("!!window.DndDice"), "[dice] dice.js loads on the main page")
+                if page.evaluate("!!window.DndDice"):
+                    page.evaluate("""() => { const d = document.createElement('div'); d.id = 'ddT'; d.setAttribute('data-dice', '');
+                        d.innerHTML = '<p>Hit: +5 to hit, 7 (2d6) slashing.</p>'; document.body.appendChild(d); }""")
+                    page.wait_for_timeout(300)
+                    check(page.locator("#ddT .dd-roll").count() == 2, f"[dice] '+5 to hit' and '2d6' become rolls ({page.locator('#ddT .dd-roll').count()})")
+                    if page.locator("#ddT .dd-roll").count():
+                        page.locator("#ddT .dd-roll").last.click(); page.wait_for_timeout(200)
+                        v = page.locator(".dd-tray .dd-total").inner_text() if page.locator(".dd-tray .dd-total").count() else ""
+                        check(v.isdigit() and 2 <= int(v) <= 12, f"[dice] clicking 2d6 shows a total from 2 to 12 ({v!r})")
+                    ov = page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth")
+                    check(ov <= 1, f"[dice] the roll tray causes no sideways scroll ({ov}px)")
+                for e in errors: check(False, f"[dice] {e}")
+                ctx.close()
+            if (ROOT / "site" / "links.js").exists():
+                ctx = browser.new_context(viewport={"width": 1280, "height": 900})
+                page = ctx.new_page(); page.goto(base, wait_until="load"); page.wait_for_timeout(300)
+                check(page.evaluate("!!window.DndLinks"), "[links] links.js loads on the main page")
                 ctx.close()
 
             # site-specific tests

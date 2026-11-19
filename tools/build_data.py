@@ -249,7 +249,7 @@ def from_open5e(r, magic, wtable):
 
 
 def search_list(rows):
-    """One hub search entry per name (STYLE.md 6j): a variant family is one entry that opens the family,
+    """One hub search entry per name (STYLE.md 6j): a variant family has one entry that opens the family plus one per variant,
     2014 and 2024 merge, and the link opens the newest edition's entry. Names and short facts only."""
     def low(x):
         return x[:1].upper() + x[1:].lower() if x else x
@@ -264,10 +264,9 @@ def search_list(rows):
         entries.append({"name": "+1, +2 and +3 Weapons" if first["groupName"] == "+N Weapon" else first["groupName"],
                         "ed": first["ed"], "id": g, "type": first["type"], "magic": any(v.get("magic") for v in m),
                         "rar": rars, "att": any(v.get("attune") for v in m)})
-    for r in rows:
-        if not r.get("group"):
-            entries.append({"name": r["name"], "ed": r["ed"], "id": r["id"], "type": r["type"], "magic": bool(r.get("magic")),
-                            "rar": [r["rarity"]], "att": bool(r.get("attune"))})
+    for r in rows:  # every item by its own name too (variants as well), so other tools can link "Belt of Stone Giant Strength"
+        entries.append({"name": r["name"], "ed": r["ed"], "id": r["id"], "type": r["type"], "magic": bool(r.get("magic")),
+                        "rar": [r["rarity"]], "att": bool(r.get("attune"))})
     for e in sorted(entries, key=lambda e: e["ed"], reverse=True):  # 2024 first, so it owns the link
         k = norm(e["name"])
         if k in out:

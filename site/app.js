@@ -731,7 +731,7 @@
     if (a) { rows.push(['Armor Class', a.ac]); rows.push(['Strength', a.str || '']); rows.push(['Stealth', a.stealth ? 'Disadvantage' : '']); }
     rows.push(['Cost', money(it.cost)]); rows.push(['Weight', it.weight ? it.weight + ' lb' : '']);
     rows.push(['Rules', it.ed + (it.srd ? ' (' + it.src + ')' : '')]);
-    return '<dl class="facts-dl">' + rows.filter(function (r) { return r[1]; }).map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join('') + '</dl>';
+    return '<dl class="facts-dl">' + rows.filter(function (r) { return r[1]; }).map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd' + (r[0] === 'Damage' || r[0] === 'Properties' ? ' data-dice data-roll-entry="' + r[0] + '"' : '') + '>' + esc(r[1]) + '</dd>'; }).join('') + '</dl>';
   }
   var favsAtOpen = null;
   function openDetail(id) {
@@ -746,7 +746,7 @@
       h = '<div class="sb-head"><h2 id="dTitle">' + esc(groupLabel(first.groupName)) + '</h2>' +
         '<p class="sb-sub">' + esc(first.type + ', ' + m.length + ' variants') + ' ' + bookLink(first) + alsoLinks(first) + '</p></div>' +
         '<div class="mn-actions">' + favDlgBtn(id) + wishBtn(id) + '</div>' +
-        '<div class="itext">' + md(first.desc) + '</div><div class="sb-sec">Variants</div><ul class="variants">' +
+        '<div class="itext" data-dice data-links>' + md(first.desc) + '</div><div class="sb-sec">Variants</div><ul class="variants">' +
         m.map(function (x) { return '<li><button type="button" class="linkish" data-open="' + esc(x.id) + '">' + esc(x.name) + '</button> ' + rarPill(x.rarity) + (x.attune ? ' <span class="small">attunement</span>' : '') + (isFav(x.id) ? ' <span class="mark fav">&#9733;</span>' : '') + marks(x) + '</li>'; }).join('') + '</ul>';
     } else {
       var alt = otherEd(it);
@@ -759,10 +759,12 @@
       h += '<div class="mn-actions">' + favDlgBtn(id) + invBtn(id) + wishBtn(id) + attBtn(it) + '</div>';
       h += factsTable(it);
       if (it.summary) h += '<p class="summary">' + esc(it.summary) + '</p>';
-      if (it.srd) h += '<div class="itext">' + md(it.desc) + '</div><p class="small">Text from the ' + (it.src === 'SRD 5.1' ? 'System Reference Document 5.1' : 'System Reference Document 5.2') + ', CC-BY-4.0.</p>';
+      if (it.srd) h += '<div class="itext" data-dice data-links>' + md(it.desc) + '</div><p class="small">Text from the ' + (it.src === 'SRD 5.1' ? 'System Reference Document 5.1' : 'System Reference Document 5.2') + ', CC-BY-4.0.</p>';
       else h += '<div class="wsnote">This item is not in the free SRD, so its rules text is not reproduced here. Look it up in <b>' + esc(it.src) + '</b>' + (it.page ? ', page ' + esc(it.page) : '') + (bookUrl(it.src) ? ' (<a href="' + bookUrl(it.src) + '" target="_blank" rel="noopener">D&amp;D Beyond</a>)' : '') + '.</div>';
     }
     $('#dBody').innerHTML = h;
+    /* dice.js names rolls after the item (STYLE 6k) */
+    $('#dBody').setAttribute('data-roll-ctx', it ? it.name : groupLabel(g[0].groupName));
     var d = $('#detail');
     if (!d.open) {
       if (d.showModal) d.showModal(); else d.setAttribute('open', '');

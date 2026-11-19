@@ -354,7 +354,7 @@ a.open:focus { outline: none; }
 .warn-txt { color: var(--warn); margin: 4px 0 0; flex-basis: 100%; }
 #show { max-width: 12rem; }
 
-/* === dnd-shared v1.10 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
+/* === dnd-shared v1.11 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
 /* Paste this block unchanged at the END of each site's styles.css. Do not edit it per site;
    change it in the hub repo and re-copy it to every site. It relies on the shared tokens
    (--bg, --surface, --surface-2, --ink, --ink-2, --muted, --line, --accent, --gold, --radius). */
@@ -497,15 +497,52 @@ a.open:focus { outline: none; }
 .dsb.mini .dsb-abil div { font-size: .76rem; }
 .dsb.mini .dsb-sec { font-size: .95rem; margin: 8px 0 4px; }
 @media (max-width: 520px) { .dsb-abil { grid-template-columns: repeat(3, 1fr); } }
+/* dice (dice.js) and cross-links (links.js), v1.11 */
+.dd-roll { color: var(--accent); cursor: pointer; border-bottom: 1px dashed currentColor; border-radius: 3px; white-space: nowrap; }
+.dd-roll:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.dd-roll:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+a.dlx { color: inherit; text-decoration: underline dotted; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--accent) 70%, transparent); }
+a.dlx:hover, a.dlx:focus-visible { color: var(--accent); text-decoration-style: solid; }
+.dd-tray { position: fixed; right: 16px; bottom: 16px; z-index: 900; width: min(320px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-top: 3px solid var(--gold); border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, .28); padding: 10px 14px 12px; font-size: .9rem; }
+.dd-tray[hidden] { display: none; }
+.dd-head { display: flex; justify-content: space-between; align-items: center; }
+.dd-head b { font-family: Fraunces, Georgia, serif; font-size: 1rem; color: var(--gold); }
+.dd-x { font: inherit; font-size: 1.3rem; line-height: 1; background: none; border: 0; color: var(--muted); cursor: pointer; min-width: 32px; min-height: 32px; border-radius: 6px; }
+.dd-x:hover, .dd-x:focus-visible { color: var(--ink); background: var(--surface-2); }
+.dd-last p { margin: 4px 0; }
+.dd-lbl { color: var(--ink-2); font-weight: 600; }
+.dd-res { display: flex; align-items: baseline; gap: 10px; }
+.dd-total { font-family: Fraunces, Georgia, serif; font-size: 2.2rem; font-weight: 700; line-height: 1.1; color: var(--ink); }
+.dd-expr, .dd-parts, .dd-sub, .dd-hint { color: var(--muted); }
+.dd-nat { font-weight: 600; padding: 0 6px; border-radius: 6px; }
+.dd-nat.hi { color: var(--accent-ink); background: var(--accent); }
+.dd-nat.lo { color: var(--warn); background: var(--warn-bg); }
+.dd-advdis { display: flex; flex-wrap: wrap; gap: 2px 14px; }
+.dd-advdis b { color: var(--ink); }
+.dd-free { display: flex; gap: 6px; margin: 8px 0 6px; }
+.dd-free input { flex: 1; min-width: 0; font: inherit; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; min-height: 32px; }
+.dd-btn { font: inherit; font-size: .85rem; min-height: 32px; padding: 2px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); cursor: pointer; }
+.dd-btn:hover, .dd-btn:focus-visible { border-color: var(--accent); color: var(--accent); }
+.dd-quick { display: flex; flex-wrap: wrap; gap: 4px; }
+.dd-quick .dd-btn { padding: 2px 8px; }
+.dd-link { font: inherit; background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; min-height: 24px; }
+.dd-more { margin-top: 8px; }
+.dd-more summary { cursor: pointer; color: var(--ink-2); min-height: 24px; }
+.dd-log { list-style: none; margin: 6px 0; padding: 0; max-height: 220px; overflow: auto; }
+.dd-log li { padding: 3px 0; border-bottom: 1px solid var(--line); }
+.dd-lv { display: inline-block; min-width: 2.2em; font-weight: 700; color: var(--ink); }
+.dd-le, .dd-ad { color: var(--muted); font-size: .84rem; }
+.dd-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 /* print: paper-friendly, no chrome. Sites add their own rules to hide tool controls. */
 @media print {
   :root, :root:not([data-theme="light"]), :root[data-theme="dark"] { --bg: #fff; --surface: #fff; --surface-2: #f3f3f3; --ink: #000; --ink-2: #222; --muted: #555; --line: #bbb; --shadow: none; --accent: #2f6b4f; --accent-ink: #ffffff; --gold: #a8841c; --warn: #9a4b1c; --warn-bg: #f7e6d8; --chip: #e6efe9; color-scheme: light; }
   body { background: #fff; }
-  .hub-bar, .tool-menu, .char-pick, .char-import, .plot-tip, .plot-table summary, #themeBtn, .site-footer .foot-links, button, dialog::backdrop { display: none !important; }
+  .hub-bar, .tool-menu, .char-pick, .char-import, .plot-tip, .plot-table summary, #themeBtn, .site-footer .foot-links, button, dialog::backdrop, .dd-tray { display: none !important; }
+  .dd-roll { color: inherit; border: 0; }
   .site-header { border-bottom: 1px solid #000; }
   a { color: inherit; text-decoration: none; }
   .card, .change-day li, .statblock, .dsb { break-inside: avoid; }
   .ui-anim [data-reveal] > * { opacity: 1 !important; }
   .plot-fig { break-inside: avoid; }
 }
-/* === end dnd-shared v1.10 === */
+/* === end dnd-shared v1.11 === */
