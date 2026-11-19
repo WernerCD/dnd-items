@@ -63,6 +63,16 @@ def loose_keys(name, variant_base):
     m = re.match(r"^(.*?)\s*\(([^)]*)\)$", n)
     if m and (QTY_PAREN.match(m.group(2).strip()) or variant_base):
         out.add(m.group(1))
+    # the 2024 SRD renamed the giant-strength items: "Belt of Hill Giant Strength" is
+    # "Belt of Giant Strength (Hill)" (Frost and Stone share one entry), and the six potions are one
+    g = re.match(r"^(Belt|Potion) of (\w+) Giant Strength$", n)
+    if g:
+        if g.group(1) == "Belt":
+            out.add(f"Belt of Giant Strength ({g.group(2)})")
+            if g.group(2) in ("Frost", "Stone"):
+                out.add("Belt of Giant Strength (Frost or Stone)")
+        else:
+            out.add("Potion of Giant Strength")
     for x in list(out):
         r = re.match(r"^([^,]+),\s*(.+)$", x)
         if r:

@@ -461,7 +461,7 @@
     if (!ch || !DATA || !window.DndChar || !DndChar.setSheet) return;
     DndChar.setSheet(ch.id, REPO, sheetSummary(ch));
   }
-  var IMP_SRC = { ddb: 'D&D Beyond', foundry: 'Foundry VTT', fc5: 'Fight Club 5' };
+  var IMP_SRC = { ddb: 'D&D Beyond', foundry: 'Foundry VTT', fc5: 'Fight Club 5', dicecloud: 'DiceCloud' };
   function impOf(ch) { var i = ch && ch.imp; return i && Array.isArray(i.items) && i.items.length && i.at ? i : null; }
   function impPending(ch) { var i = impOf(ch), l = ch && (ch.links[REPO] || {}); return !!(i && (!l.impAt || String(i.at) > String(l.impAt))); }
   function hideImp() { $('#impNote').hidden = true; $('#impNote').innerHTML = ''; }
@@ -488,6 +488,12 @@
     var bare = s.replace(/\s*\([^)]*\)\s*$/, ''); push(bare);
     var m = bare.match(/^([^,]+),\s*(.+)$/); if (m) { push(m[2] + ' ' + m[1]); bare = m[2] + ' ' + m[1]; }
     var p = bare.match(/^\+(\d)\s+(.+)$/); if (p) push(p[2] + ' (+' + p[1] + ')');
+    /* the 2024 SRD renamed these: "Belt of Hill Giant Strength" -> "Belt of Giant Strength (Hill)", six potions -> one */
+    var gs = bare.match(/^(Belt|Potion) of (\w+) Giant Strength$/i);
+    if (gs && /^belt$/i.test(gs[1])) { push('Belt of Giant Strength (' + gs[2] + ')'); if (/^(frost|stone)$/i.test(gs[2])) push('Belt of Giant Strength (Frost or Stone)'); }
+    else if (gs) push('Potion of Giant Strength');
+    /* "Studded Leather" is "Studded Leather Armor" in the SRD, and the other way round */
+    if (/\barmor$/i.test(bare)) push(bare.replace(/\s+armor$/i, '')); else push(bare + ' Armor');
     return out;
   }
   var KEYIDX = null;
