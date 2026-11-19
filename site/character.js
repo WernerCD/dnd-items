@@ -1,4 +1,4 @@
-/* dnd-shared character.js v1.4 (canonical copy: WernerCD/dnd shared/character.js). Copy unchanged to site/character.js.
+/* dnd-shared character.js v1.5 (canonical copy: WernerCD/dnd shared/character.js). Copy unchanged to site/character.js.
  *
  * One list of characters shared by every D&D Toolbox site. All the sites are served from
  * wernercd.github.io, so they share localStorage: a Paladin built in the Multiclass Planner shows up,
@@ -206,7 +206,11 @@
     var bad = incomingBad; incomingBad = false;
     var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
     var mine = inc && API.get(inc.id);
-    if (mine && same(mine, inc)) { API.setActive(mine.id); return; }
+    if (mine && same(mine, inc)) {   // same character: quietly take any newer sheet summaries it carries (read-only data)
+      var sh = {}, k0; for (k0 in mine.sheet) sh[k0] = mine.sheet[k0]; for (k0 in inc.sheet) sh[k0] = inc.sheet[k0];
+      if (JSON.stringify(sh) !== JSON.stringify(mine.sheet)) { var d0 = read(), i0 = find(d0, mine.id); if (i0 >= 0) { d0.list[i0].sheet = sh; d0.list[i0] = clean(d0.list[i0]); write(d0); } }
+      API.setActive(mine.id); return;
+    }
     var box = document.createElement('div');
     box.className = 'char-import'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-labelledby', 'charImpT');
     var desc = inc ? esc(API.summary(inc)) + ', ' + inc.ed + ' rules' : '';
