@@ -1,4 +1,4 @@
-/* dnd-shared nav.js v1.0 (canonical copy: WernerCD/dnd shared/nav.js). Copy unchanged to site/nav.js.
+/* dnd-shared nav.js v1.0.1 (canonical copy: WernerCD/dnd shared/nav.js). Copy unchanged to site/nav.js.
  * Centred drop-down menus of every D&D Toolbox page in the top bar (STYLE.md 3). It inserts itself into
  * .hub-bar after the "D&D Toolbox" link, so pages need no markup, only <script src="nav.js?v=dev"></script>.
  * Adding a site or page = one line in MENU below, then re-copy this file to every site.
@@ -35,14 +35,15 @@
       Array.prototype.forEach.call(nav.querySelectorAll('.tm-btn[aria-expanded="true"]'), function (b) { if (b !== except) b.setAttribute('aria-expanded', 'false'); });
     }
     function closeEverything() { closeAll(); nav.querySelector('.tm-all').setAttribute('aria-expanded', 'false'); nav.classList.remove('open'); }
+    var canHover = window.matchMedia && window.matchMedia('(hover: hover) and (min-width: 721px)').matches;
     nav.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
       if (b.classList.contains('tm-all')) { var o = b.getAttribute('aria-expanded') !== 'true'; b.setAttribute('aria-expanded', String(o)); nav.classList.toggle('open', o); return; }
-      var open = b.getAttribute('aria-expanded') !== 'true'; closeAll(b); b.setAttribute('aria-expanded', String(open));
+      // a mouse click right after hover-open must not close it again: with a hovering mouse, clicks only open
+      var open = (canHover && e.detail > 0) ? true : b.getAttribute('aria-expanded') !== 'true'; closeAll(b); b.setAttribute('aria-expanded', String(open));
       if (open && e.detail === 0) { var a = b.nextElementSibling.querySelector('a'); if (a) a.focus(); }   // keyboard: into the menu
     });
     // pointer hover opens a group on devices that can hover (desktop)
-    var canHover = window.matchMedia && window.matchMedia('(hover: hover) and (min-width: 721px)').matches;
     if (canHover) Array.prototype.forEach.call(nav.querySelectorAll('.tm-g'), function (li) {
       var b = li.querySelector('.tm-btn'), t;
       li.addEventListener('mouseenter', function () { clearTimeout(t); closeAll(b); b.setAttribute('aria-expanded', 'true'); });
