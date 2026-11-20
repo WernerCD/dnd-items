@@ -1,4 +1,4 @@
-/* dnd-shared links.js v1.0.3 (canonical copy: WernerCD/dnd shared/links.js). Copy unchanged to site/links.js.
+/* dnd-shared links.js v1.0.4 (canonical copy: WernerCD/dnd shared/links.js). Copy unchanged to site/links.js.
  * Links the tools to each other (STYLE.md 6k), using the search lists every tool already publishes (6j).
  * Works inside any .dsb stat block and any element with a data-links attribute; content added later is
  * picked up automatically. Links into the page's own site are left out (each tool links itself).
@@ -16,6 +16,8 @@
  * v1.0.2: 2014 text links to a tool's 2014 entry when its search list gives one (u14, STYLE 6j). The edition is
  *   the nearest data-ed attribute (statblock.js v1.1.1 sets it), else the page's ?ed=, else 2024.
  * v1.0.3: Title Case names inside a bold run-in heading (<b>/<strong> ending in . or :, e.g. "Divine Smite.") never link.
+ * v1.0.4: plural magic item names link too ("bags of holding", "Potions of Healing"), and arrows, bolts and
+ *   bullets "of X" link to Ammunition of X when no such entry exists. Exact names always win.
  * Opt out inside a block with data-nolink. The lists come from wernercd.github.io (also when testing
  * locally); with no connection and nothing cached, the text simply stays plain.
  */
@@ -34,6 +36,22 @@
   var SKIP = /^(A|BUTTON|SCRIPT|STYLE|INPUT|TEXTAREA|SELECT|OPTION|LABEL|SUMMARY|H1|H2|H3)$/;
   var idx = {}, loading = {}, titles = {}, TRX = null;
   var fold = function (s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[‘’ʼ]/g, "'").toLowerCase().replace(/\s+/g, ' ').replace(/[\s.,;:!?]+$/, '').trim(); };
+  var TC = /^[A-Z][\w'\u2019-]*( (of|the|and|from|to|in|on|a|[A-Z][\w'\u2019-]*))* [A-Z][\w'\u2019-]*$/;
+  function plural(w) {   // English plural of an item's head noun; '' when it already ends in s (Boots, Wraps)
+    if (/s$/i.test(w)) return '';
+    if (/(staff|knife)$/i.test(w)) return w.replace(/(f|fe)$/i, 'ves');
+    if (/[^aeiou]y$/i.test(w)) return w.slice(0, -1) + 'ies';
+    if (/(x|ch|sh)$/i.test(w)) return w + 'es';
+    return w + 's';
+  }
+  function variants(n) {   // other ways text names this item: plural, and arrow/bolt/bullet for ammunition
+    if (/[,()]/.test(n)) return [];
+    var i = n.indexOf(' of '), head = i > 0 ? n.slice(0, i) : n, tail = i > 0 ? n.slice(i) : '', out = [];
+    var j = head.lastIndexOf(' '), pl = plural(head.slice(j + 1));
+    if (pl) out.push(head.slice(0, j + 1) + pl + tail);
+    if (tail && /^Ammunition$/i.test(head)) ['Arrow', 'Arrows', 'Bolt', 'Bolts', 'Bullet', 'Bullets'].forEach(function (a) { out.push(a + tail); });
+    return out;
+  }
   var off = function (kind) { return !KINDS[kind] || KINDS[kind][0] === HERE; };
 
   function load(kinds) {
@@ -44,7 +62,15 @@
         var m = {}, t = [];
         ((d && d.items) || []).forEach(function (it) {
           var f = fold(it.n); if (f && !m[f + '|' + it.k]) { m[f + '|' + it.k] = it.u || ''; if (it.u14) m[f + '|' + it.k + '|14'] = it.u14; }
-          if ((it.k === 'Spell' || it.k === 'Item') && /^[A-Z][\w'\u2019-]*( (of|the|and|from|to|in|on|a|[A-Z][\w'\u2019-]*))* [A-Z][\w'\u2019-]*$/.test(it.n) && it.n.indexOf(' ') > 0) t.push(it.n);
+          if ((it.k === 'Spell' || it.k === 'Item') && TC.test(it.n) && it.n.indexOf(' ') > 0) t.push(it.n);
+        });
+        ((d && d.items) || []).forEach(function (it) {   // second pass, so exact names always win
+          if (it.k !== 'Item') return;
+          variants(it.n).forEach(function (v) {
+            var f = fold(v); if (m[f + '|Item'] != null) return;
+            m[f + '|Item'] = it.u || ''; if (it.u14) m[f + '|Item|14'] = it.u14;
+            if (TC.test(v)) t.push(v);
+          });
         });
         idx[repo] = m; titles[repo] = t; TRX = null;
       }).catch(function () { idx[repo] = {}; });
